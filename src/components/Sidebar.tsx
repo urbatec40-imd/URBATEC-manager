@@ -1,5 +1,6 @@
 import { Home, FolderOpen, Users, FileText, Wallet, Clock3, Scale, FlaskConical, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/uratec.svg";
 
 interface SidebarProps {
   current: string;
@@ -30,8 +31,8 @@ export function Sidebar({ current, onNavigate }: SidebarProps) {
   return (
     <aside className="app-sidebar flex h-full w-[248px] shrink-0 flex-col bg-[#0b1220] text-white">
       <div className="flex h-[82px] items-center border-b border-white/[0.06] px-5">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-blue-600 shadow-lg shadow-black/20">
-          <span className="text-[15px] font-black tracking-tight text-white">U</span>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-lg shadow-black/20">
+          <img src={logo} alt="URATEC" className="h-7 w-7 object-contain" />
         </div>
         <div className="ml-3">
           <div className="text-[15px] font-extrabold tracking-[0.04em]">URATEC</div>
