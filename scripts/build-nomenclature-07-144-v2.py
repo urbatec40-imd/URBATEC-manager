@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import json
 import re
-import subprocess
 import urllib.request
 from pathlib import Path
+
+from pypdf import PdfReader
 
 PDF_URL = "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.PDF"
 ROOT = Path(__file__).resolve().parents[1]
 TMP = ROOT / ".tmp-nomenclature"
 PDF = TMP / "07-144.pdf"
-TXT = TMP / "07-144-layout.txt"
 OUT = ROOT / "public" / "data" / "nomenclature-07-144.json"
 
 FAMILIES = {
@@ -71,77 +71,75 @@ def parse() -> None:
     TMP.mkdir(parents=True, exist_ok=True)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     urllib.request.urlretrieve(PDF_URL, PDF)
-    subprocess.run(["pdftotext", "-layout", "-enc", "UTF-8", str(PDF), str(TXT)], check=True)
-    lines = TXT.read_text(encoding="utf-8", errors="replace").splitlines()
 
+    reader = PdfReader(str(PDF))
     rows: list[dict] = []
     current: dict | None = None
-    page = 0
+    page_number = 0
 
-    for raw_line in lines:
-        line = normalize(raw_line)
-        if not line:
-            continue
-        if "JOURNAL OFFICIEL" in line:
-            nums = re.findall(r"\b(\d{1,3})\b", line)
-            if nums:
-                page = int(nums[-1])
-            continue
-        if line.startswith("ANNEXE") or line.startswith("Désignation de l’activité"):
-            continue
+    for page_number, page in enumerate(reader.pages, start=1):
+        text = page.extract_text() or ""
+        for raw_line in text.splitlines():
+            line = normalize(raw_line)
+            if not line:
+                continue
+            if "JOURNAL OFFICIEL" in line:
+                continue
+            if line.startswith("ANNEXE") or line.startswith("Désignation de l’activité"):
+                continue
 
-        m = CODE_WITH_TEXT.match(line)
-        if m:
-            close_current(rows, current)
-            code, first_text = m.groups()
-            family = code[:2] + "00"
-            current = {
-                "rubrique": code,
-                "famille": family,
-                "familleLabel": FAMILIES.get(family, "Installation classée"),
-                "designation": first_text,
-                "conditions": [],
-                "inputProfile": [],
-                "source": "Décret exécutif n° 07-144 du 19 mai 2007",
-                "sourceUrl": PDF_URL,
-                "sourcePage": page,
-                "_lines": [first_text],
-            }
-            continue
+            match = CODE_WITH_TEXT.match(line)
+            if match:
+                close_current(rows, current)
+                code, first_text = match.groups()
+                family = code[:2] + "00"
+                current = {
+                    "rubrique": code,
+                    "famille": family,
+                    "familleLabel": FAMILIES.get(family, "Installation classée"),
+                    "designation": first_text,
+                    "conditions": [],
+                    "inputProfile": [],
+                    "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+                    "sourceUrl": PDF_URL,
+                    "sourcePage": page_number,
+                    "_lines": [first_text],
+                }
+                continue
 
-        m = CODE_ONLY.match(line)
-        if m:
-            close_current(rows, current)
-            code = m.group(1)
-            family = code[:2] + "00"
-            current = {
-                "rubrique": code,
-                "famille": family,
-                "familleLabel": FAMILIES.get(family, "Installation classée"),
-                "designation": "",
-                "conditions": [],
-                "inputProfile": [],
-                "source": "Décret exécutif n° 07-144 du 19 mai 2007",
-                "sourceUrl": PDF_URL,
-                "sourcePage": page,
-                "_lines": [],
-            }
-            continue
+            match = CODE_ONLY.match(line)
+            if match:
+                close_current(rows, current)
+                code = match.group(1)
+                family = code[:2] + "00"
+                current = {
+                    "rubrique": code,
+                    "famille": family,
+                    "familleLabel": FAMILIES.get(family, "Installation classée"),
+                    "designation": "",
+                    "conditions": [],
+                    "inputProfile": [],
+                    "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+                    "sourceUrl": PDF_URL,
+                    "sourcePage": page_number,
+                    "_lines": [],
+                }
+                continue
 
-        if current is None:
-            continue
+            if current is None:
+                continue
 
-        rm = REGIME_RE.search(line)
-        if rm:
-            regime = rm.group(1)
-            left = line[:rm.start()].strip(" -:;")
-            right = line[rm.end():].strip()
-            if left:
-                current["conditions"].append({"texte": left, "regime": regime, "meta": right})
-            elif current["conditions"] and right:
-                current["conditions"][-1]["meta"] = right
-        else:
-            current["_lines"].append(line)
+            rm = REGIME_RE.search(line)
+            if rm:
+                regime = rm.group(1)
+                left = line[:rm.start()].strip(" -:;")
+                right = line[rm.end():].strip()
+                if left:
+                    current["conditions"].append({"texte": left, "regime": regime, "meta": right})
+                elif current["conditions"] and right:
+                    current["conditions"][-1]["meta"] = right
+            else:
+                current["_lines"].append(line)
 
     close_current(rows, current)
 
@@ -160,7 +158,7 @@ def parse() -> None:
         "families": [{"code": k, "label": v} for k, v in FAMILIES.items()],
         "rubriques": unique,
         "generated": True,
-        "generatorNote": "Extraction automatique du Journal Officiel. Les seuils et conditions doivent être vérifiés dans le texte officiel avant dépôt.",
+        "generatorNote": "Extraction automatique du Journal Officiel via pypdf. Les seuils et conditions doivent être vérifiés dans le texte officiel avant dépôt.",
     }
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Generated {len(unique)} rubrique records -> {OUT}")
