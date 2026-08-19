@@ -90,7 +90,7 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
   const direct = useMemo(() => directRubrique(query, dataset.rubriques), [query, dataset.rubriques]);
   const suggestions = useMemo(() => {
     if (selected || direct || query.trim().length < 2) return [];
-    return suggestActivities(index, query, 10);
+    return suggestActivities(index, query, 6);
   }, [selected, direct, index, query]);
 
   const cases = useMemo(() => {
@@ -114,12 +114,12 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
       <span className="text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Nomenclature 07-144</span>
     </div>
 
-    <div className="grid grid-cols-3 gap-2 text-xs"><Step n="1" title="Rubrique" active={!selected}/><Step n="2" title="Classement" active={!!selected && !selectedCase}/><Step n="3" title="Dossier réglementaire" active={!!selectedCase}/></div>
+    <div className="grid grid-cols-3 gap-2 text-xs"><Step n="1" title="Activité / Rubrique" active={!selected}/><Step n="2" title="Classement" active={!!selected && !selectedCase}/><Step n="3" title="Rapports nécessaires" active={!!selectedCase}/></div>
 
     {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <Field label="Type / désignation de l’activité" required><div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => { setQuery(e.target.value); setError(''); }} placeholder="Désignation de l’activité ou N° de rubrique (ex. 1240)" />{query && <button type="button" onClick={reset} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div></Field>
+      <Field label="Type / désignation de l’activité" required><div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => { setQuery(e.target.value); setError(''); }} placeholder="Désignation, mot-clé, abréviation ou N° de rubrique" />{query && <button type="button" onClick={reset} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div></Field>
       {direct && <div className="mt-4 border border-emerald-200 bg-emerald-50 rounded-lg p-4 flex items-center gap-3"><div className="flex-1"><div className="text-sm font-semibold">{direct.rubrique} — {shortDesignation(direct.designation)}</div></div><button type="button" onClick={() => accept(direct)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>}
-      {!direct && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-96 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-4 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div><button type="button" disabled={!r} onClick={() => r && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40"><Check size={14}/> Accepter</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
+      {!direct && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div><button type="button" disabled={!r} onClick={() => r && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40"><Check size={14}/> Accepter</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
     </div>}
 
     {selected && <>
@@ -140,7 +140,7 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
 
       {selectedCase && <>
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5"><div className="text-sm font-semibold text-emerald-800">Classement selon la Nomenclature 07-144</div><div className="text-2xl font-bold text-emerald-950 mt-1">{category(selectedCase.regime)} — {regimeLabel(selectedCase.regime)}</div><div className="grid md:grid-cols-4 gap-3 mt-4"><Result label="Rubrique" value={selectedCase.rubrique}/><Result label="Situation" value={rangeLabel(selectedCase)}/><Result label="Rayon d’affichage" value={selectedCase.rayon || '—'}/><Result label="Régime" value={selectedCase.regime}/></div></div>
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><FileText size={18} className="text-emerald-600"/><h2 className="font-semibold">التقارير اللازمة</h2></div>{documentsFor(selectedCase).length ? <div className="grid md:grid-cols-2 gap-3">{documentsFor(selectedCase).map(([name]) => <div key={name} className="rounded-lg border p-4 bg-emerald-50 border-emerald-200"><div className="text-xs font-semibold">مطلوب</div><div className="font-medium mt-1">{name}</div></div>)}</div> : <div className="text-sm text-gray-600">لا توجد تقارير محددة بعلامة X لهذه الحالة.</div>}</div>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><FileText size={18} className="text-emerald-600"/><h2 className="font-semibold">Rapports nécessaires</h2></div>{documentsFor(selectedCase).length ? <div className="grid md:grid-cols-2 gap-3">{documentsFor(selectedCase).map(([name]) => <div key={name} className="rounded-lg border p-4 bg-emerald-50 border-emerald-200"><div className="text-xs font-semibold">Requis</div><div className="font-medium mt-1">{name}</div></div>)}</div> : <div className="text-sm text-gray-600">Aucun rapport marqué X pour cette situation.</div>}</div>
       </>}
     </>}
 
