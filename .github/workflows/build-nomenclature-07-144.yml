@@ -20,8 +20,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install pdftotext
-        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - name: Install Python PDF reader
+        run: python3 -m pip install pypdf
 
       - name: Generate dataset from official PDF
         run: python3 scripts/build-nomenclature-07-144-v2.py
