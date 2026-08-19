@@ -1,0 +1,43 @@
+name: Build Nomenclature 07-144
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - bolt-latest-2026-08-19
+    paths:
+      - 'scripts/build-nomenclature-07-144.py'
+      - '.github/workflows/build-nomenclature-07-144.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pdftotext
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
+      - name: Generate dataset from official PDF
+        run: python3 scripts/build-nomenclature-07-144.py
+
+      - name: Publish dataset where the app reads it
+        run: |
+          mkdir -p public/data
+          cp src/data/nomenclature-07-144.json public/data/nomenclature-07-144.json
+
+      - name: Commit generated dataset
+        run: |
+          git config user.name "URATEC Bot"
+          git config user.email "urbatec40-imd@users.noreply.github.com"
+          git add public/data/nomenclature-07-144.json
+          if git diff --cached --quiet; then
+            echo "Dataset unchanged"
+          else
+            git commit -m "chore(environment): update generated 07-144 dataset"
+            git push
+          fi
