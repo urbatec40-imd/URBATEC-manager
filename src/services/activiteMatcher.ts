@@ -1,6 +1,6 @@
 import { ACTIVITY_TARGETS, NOMENCLATURE_OVERRIDES } from '@/data/environnementNomenclatureOverrides';
 
-export interface ActivityCandidate { rubrique: string; famille: string; familleLabel: string; designation: string; score: number; matchedTerms: string[]; source: string }
+export interface ActivityCandidate { rubrique: string; famille: string; familleLabel: string; designation: string; score: number; matchedTerms: string[]; source: string; selectable?: boolean }
 export interface ActivityRowLike { rubrique: string; famille: string; familleLabel: string; designation: string; source: string }
 
 const SYNONYMS: Record<string, string[]> = {
@@ -62,7 +62,7 @@ function referenceContexts(text: string): Array<{ context: string; rubrique: str
 export function buildActivityIndex<T extends ActivityRowLike>(rows: T[]) {
   const byRubrique = new Map<string, T>();
   for (const row of [...rows, ...NOMENCLATURE_OVERRIDES as T[]]) if (!byRubrique.has(row.rubrique)) byRubrique.set(row.rubrique, row);
-  return Array.from(byRubrique.values()).filter(row => row.designation?.trim()).map(row => ({ row, normalized: normalize(row.designation), tokens: new Set(tokens(row.designation)) }));
+  return Array.from(byRubrique.values()).filter(row => row.designation?.trim()).map(row => ({ row, normalized: normalize(row.designation), tokens: new Set(tokens(row.designation)), selectable: !/^\d{2}00$/.test(row.rubrique) }));
 }
 function resolveDeterministicTargets(query: string, queryTokens: string[]): string[] {
   const normalizedQuery = normalize(query);
@@ -75,7 +75,28 @@ function resolveDeterministicTargets(query: string, queryTokens: string[]): stri
   return Array.from(targets);
 }
 export function suggestActivities<T extends ActivityRowLike>(index: ReturnType<typeof buildActivityIndex<T>>, description: string, limit = 12): ActivityCandidate[] {
-  const query = normalize(description); const queryTokens = tokens(query); if (!queryTokens.length) return [];
+  const query = normalize(description);
+  const queryTokens = tokens(query);
+  if (!queryTokens.length) return [];
+
+  // Numeric prefix search is hierarchical: "2" -> all 2xxx rubriques, "21" -> 21xx, "211" -> 211x.
+  // Family headings such as 2100/2200 remain visible but are never selectable.
+  if (/^\d{1,3}$/.test(query)) {
+    const matches = index
+      .filter(item => item.row.rubrique.startsWith(query))
+      .map(item => ({
+        rubrique: item.row.rubrique,
+        famille: item.row.famille,
+        familleLabel: item.row.familleLabel,
+        designation: item.row.designation,
+        score: 10000 - item.row.rubrique.length,
+        matchedTerms: [query],
+        source: item.row.source,
+        selectable: item.selectable,
+      }));
+    return matches.sort((a, b) => a.rubrique.localeCompare(b.rubrique)).slice(0, Math.max(limit, matches.length));
+  }
+
   const rowsByRubrique = new Map(index.map(item => [item.row.rubrique, item.row] as const));
   const aggregate = new Map<string, ActivityCandidate>();
   const deterministicTargets = resolveDeterministicTargets(query, queryTokens);
@@ -84,7 +105,7 @@ export function suggestActivities<T extends ActivityRowLike>(index: ReturnType<t
     const s = scoreQuery(query, queryTokens, item.row.designation);
     if (s.value < 5) continue;
     const deterministicBoost = deterministicTargets.includes(item.row.rubrique) ? 400 : 0;
-    const candidate: ActivityCandidate = { rubrique: item.row.rubrique, famille: item.row.famille, familleLabel: item.row.familleLabel, designation: item.row.designation, score: s.value + deterministicBoost, matchedTerms: s.matched, source: item.row.source };
+    const candidate: ActivityCandidate = { rubrique: item.row.rubrique, famille: item.row.famille, familleLabel: item.row.familleLabel, designation: item.row.designation, score: s.value + deterministicBoost, matchedTerms: s.matched, source: item.row.source, selectable: item.selectable };
     const key = `${item.row.rubrique}|${item.row.designation}`;
     const old = aggregate.get(key); if (!old || candidate.score > old.score) aggregate.set(key, candidate);
   }
@@ -95,7 +116,8 @@ export function suggestActivities<T extends ActivityRowLike>(index: ReturnType<t
       if (s.value < 10) continue;
       const target = rowsByRubrique.get(ref.rubrique) ?? NOMENCLATURE_OVERRIDES.find(r => r.rubrique === ref.rubrique);
       if (!target) continue;
-      const candidate: ActivityCandidate = { rubrique: target.rubrique, famille: target.famille, familleLabel: target.familleLabel, designation: target.designation, score: s.value + (deterministicTargets.includes(ref.rubrique) ? 350 : 50), matchedTerms: s.matched, source: target.source };
+      const selectable = !/^\d{2}00$/.test(target.rubrique);
+      const candidate: ActivityCandidate = { rubrique: target.rubrique, famille: target.famille, familleLabel: target.familleLabel, designation: target.designation, score: s.value + (deterministicTargets.includes(ref.rubrique) ? 350 : 50), matchedTerms: s.matched, source: target.source, selectable };
       const key = `${target.rubrique}|${target.designation}`; const old = aggregate.get(key); if (!old || candidate.score > old.score) aggregate.set(key, candidate);
     }
   }
