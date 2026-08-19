@@ -9,6 +9,7 @@ on:
       - 'scripts/build-nomenclature-07-144.py'
       - 'scripts/build-nomenclature-07-144-v2.py'
       - 'scripts/build-nomenclature-07-144-v3.py'
+      - 'scripts/build-nomenclature-07-144-v4.py'
       - '.github/workflows/build-nomenclature-07-144.yml'
 
 permissions:
@@ -21,11 +22,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Python PDF reader
-        run: python3 -m pip install pypdf
+      - name: Install PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
 
       - name: Generate dataset from official PDF
-        run: python3 scripts/build-nomenclature-07-144-v3.py
+        run: python3 scripts/build-nomenclature-07-144-v4.py
 
       - name: Commit generated dataset
         run: |
@@ -35,6 +38,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Dataset unchanged"
           else
-            git commit -m "chore(environment): update clean 07-144 dataset"
+            git commit -m "chore(environment): update layout-preserved 07-144 dataset"
             git push
           fi
