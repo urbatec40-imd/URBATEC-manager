@@ -47,9 +47,9 @@ const PROFILES: Record<string, ClassificationProfile> = {
     classify: values => {
       const v = Number(values.volumeStockage);
       if (!Number.isFinite(v) || v < 0) return null;
-      if (v <= 5000) return { code: '2126-3', regime: 'PAPPC', categorie: '3e catégorie', seuil: 'Volume supérieur à 5 000 m³ non atteint : contrôle du sous-cas applicable' };
-      if (v <= 15000) return { code: '2126-2', regime: 'AW', categorie: '2e catégorie', seuil: 'Volume supérieur à 5 000 m³ et inférieur ou égal à 15 000 m³', rayon: '2 km' };
-      return { code: '2126-1', regime: 'AM', categorie: '1re catégorie', seuil: 'Volume supérieur à 15 000 m³', rayon: '3 km' };
+      if (v > 15000) return { code: '2126-1', regime: 'AM', categorie: '1re catégorie', seuil: 'Volume supérieur à 15 000 m³', rayon: '3 km' };
+      if (v > 5000) return { code: '2126-2', regime: 'AW', categorie: '2e catégorie', seuil: 'Volume supérieur à 5 000 m³ et inférieur ou égal à 15 000 m³', rayon: '2 km' };
+      return null;
     },
   },
   '2724': {
