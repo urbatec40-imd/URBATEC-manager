@@ -4,7 +4,7 @@ import { Field, inputCls } from '@/components/Field';
 import { buildActivityIndex, suggestActivities, type ActivityCandidate } from '@/services/activiteMatcher';
 import { extractRequirementHints, getClassificationProfile, type ClassificationField, type ClassificationResult } from '@/services/environnementClassification';
 
-interface ProfileField { key: string; label: string; type: string; unit: string; required?: boolean; options?: string[] }
+interface ProfileField { key: string; label: string; type: string; unit: string; required?: boolean; options?: string[]; helper?: string }
 interface Condition { condition?: string; texte?: string; regime: string; meta?: string }
 interface Row { rubrique: string; famille: string; familleLabel: string; designation: string; conditions?: Condition[]; inputProfile?: ProfileField[]; source: string; sourceUrl: string }
 interface Dataset { version: string; date: string; sourceUrl: string; rubriques: Row[]; generated?: boolean }
@@ -21,7 +21,7 @@ function conditionText(row: Row) {
 }
 
 function fieldsFor(row: Row): ClassificationField[] {
-  if (row.inputProfile?.length) return row.inputProfile.map(f => ({ key: f.key, label: f.label, unit: f.unit, type: f.type === 'number' ? 'number' : 'text', required: f.required }));
+  if (row.inputProfile?.length) return row.inputProfile.map(f => ({ key: f.key, label: f.label, unit: f.unit, type: f.type === 'number' ? 'number' : 'text', required: f.required, helper: f.helper }));
   return getClassificationProfile(row.rubrique, conditionText(row), row.conditions)?.fields ?? [];
 }
 
