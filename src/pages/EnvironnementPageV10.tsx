@@ -68,7 +68,7 @@ function documentsFor(row: DecisionRow) {
 }
 function directRubrique(query: string, rows: Row[]) {
   const code = norm(query);
-  if (!/^[12]\d{3}$/.test(code)) return null;
+  if (!/^[12]\d{3}$/.test(code) || code.endsWith('00')) return null;
   return rows.find(r => r.rubrique === code) ?? null;
 }
 
@@ -88,10 +88,15 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
 
   const index = useMemo(() => buildActivityIndex(dataset.rubriques), [dataset.rubriques]);
   const direct = useMemo(() => directRubrique(query, dataset.rubriques), [query, dataset.rubriques]);
+  const numericPrefix = useMemo(() => {
+    const q = norm(query);
+    if (!/^\d{2,4}$/.test(q) || q.endsWith('00') || direct) return [] as Row[];
+    return dataset.rubriques.filter(r => !r.rubrique.endsWith('00') && r.rubrique.startsWith(q)).slice(0, 6);
+  }, [query, dataset.rubriques, direct]);
   const suggestions = useMemo(() => {
-    if (selected || direct || query.trim().length < 2) return [];
+    if (selected || direct || numericPrefix.length || query.trim().length < 2) return [];
     return suggestActivities(index, query, 6);
-  }, [selected, direct, index, query]);
+  }, [selected, direct, numericPrefix.length, index, query]);
 
   const cases = useMemo(() => {
     if (!selected) return [];
@@ -101,12 +106,8 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
   const firstCriterion = cases[0]?.criterion ?? '';
   const firstUnit = cases[0]?.unit ?? '';
 
-  function reset() {
-    setQuery(''); setSelected(null); setSelectedCase(null); setError('');
-  }
-  function accept(r: Row) {
-    setSelected(r); setSelectedCase(null); setError('');
-  }
+  function reset() { setQuery(''); setSelected(null); setSelectedCase(null); setError(''); }
+  function accept(r: Row) { setSelected(r); setSelectedCase(null); setError(''); }
 
   return <div className="space-y-6">
     <div className="flex items-center justify-between gap-3">
@@ -118,8 +119,9 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
 
     {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
       <Field label="Type / désignation de l’activité" required><div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => { setQuery(e.target.value); setError(''); }} placeholder="Désignation, mot-clé, abréviation ou N° de rubrique" />{query && <button type="button" onClick={reset} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div></Field>
-      {direct && <div className="mt-4 border border-emerald-200 bg-emerald-50 rounded-lg p-4 flex items-center gap-3"><div className="flex-1"><div className="text-sm font-semibold">{direct.rubrique} — {shortDesignation(direct.designation)}</div></div><button type="button" onClick={() => accept(direct)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>}
-      {!direct && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div><button type="button" disabled={!r} onClick={() => r && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40"><Check size={14}/> Accepter</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
+      {direct && <ResultCard row={direct} onAccept={() => accept(direct)} />}
+      {!direct && numericPrefix.length > 0 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités</div><div className="border rounded-lg divide-y">{numericPrefix.map(r => <ResultCard key={r.rubrique} row={r} onAccept={() => accept(r)} compact />)}</div></div>}
+      {!direct && numericPrefix.length === 0 && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div><button type="button" disabled={!r} onClick={() => r && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40"><Check size={14}/> Accepter</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
     </div>}
 
     {selected && <>
@@ -129,12 +131,7 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
         <div className="flex items-center gap-2 mb-4"><h2 className="font-semibold">Données nécessaires au classement</h2></div>
         {hasCases ? <>
           <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 mb-4"><div className="text-sm font-semibold">{firstCriterion || 'Situation de classement'}</div>{firstUnit && <div className="text-xs text-gray-500 mt-1">Unité : {firstUnit}</div>}</div>
-          <Field label="Choisir la situation / l’intervalle" required>
-            <select className={inputCls} value={selectedCase ? String(cases.indexOf(selectedCase)) : ''} onChange={e => { const item = cases[Number(e.target.value)]; setSelectedCase(item ?? null); setError(''); }}>
-              <option value="">Sélectionnez la situation prévue par la Nomenclature</option>
-              {cases.map((c, i) => <option key={`${c.rubrique}-${i}`} value={String(i)}>{rangeLabel(c)}</option>)}
-            </select>
-          </Field>
+          <Field label="Choisir la situation / l’intervalle" required><select className={inputCls} value={selectedCase ? String(cases.indexOf(selectedCase)) : ''} onChange={e => { const item = cases[Number(e.target.value)]; setSelectedCase(item ?? null); setError(''); }}><option value="">Sélectionnez la situation prévue par la Nomenclature</option>{cases.map((c, i) => <option key={`${c.rubrique}-${i}`} value={String(i)}>{rangeLabel(c)}</option>)}</select></Field>
         </> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">Aucune situation structurée n’est disponible dans les données de cette Rubrique.</div>}
       </div>
 
@@ -143,9 +140,9 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><FileText size={18} className="text-emerald-600"/><h2 className="font-semibold">Rapports nécessaires</h2></div>{documentsFor(selectedCase).length ? <div className="grid md:grid-cols-2 gap-3">{documentsFor(selectedCase).map(([name]) => <div key={name} className="rounded-lg border p-4 bg-emerald-50 border-emerald-200"><div className="text-xs font-semibold">Requis</div><div className="font-medium mt-1">{name}</div></div>)}</div> : <div className="text-sm text-gray-600">Aucun rapport marqué X pour cette situation.</div>}</div>
       </>}
     </>}
-
     {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
   </div>;
 }
+function ResultCard({ row, onAccept, compact = false }: { row: Row; onAccept: () => void; compact?: boolean }) { return <div className={`${compact ? '' : 'mt-4 '}border border-emerald-200 bg-emerald-50 rounded-lg p-3 flex items-center gap-3`}><div className="flex-1"><div className="text-sm font-semibold">{row.rubrique} — {shortDesignation(row.designation)}</div></div><button type="button" onClick={onAccept} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>; }
 function Step({ n, title, active }: { n: string; title: string; active: boolean }) { return <div className={`rounded-lg border p-2 text-center ${active ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-gray-200 bg-gray-50 text-gray-500'}`}>{n}. {title}</div>; }
 function Result({ label, value }: { label: string; value: string }) { return <div className="rounded-lg border border-emerald-100 bg-white/70 p-3"><div className="text-xs text-emerald-700">{label}</div><div className="font-semibold mt-1">{value}</div></div>; }
