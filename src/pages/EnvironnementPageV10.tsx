@@ -79,12 +79,17 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
   const [selected, setSelected] = useState<Row | null>(null);
   const [selectedCase, setSelectedCase] = useState<DecisionRow | null>(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/data/nomenclature-07-144.json')
+    let alive = true;
+    setLoading(true);
+    fetch('/data/nomenclature-07-144.json', { cache: 'no-store' })
       .then(async r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return await r.json() as Dataset; })
-      .then(d => setDataset({ ...d, rubriques: (d.rubriques ?? []).map(r => ({ ...r, designation: clean(r.designation), familleLabel: clean(r.familleLabel), decisionRows: r.decisionRows ?? [] })) }))
-      .catch(e => setError((e as Error).message));
+      .then(d => { if (alive) setDataset({ ...d, rubriques: (d.rubriques ?? []).map(r => ({ ...r, designation: clean(r.designation), familleLabel: clean(r.familleLabel), decisionRows: r.decisionRows ?? [] })) }); })
+      .catch(e => { if (alive) setError((e as Error).message); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
   }, []);
 
   const index = useMemo(() => buildActivityIndex(dataset.rubriques), [dataset.rubriques]);
@@ -92,9 +97,7 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
   const numericPrefix = useMemo(() => {
     const q = norm(query);
     if (!/^\d{1,4}$/.test(q) || direct) return [] as Row[];
-    return dataset.rubriques
-      .filter(r => r.rubrique.startsWith(q))
-      .sort((a, b) => a.rubrique.localeCompare(b.rubrique));
+    return dataset.rubriques.filter(r => r.rubrique.startsWith(q)).sort((a, b) => a.rubrique.localeCompare(b.rubrique));
   }, [query, dataset.rubriques, direct]);
   const suggestions = useMemo(() => {
     if (selected || direct || numericPrefix.length || query.trim().length < 2) return [];
@@ -122,9 +125,11 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
 
     {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
       <Field label="Type / désignation de l’activité" required><div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => { setQuery(e.target.value); setError(''); }} placeholder="Désignation, mot-clé, abréviation ou N° de rubrique" />{query && <button type="button" onClick={reset} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div></Field>
-      {direct && <ResultCard row={direct} onAccept={() => accept(direct)} />}
-      {!direct && numericPrefix.length > 0 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités</div><div className="border rounded-lg divide-y max-h-[32rem] overflow-y-auto">{numericPrefix.map(r => <ResultCard key={r.rubrique} row={r} onAccept={() => accept(r)} compact />)}</div></div>}
-      {!direct && numericPrefix.length === 0 && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div><button type="button" disabled={!r || c.selectable === false} onClick={() => r && c.selectable !== false && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40">{c.selectable === false ? 'Rubrique' : <><Check size={14}/> Accepter</>}</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
+      {loading && <div className="mt-4 rounded-lg bg-slate-50 border border-slate-200 p-3 text-sm text-slate-600">Chargement de la Nomenclature 07-144…</div>}
+      {!loading && direct && <ResultCard row={direct} onAccept={() => accept(direct)} />}
+      {!loading && !direct && numericPrefix.length > 0 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités</div><div className="border rounded-lg divide-y max-h-[32rem] overflow-y-auto">{numericPrefix.map(r => <ResultCard key={r.rubrique} row={r} onAccept={() => accept(r)} compact />)}</div></div>}
+      {!loading && !direct && numericPrefix.length === 0 && /^\d{1,4}$/.test(norm(query)) && query.trim().length > 0 && <div className="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune Rubrique correspondant à « {query} ».</div>}
+      {!loading && !direct && numericPrefix.length === 0 && !/^\d{1,4}$/.test(norm(query)) && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div><button type="button" disabled={!r} onClick={() => r && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40"><Check size={14}/> Accepter</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
     </div>}
 
     {selected && <>
