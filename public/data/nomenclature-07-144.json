@@ -1,29 +1,86 @@
 {
-  "version":"07-144",
-  "date":"19 mai 2007",
-  "sourceUrl":"https://www.me.gov.dz/wp-content/uploads/2022/05/Decret-executif-07-144.pdf",
-  "familles":[
-    {"code":"1000","label":"Substances"},{"code":"1100","label":"Très toxiques"},{"code":"1200","label":"Toxiques"},{"code":"1300","label":"Comburantes"},{"code":"1400","label":"Explosibles"},{"code":"1500","label":"Inflammables"},{"code":"1600","label":"Combustibles"},{"code":"1700","label":"Corrosives"},{"code":"1800","label":"Divers"},{"code":"2000","label":"Activité"},{"code":"2100","label":"Élevage d’animaux & Activité agricole"},{"code":"2200","label":"Agro alimentaires"},{"code":"2300","label":"Textiles, Cuirs et Peaux"},{"code":"2400","label":"Bois- papier- carton- imprimerie"},{"code":"2500","label":"Matériaux, minerais et métaux"},{"code":"2600","label":"Chimie, Caoutchouc"},{"code":"2700","label":"Déchets et traitements des eaux"},{"code":"2800","label":"Aquaculture et Pêche"},{"code":"2900","label":"Divers"}
-  ],
-  "rubriques":[
+  "version": "07-144",
+  "date": "19 mai 2007",
+  "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.PDF",
+  "families": [
     {
-      "rubrique":"2119","code":"2119-1/2/3","famille":"2100","familleLabel":"Élevage d’animaux & Activité agricole","designation":"Ovins, Caprins (Elevage, vente, transit etc..., de)",
-      "conditions":[{"condition":"Plus de 1000 animaux","regime":"AW"},{"condition":"De 250 à 1000 animaux","regime":"APAPC"},{"condition":"Moins de 250 animaux","regime":"D"}],
-      "inputProfile":[{"key":"typeElevage","label":"Type d’élevage","type":"text","unit":"","required":true},{"key":"nombreAnimaux","label":"Nombre d’animaux","type":"number","unit":"sujets","required":true}],
-      "source":"Décret exécutif n° 07-144 du 19 mai 2007 — rubrique 2119","sourceUrl":"https://www.me.gov.dz/wp-content/uploads/2022/05/Decret-executif-07-144.pdf"
+      "code": "1000",
+      "label": "Substances"
     },
     {
-      "rubrique":"2121","code":"2121-1/2/3","famille":"2100","familleLabel":"Élevage d’animaux & Activité agricole","designation":"Volailles, gibier à plume (élevage, vente, etc...)",
-      "conditions":[{"condition":"Plus de 20 000 animaux-équivalents","regime":"AW"},{"condition":"De 5 000 à 20 000 animaux-équivalents","regime":"APAPC"},{"condition":"Moins de 5 000 animaux-équivalents","regime":"D"}],
-      "inputProfile":[{"key":"typeElevage","label":"Type d’élevage","type":"text","unit":"","required":true},{"key":"nombreAnimaux","label":"Nombre d’animaux","type":"number","unit":"sujets","required":true},{"key":"facteurEquivalent","label":"Facteur animal-équivalent","type":"number","unit":"AE","required":true}],
-      "source":"Décret exécutif n° 07-144 du 19 mai 2007 — rubrique 2121","sourceUrl":"https://www.me.gov.dz/wp-content/uploads/2022/05/Decret-executif-07-144.pdf"
+      "code": "1100",
+      "label": "Très toxiques"
     },
     {
-      "rubrique":"2724","code":"2724-1/2/3","famille":"2700","familleLabel":"Déchets et traitements des eaux","designation":"Station de dessalement d’eau de mer",
-      "conditions":[{"condition":"Supérieure ou égale à 100 000 m³/j","regime":"AM"},{"condition":"Inférieure à 100 000 m³/j mais supérieure à 50 000 m³/j","regime":"AW"},{"condition":"Inférieure à 50 000 m³/j","regime":"APAPC"}],
-      "inputProfile":[{"key":"capaciteTraitement","label":"Capacité de traitement","type":"number","unit":"m³/j","required":true}],
-      "source":"Décret exécutif n° 07-144 du 19 mai 2007 — rubrique 2724","sourceUrl":"https://www.me.gov.dz/wp-content/uploads/2022/05/Decret-executif-07-144.pdf"
+      "code": "1200",
+      "label": "Toxiques"
+    },
+    {
+      "code": "1300",
+      "label": "Comburantes"
+    },
+    {
+      "code": "1400",
+      "label": "Explosibles"
+    },
+    {
+      "code": "1500",
+      "label": "Inflammables"
+    },
+    {
+      "code": "1600",
+      "label": "Combustibles"
+    },
+    {
+      "code": "1700",
+      "label": "Corrosives"
+    },
+    {
+      "code": "1800",
+      "label": "Divers"
+    },
+    {
+      "code": "2000",
+      "label": "Activité"
+    },
+    {
+      "code": "2100",
+      "label": "Élevage d’animaux & Activité agricole"
+    },
+    {
+      "code": "2200",
+      "label": "Agro alimentaires"
+    },
+    {
+      "code": "2300",
+      "label": "Textiles, Cuirs et Peaux"
+    },
+    {
+      "code": "2400",
+      "label": "Bois- papier- carton- imprimerie"
+    },
+    {
+      "code": "2500",
+      "label": "Matériaux, minerais et métaux"
+    },
+    {
+      "code": "2600",
+      "label": "Chimie, Caoutchouc"
+    },
+    {
+      "code": "2700",
+      "label": "Déchets et traitements des eaux"
+    },
+    {
+      "code": "2800",
+      "label": "Aquaculture et Pêche"
+    },
+    {
+      "code": "2900",
+      "label": "Divers"
     }
   ],
-  "generated":false
+  "rubriques": [],
+  "generated": true,
+  "generatorNote": "Extracted from the official Journal Officiel PDF. Threshold logic must be validated per rubrique; the generator does not invent legal thresholds."
 }
