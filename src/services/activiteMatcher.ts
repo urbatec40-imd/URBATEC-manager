@@ -76,54 +76,35 @@ function resolveDeterministicTargets(query: string, queryTokens: string[]): stri
 }
 
 export function suggestActivities<T extends ActivityRowLike>(index: ReturnType<typeof buildActivityIndex<T>>, description: string, limit = 12): ActivityCandidate[] {
-  const query = normalize(description); const queryTokens = tokens(query); if (!queryTokens.length) return [];
+  const query = normalize(description); const queryTokens = tokens(query); if (queryTokens.length < 1) return [];
   const rowsByRubrique = new Map(index.map(item => [item.row.rubrique, item.row] as const));
   const aggregate = new Map<string, ActivityCandidate>();
   const deterministicTargets = resolveDeterministicTargets(query, queryTokens);
 
-  // 1) Deterministic legal aliases are authoritative when available.
+  // Authoritative aliases always win and suppress unrelated fuzzy results.
   for (const rubrique of deterministicTargets) {
     const row = rowsByRubrique.get(rubrique);
     if (!row) continue;
-    aggregate.set(`${rubrique}|${row.designation}`, {
-      rubrique,
-      famille: row.famille,
-      familleLabel: row.familleLabel,
-      designation: row.designation,
-      score: 100,
-      matchedTerms: queryTokens,
-      source: row.source,
-    });
+    aggregate.set(`${rubrique}|${row.designation}`, { rubrique, famille: row.famille, familleLabel: row.familleLabel, designation: row.designation, score: 100, matchedTerms: queryTokens, source: row.source });
   }
 
-  // 2) Cross-reference phrases from the extracted Nomenclature can reinforce or resolve a target.
+  // Follow legal cross-references only when they match the requested activity.
   for (const item of index) {
     for (const ref of referenceContexts(item.row.designation)) {
       const s = score(queryTokens, ref.context);
       if (s.value <= 0) continue;
       if (deterministicTargets.length > 0 && !deterministicTargets.includes(ref.rubrique)) continue;
-
       const target = rowsByRubrique.get(ref.rubrique) ?? NOMENCLATURE_OVERRIDES.find(r => r.rubrique === ref.rubrique);
       if (!target) continue;
-      const candidate: ActivityCandidate = {
-        rubrique: target.rubrique,
-        famille: target.famille,
-        familleLabel: target.familleLabel,
-        designation: target.designation,
-        score: (deterministicTargets.includes(ref.rubrique) ? 105 : 80) + s.value,
-        matchedTerms: s.matched,
-        source: target.source,
-      };
-      const key = `${target.rubrique}|${target.designation}`;
-      const old = aggregate.get(key);
-      if (!old || candidate.score > old.score) aggregate.set(key, candidate);
+      const candidate: ActivityCandidate = { rubrique: target.rubrique, famille: target.famille, familleLabel: target.familleLabel, designation: target.designation, score: (deterministicTargets.includes(ref.rubrique) ? 105 : 80) + s.value, matchedTerms: s.matched, source: target.source };
+      const key = `${target.rubrique}|${target.designation}`; const old = aggregate.get(key); if (!old || candidate.score > old.score) aggregate.set(key, candidate);
     }
   }
 
-  // 3) Only use fuzzy matching when no authoritative target was found.
+  // Fuzzy matching is only a fallback and must have a meaningful score.
   if (deterministicTargets.length === 0) {
     for (const item of index) {
-      const s = score(queryTokens, item.row.designation); if (s.value <= 0) continue;
+      const s = score(queryTokens, item.row.designation); if (s.value < 3) continue;
       const exact = item.normalized.includes(query) ? 8 : 0;
       const candidate: ActivityCandidate = { rubrique: item.row.rubrique, famille: item.row.famille, familleLabel: item.row.familleLabel, designation: item.row.designation, score: s.value + exact, matchedTerms: s.matched, source: item.row.source };
       const key = `${item.row.rubrique}|${item.row.designation}`; const old = aggregate.get(key); if (!old || candidate.score > old.score) aggregate.set(key, candidate);
