@@ -1,8 +1,8 @@
 {
   "version": "07-144",
   "date": "19 mai 2007",
-  "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.PDF",
-  "families": [
+  "sourceUrl": "https://creg.gov.dz/T%C3%A9l%C3%A9charger/487/autorisation-dexploitation-de-letablissement-classe/13053/decret-executif-n07-144-du-19-mai-2007.pdf",
+  "familles": [
     {
       "code": "1000",
       "label": "Substances"
@@ -57,7 +57,7 @@
     },
     {
       "code": "2400",
-      "label": "Bois- papier- carton- imprimerie"
+      "label": "Bois, papier, carton, imprimerie"
     },
     {
       "code": "2500",
@@ -81,6 +81,8 @@
     }
   ],
   "rubriques": [],
-  "generated": true,
-  "generatorNote": "Extracted from the official Journal Officiel PDF. Threshold logic must be validated per rubrique; the generator does not invent legal thresholds."
+  "parser": {
+    "generatedBy": "URATEC Manager",
+    "warning": "Les conditions extraites automatiquement doivent être vérifiées dans le texte officiel avant dépôt d’un dossier administratif."
+  }
 }
