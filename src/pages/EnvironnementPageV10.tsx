@@ -71,6 +71,7 @@ function directRubrique(query: string, rows: Row[]) {
   if (!/^[12]\d{3}$/.test(code) || code.endsWith('00')) return null;
   return rows.find(r => r.rubrique === code) ?? null;
 }
+function isFamilyRow(row: Row) { return /^\d{2}00$/.test(row.rubrique); }
 
 export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { clientName: string; dossierNumero?: string; onBack: () => void }) {
   const [dataset, setDataset] = useState<Dataset>(EMPTY);
@@ -90,8 +91,10 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
   const direct = useMemo(() => directRubrique(query, dataset.rubriques), [query, dataset.rubriques]);
   const numericPrefix = useMemo(() => {
     const q = norm(query);
-    if (!/^\d{2,4}$/.test(q) || q.endsWith('00') || direct) return [] as Row[];
-    return dataset.rubriques.filter(r => !r.rubrique.endsWith('00') && r.rubrique.startsWith(q)).slice(0, 6);
+    if (!/^\d{1,4}$/.test(q) || direct) return [] as Row[];
+    return dataset.rubriques
+      .filter(r => r.rubrique.startsWith(q))
+      .sort((a, b) => a.rubrique.localeCompare(b.rubrique));
   }, [query, dataset.rubriques, direct]);
   const suggestions = useMemo(() => {
     if (selected || direct || numericPrefix.length || query.trim().length < 2) return [];
@@ -107,7 +110,7 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
   const firstUnit = cases[0]?.unit ?? '';
 
   function reset() { setQuery(''); setSelected(null); setSelectedCase(null); setError(''); }
-  function accept(r: Row) { setSelected(r); setSelectedCase(null); setError(''); }
+  function accept(r: Row) { if (isFamilyRow(r)) return; setSelected(r); setSelectedCase(null); setError(''); }
 
   return <div className="space-y-6">
     <div className="flex items-center justify-between gap-3">
@@ -120,8 +123,8 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
     {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
       <Field label="Type / désignation de l’activité" required><div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => { setQuery(e.target.value); setError(''); }} placeholder="Désignation, mot-clé, abréviation ou N° de rubrique" />{query && <button type="button" onClick={reset} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div></Field>
       {direct && <ResultCard row={direct} onAccept={() => accept(direct)} />}
-      {!direct && numericPrefix.length > 0 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités</div><div className="border rounded-lg divide-y">{numericPrefix.map(r => <ResultCard key={r.rubrique} row={r} onAccept={() => accept(r)} compact />)}</div></div>}
-      {!direct && numericPrefix.length === 0 && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div><button type="button" disabled={!r} onClick={() => r && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40"><Check size={14}/> Accepter</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
+      {!direct && numericPrefix.length > 0 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités</div><div className="border rounded-lg divide-y max-h-[32rem] overflow-y-auto">{numericPrefix.map(r => <ResultCard key={r.rubrique} row={r} onAccept={() => accept(r)} compact />)}</div></div>}
+      {!direct && numericPrefix.length === 0 && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div><button type="button" disabled={!r || c.selectable === false} onClick={() => r && c.selectable !== false && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40">{c.selectable === false ? 'Rubrique' : <><Check size={14}/> Accepter</>}</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
     </div>}
 
     {selected && <>
@@ -143,6 +146,9 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
     {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
   </div>;
 }
-function ResultCard({ row, onAccept, compact = false }: { row: Row; onAccept: () => void; compact?: boolean }) { return <div className={`${compact ? '' : 'mt-4 '}border border-emerald-200 bg-emerald-50 rounded-lg p-3 flex items-center gap-3`}><div className="flex-1"><div className="text-sm font-semibold">{row.rubrique} — {shortDesignation(row.designation)}</div></div><button type="button" onClick={onAccept} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>; }
+function ResultCard({ row, onAccept, compact = false }: { row: Row; onAccept: () => void; compact?: boolean }) {
+  const family = isFamilyRow(row);
+  return <div className={`${compact ? '' : 'mt-4 '}border border-emerald-200 bg-emerald-50 rounded-lg p-3 flex items-center gap-3`}><div className="flex-1"><div className="text-sm font-semibold">{row.rubrique} — {shortDesignation(row.designation)}</div>{family && <div className="text-xs text-gray-500 mt-1">Titre / section</div>}</div>{family ? <span className="text-xs font-semibold text-gray-500 px-2 py-1">Non sélectionnable</span> : <button type="button" onClick={onAccept} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button>}</div>;
+}
 function Step({ n, title, active }: { n: string; title: string; active: boolean }) { return <div className={`rounded-lg border p-2 text-center ${active ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-gray-200 bg-gray-50 text-gray-500'}`}>{n}. {title}</div>; }
 function Result({ label, value }: { label: string; value: string }) { return <div className="rounded-lg border border-emerald-100 bg-white/70 p-3"><div className="text-xs text-emerald-700">{label}</div><div className="font-semibold mt-1">{value}</div></div>; }
