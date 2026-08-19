@@ -23,17 +23,24 @@ FAMILIES = {
     "2500": "Matériaux, minerais et métaux", "2600": "Chimie, Caoutchouc", "2700": "Déchets et traitements des eaux",
     "2800": "Aquaculture et Pêche", "2900": "Divers",
 }
-REGIMES = {"AM", "AW", "APAPC", "D"}
-REGIME_RE = re.compile(r"(?<![A-Z])(AM|AW|APAPC|D)(?![A-Z])")
+REGIME_RE = re.compile(r"(?<![A-Z])(APAPC|AM|AW|D)(?![A-Z])", re.I)
 RUBRIQUE_RE = re.compile(r"^\s*(1\d{3}|2\d{3})(?:\s+|$)")
 NUMBER = r"[0-9]+(?:[.,][0-9]+)?"
+DOC_KEYS = ("impact", "danger", "notice", "rapportDangereux")
+DOC_LABELS = {
+    "impact": ("étude d’impact", "etude d’impact", "etude d'impact"),
+    "danger": ("étude de dangers", "etude de dangers"),
+    "notice": ("notice d’impact", "notice d’impact", "notice d'impact"),
+    "rapportDangereux": ("rapport sur les produits dangereux", "rapport produits dangereux"),
+}
 
 
 def clean(text: str) -> str:
     replacements = {
         "È": "é", "Ë": "ê", "Í": "î", "Î": "î", "Ú": "û", "˚": "°", "‡": "à",
         "Ã©": "é", "Ã¨": "è", "Ãª": "ê", "Ã®": "î", "Ã´": "ô", "Ã¹": "ù", "Ã§": "ç",
-        "â€™": "’", "â€“": "–", "Â": "",
+        "Ã‰": "É", "Ã€": "À", "Ã‚": "Â", "Ã”": "Ô", "Ã›": "Û",
+        "â€™": "’", "â€“": "–", "â€œ": "“", "â€": "”", "Â": "",
     }
     for a, b in replacements.items():
         text = text.replace(a, b)
@@ -57,8 +64,10 @@ def infer_unit(text: str) -> str:
         (r"\bkw\b", "kW"), (r"\bkva\b", "kVA"), (r"\bmw\b", "MW"),
         (r"litres?\s*/\s*j|l\s*/\s*j", "L/j"),
         (r"\bkg\b|kilogrammes?\b", "kg"), (r"\btonnes?\b|\bt\b", "t"),
-        (r"m\s*3|m\s*³|mètres? cubes?", "m³"), (r"\bm2\b|m\s*²|mètres? carrés?", "m²"),
+        (r"m\s*3|m\s*³|mètres? cubes?", "m³"),
+        (r"\bm2\b|m\s*²|mètres? carrés?", "m²"),
         (r"\bbar\b", "bar"), (r"\bpa\b", "Pa"), (r"°c|celsius", "°C"),
+        (r"volts?", "V"), (r"ampères?", "A"),
     ]
     for pattern, unit in rules:
         if re.search(pattern, t, re.I):
@@ -98,30 +107,6 @@ def parse_bounds(text: str):
     return None
 
 
-def decode_row(line: str):
-    s = clean(line)
-    m = REGIME_RE.search(s)
-    if not m:
-        return None
-    left, right = clean(s[:m.start()]), clean(s[m.end():])
-    if not left:
-        return None
-    nums = re.findall(NUMBER, right)
-    rayon = nums[0] if nums else ""
-    after_rayon = right[right.find(nums[0]) + len(nums[0]):] if nums else right
-    compact = re.findall(r"[x×]|[^\s]+", after_rayon)
-    last4 = compact[-4:] if len(compact) >= 4 else []
-    docs = {"impact": False, "danger": False, "notice": False, "rapportDangereux": False}
-    if last4:
-        docs = {
-            "impact": last4[0].lower() in {"x", "×"},
-            "danger": last4[1].lower() in {"x", "×"},
-            "notice": last4[2].lower() in {"x", "×"},
-            "rapportDangereux": last4[3].lower() in {"x", "×"},
-        }
-    return m.group(1), left, rayon, docs
-
-
 def looks_like_group(text: str) -> bool:
     t = clean(text).lower()
     return bool(
@@ -134,109 +119,211 @@ def looks_like_group(text: str) -> bool:
 def looks_like_non_designation(text: str) -> bool:
     t = clean(text).lower()
     starters = (
-        "voir ", "visé", "vises ", "à l’exclusion", "a l'exclusion", "la quantité",
-        "le nombre", "la capacité", "la puissance", "la surface", "le volume",
-        "1.", "2.", "3.", "4.", "cas ",
+        "voir ", "visé", "vises ", "visés ", "à l’exclusion", "a l'exclusion",
+        "la quantité", "le nombre", "la capacité", "la puissance", "la surface",
+        "le volume", "contenant ", "contennant ", "supérieure", "inférieure",
+        "plus de ", "moins de ", "1.", "2.", "3.", "4.", "cas ",
     )
-    return t.startswith(starters) or t.startswith("condition") or re.match(r"^\d+[.)]\s+", t) is not None
-
-
-def looks_like_condition_continuation(text: str) -> bool:
-    """Identify wrapped legal situation text that continues on the next PDF line."""
-    t = clean(text).lower()
-    starters = (
-        "contenant ", "contennant ", "si l", "l'établissement", "l’etablissement", "l’établissement",
-        "étant ", "etant ", "situé ", "situe ", "située ", "situee ", "à une distance", "a une distance",
-        "d'une distance", "d’une distance", "distance ", "autorisé ", "autorise ", "destiné ", "destine ",
-        "pour ", "dans ", "lorsque ", "lorsqu", "pour lequel", "pour laquelle", "dont ", "avec ",
+    return (
+        t.startswith(starters)
+        or t.startswith("condition")
+        or "visés par d'autres rubriques" in t
+        or "visés par d’autres rubriques" in t
+        or re.match(r"^\d+[.)]\s+", t) is not None
     )
-    return t.startswith(starters) or (len(t) > 25 and not looks_like_group(t) and not looks_like_non_designation(t))
 
 
-def download_pdf() -> None:
-    TMP.mkdir(parents=True, exist_ok=True)
-    if PDF.exists() and PDF.stat().st_size > 100_000:
-        return
-    last_error = None
-    for url in PDF_URLS:
-        try:
-            urllib.request.urlretrieve(url, PDF)
-            if PDF.stat().st_size > 100_000:
-                return
-        except Exception as exc:
-            last_error = exc
-    raise SystemExit(f"Impossible de télécharger le PDF officiel : {last_error}")
+def is_family(code: str) -> bool:
+    return code.endswith("00")
 
 
-def extract() -> list[dict]:
-    rows = []
-    current_code = None
-    current_group = ""
-    pending_condition = []
+def table_settings() -> list[dict]:
+    return [
+        {
+            "vertical_strategy": "lines",
+            "horizontal_strategy": "lines",
+            "snap_tolerance": 3,
+            "join_tolerance": 3,
+            "edge_min_length": 20,
+            "intersection_tolerance": 5,
+        },
+        {
+            "vertical_strategy": "text",
+            "horizontal_strategy": "lines",
+            "snap_tolerance": 3,
+            "join_tolerance": 3,
+            "min_words_vertical": 1,
+            "min_words_horizontal": 1,
+        },
+    ]
+
+
+def normalize_cells(row) -> list[str]:
+    # Never drop empty cells: their positions identify the X columns.
+    return [clean(cell or "") for cell in row]
+
+
+def detect_header_columns(table: list[list[str]]) -> dict[str, int]:
+    result: dict[str, int] = {}
+    for raw_row in table[:10]:
+        cells = normalize_cells(raw_row)
+        for idx, cell in enumerate(cells):
+            n = cell.lower()
+            for key, labels in DOC_LABELS.items():
+                if any(label in n for label in labels):
+                    result[key] = idx
+    return result
+
+
+def detect_regime_index(cells: list[str]) -> int | None:
+    for idx, cell in enumerate(cells):
+        if REGIME_RE.fullmatch(cell):
+            return idx
+    return None
+
+
+def physical_document_columns(cells: list[str], header_cols: dict[str, int], rayon_idx: int | None) -> dict[str, bool]:
+    docs = {k: False for k in DOC_KEYS}
+    if header_cols:
+        for key, idx in header_cols.items():
+            if idx < len(cells):
+                docs[key] = clean(cells[idx]).lower() in {"x", "×", "x.", "×."}
+        return docs
+    if rayon_idx is None:
+        return docs
+    # Fallback uses the four physical cells immediately after the rayon cell.
+    for pos, key in enumerate(DOC_KEYS, start=rayon_idx + 1):
+        if pos < len(cells):
+            docs[key] = clean(cells[pos]).lower() in {"x", "×", "x.", "×."}
+    return docs
+
+
+def parse_table_row(cells: list[str], current_code: str | None, page_number: int, header_cols: dict[str, int]):
+    if not any(cells):
+        return None, current_code
+
+    code = current_code
+    for cell in cells[:4]:
+        m = RUBRIQUE_RE.match(cell)
+        if m:
+            code = m.group(1)
+            break
+    if not code or is_family(code):
+        return None, code
+
+    regime_idx = detect_regime_index(cells)
+    if regime_idx is None:
+        return None, code
+    regime = REGIME_RE.fullmatch(cells[regime_idx]).group(1).upper()  # type: ignore[union-attr]
+
+    # Left side can contain [rubrique, designation/criterion, situation].
+    # The last non-empty legal-text cell is the Situation; the previous one is its criterion.
+    left = [c for c in cells[:regime_idx] if c and not RUBRIQUE_RE.fullmatch(c)]
+    if not left:
+        return None, code
+
+    non_noise = [c for c in left if not ("visés par d'autres rubriques" in c.lower() or "visés par d’autres rubriques" in c.lower())]
+    if not non_noise:
+        return None, code
+
+    if len(non_noise) >= 2:
+        criterion = non_noise[-2]
+        situation = non_noise[-1]
+    else:
+        criterion = ""
+        situation = non_noise[-1]
+
+    # Sometimes the designation itself is the only legal row (e.g. a single-case rubrique).
+    if not situation:
+        return None, code
+
+    rayon_idx = None
+    rayon = ""
+    for idx in range(regime_idx + 1, len(cells)):
+        cell = cells[idx]
+        if re.search(r"\d", cell) and not re.fullmatch(r"[x×]", cell.lower()):
+            rayon_idx = idx
+            rayon = cell
+            break
+
+    docs = physical_document_columns(cells, header_cols, rayon_idx)
+    parsed = parse_bounds(situation)
+    if parsed:
+        lo, lo_inc, hi, hi_inc, unit = parsed
+    else:
+        lo = hi = None
+        lo_inc, hi_inc = True, False
+        unit = infer_unit(situation or criterion)
+
+    return {
+        "rubrique": code,
+        "criterion": criterion,
+        "rawCondition": situation,
+        "min": lo,
+        "minInclusive": lo_inc,
+        "max": hi,
+        "maxInclusive": hi_inc,
+        "unit": unit,
+        "regime": regime,
+        "rayon": rayon,
+        "documents": docs,
+        "sourcePage": page_number,
+    }, code
+
+
+def extract_tables() -> tuple[list[dict], dict[str, str]]:
+    rows: list[dict] = []
+    designations: dict[str, str] = {}
+    current_code: str | None = None
 
     with pdfplumber.open(PDF) as pdf:
         for page_number, page in enumerate(pdf.pages, start=1):
             if page_number < 5:
                 continue
-            text = page.extract_text(x_tolerance=1, y_tolerance=3, layout=True) or ""
-            for raw_line in text.splitlines():
-                line = clean(raw_line)
-                if not line or "JOURNAL OFFICIEL" in line or line.startswith("ANNEXE"):
+            for settings in table_settings():
+                try:
+                    tables = page.extract_tables(table_settings=settings)
+                except Exception:
+                    tables = []
+                if not tables:
                     continue
 
-                m = RUBRIQUE_RE.match(line)
-                if m:
-                    current_code = m.group(1)
-                    current_group = ""
-                    pending_condition = []
-                    continue
+                parsed_any = False
+                for table in tables:
+                    header_cols = detect_header_columns(table)
+                    for raw_row in table:
+                        cells = normalize_cells(raw_row)
+                        code_in_row = None
+                        for cell in cells[:4]:
+                            m = RUBRIQUE_RE.match(cell)
+                            if m:
+                                code_in_row = m.group(1)
+                                current_code = code_in_row
+                                break
+                        if code_in_row and is_family(code_in_row):
+                            current_code = code_in_row
+                            continue
+                        if code_in_row and not is_family(code_in_row):
+                            regime_idx = detect_regime_index(cells)
+                            if regime_idx is not None:
+                                title_cells = [c for c in cells[1:regime_idx] if c]
+                                title_cells = [c for c in title_cells if not looks_like_non_designation(c)]
+                                if title_cells:
+                                    # Prefer the first real designation cell, not the situation cell.
+                                    designations.setdefault(code_in_row, max(title_cells, key=len))
 
-                if current_code is None:
-                    continue
+                        row, row_code = parse_table_row(cells, current_code, page_number, header_cols)
+                        if row:
+                            rows.append(row)
+                            current_code = row_code
+                            parsed_any = True
+                if parsed_any:
+                    break
 
-                # If this line contains the regime, prepend any wrapped condition lines.
-                decoded = decode_row(line)
-                if decoded:
-                    regime, condition_text, rayon, docs = decoded
-                    full_condition = clean(" ".join(pending_condition + [condition_text])) if pending_condition else condition_text
-                    parsed = parse_bounds(full_condition)
-                    if parsed:
-                        lo, lo_inc, hi, hi_inc, unit = parsed
-                    else:
-                        lo = hi = None
-                        lo_inc, hi_inc = True, False
-                        unit = infer_unit(full_condition)
-                    rows.append({
-                        "rubrique": current_code,
-                        "criterion": current_group or "",
-                        "group": current_group,
-                        "rawCondition": full_condition,
-                        "min": lo,
-                        "minInclusive": lo_inc,
-                        "max": hi,
-                        "maxInclusive": hi_inc,
-                        "unit": unit,
-                        "regime": regime,
-                        "rayon": rayon,
-                        "documents": docs,
-                        "sourcePage": page_number,
-                    })
-                    pending_condition = []
-                    continue
-
-                if looks_like_group(line):
-                    current_group = line
-                    pending_condition = []
-                    continue
-
-                # Preserve wrapped legal situation text instead of dropping it.
-                if current_group and looks_like_condition_continuation(line):
-                    pending_condition.append(line)
-
-    return rows
+    return rows, designations
 
 
-def extract_designations() -> dict[str, str]:
+def extract_text_designations() -> dict[str, str]:
     designations: dict[str, str] = {}
     current: str | None = None
     with pdfplumber.open(PDF) as pdf:
@@ -250,44 +337,55 @@ def extract_designations() -> dict[str, str]:
                 if m:
                     current = m.group(1)
                     rest = clean(line[m.end():])
-                    if rest:
-                        designations[current] = rest
+                    if rest and not is_family(current) and not looks_like_non_designation(rest):
+                        designations.setdefault(current, rest)
                     continue
-                if current is None or current in designations:
+                if current is None or current in designations or is_family(current):
                     continue
                 if not line or "JOURNAL OFFICIEL" in line or line.startswith("ANNEXE"):
                     continue
                 if REGIME_RE.search(line) or looks_like_group(line) or looks_like_non_designation(line):
                     continue
-                designations[current] = line
+                designations.setdefault(current, line)
     return designations
+
+
+def extract() -> tuple[list[dict], dict[str, str]]:
+    rows, table_designations = extract_tables()
+    text_designations = extract_text_designations()
+    designations = dict(text_designations)
+    designations.update(table_designations)
+    return rows, designations
 
 
 def build() -> None:
     download_pdf()
-    rows = extract()
-    designations = extract_designations()
-    grouped: dict[str, dict] = {}
+    rows, designations = extract()
 
+    grouped: dict[str, dict] = {}
     for row in rows:
         code = row["rubrique"]
-        item = grouped.setdefault(code, {
-            "rubrique": code,
-            "famille": code[:2] + "00",
-            "familleLabel": FAMILIES.get(code[:2] + "00", "Installation classée"),
-            "designation": designations.get(code, ""),
-            "decisionRows": [],
-            "source": "Décret exécutif n° 07-144 du 19 mai 2007",
-            "sourceUrl": PDF_URLS[0],
-        })
+        if is_family(code):
+            continue
+        item = grouped.setdefault(
+            code,
+            {
+                "rubrique": code,
+                "famille": code[:2] + "00",
+                "familleLabel": FAMILIES.get(code[:2] + "00", "Installation classée"),
+                "designation": designations.get(code, ""),
+                "decisionRows": [],
+                "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+                "sourceUrl": PDF_URLS[0],
+            },
+        )
         item["decisionRows"].append(row)
 
     for code, item in grouped.items():
-        item["designation"] = clean(
-            designations.get(code)
-            or item["designation"]
-            or (item["decisionRows"][0].get("criterion", "") if item["decisionRows"] else "")
-        )[:500]
+        item["designation"] = clean(designations.get(code) or item["designation"])
+        if not item["designation"] and len(item["decisionRows"]) == 1:
+            item["designation"] = clean(item["decisionRows"][0].get("criterion") or item["decisionRows"][0].get("rawCondition", ""))
+
         unique, seen = [], set()
         for row in item["decisionRows"]:
             key = json.dumps(row, ensure_ascii=False, sort_keys=True)
@@ -304,8 +402,8 @@ def build() -> None:
         "families": [{"code": k, "label": v} for k, v in FAMILIES.items()],
         "rubriques": rubriques,
         "generated": True,
-        "generatorVersion": "matrix-v3",
-        "generatorNote": "Full legal situation text is preserved across wrapped PDF lines.",
+        "generatorVersion": "matrix-v4-hierarchy-table-columns",
+        "generatorNote": "Family 00 is hierarchy only; each rubrique owns its decision rows. X is mapped by physical document-column position and single-row rubriques are supported.",
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
