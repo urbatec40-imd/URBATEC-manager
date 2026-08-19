@@ -1,6 +1,7 @@
 import type { ActivityRowLike } from '@/services/activiteMatcher';
 
 export const NOMENCLATURE_OVERRIDES: ActivityRowLike[] = [
+  { rubrique: '1240', famille: '1200', familleLabel: 'Toxiques', designation: 'Dioxyde de chlore (fabrication, stockage ou emploi du)', source: 'Décret exécutif n° 07-144 du 19 mai 2007' },
   { rubrique: '2121', famille: '2100', familleLabel: 'Élevage d’animaux & Activité agricole', designation: 'Volailles, gibier à plume (Elevage, vente, etc..., de), à l’exclusion d’activités spécifiques visées par d’autres rubriques', source: 'Décret exécutif n° 07-144 du 19 mai 2007' },
   { rubrique: '2126', famille: '2100', familleLabel: 'Élevage d’animaux & Activité agricole', designation: 'Silos et installations de stockage de céréales, grains, produits alimentaires ou tout produit organique dégageant des poussières inflammables', source: 'Décret exécutif n° 07-144 du 19 mai 2007' },
   { rubrique: '2220', famille: '2200', familleLabel: 'Agro alimentaires', designation: 'Broyage, concassage, criblage, déchiquetage, ensachage, pulvérisation, trituration, nettoyage, tamisage, blutage, mélange, épluchage et décortication des substances végétales et de tous produits organiques naturels, à l’exclusion des activités visées par les rubriques 2214, 2215, 2216 et 2229 mais y compris la fabrication d’aliments pour le bétail', source: 'Décret exécutif n° 07-144 du 19 mai 2007' },
@@ -17,6 +18,7 @@ export const NOMENCLATURE_OVERRIDES: ActivityRowLike[] = [
 export const ACTIVITY_TARGETS: Record<string, string[]> = {
   minoterie: ['2220'], minoteries: ['2220'], semoulerie: ['2220'], moulin: ['2220'], moulins: ['2220'],
   farine: ['2220'], farines: ['2220'], blutage: ['2220'], 'broyage cereales': ['2220'], 'graines et cereales': ['2220'],
+  'dioxyde de chlore': ['1240'], 'dioxyde chlore': ['1240'],
   'stockage cereales': ['2126'], 'stockage grains': ['2126'], silo: ['2126'], silos: ['2126'],
   poulet: ['2121'], poulets: ['2121'], volaille: ['2121'], volailles: ['2121'], avicole: ['2121'],
   tannerie: ['2324'], mégisserie: ['2324'], megisserie: ['2324'], cuir: ['2324'], cuirs: ['2324'], peaux: ['2324'],
