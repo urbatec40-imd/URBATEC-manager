@@ -36,6 +36,14 @@ function clean(v: string) {
 function norm(v: string) {
   return v.toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’'`´]/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').replace(/\s+/g, ' ').trim();
 }
+function shortDesignation(value: string) {
+  const s = clean(value);
+  const cut = s.search(/\s+(?:La|Le|Les)\s+(?:quantité|capacité|puissance|volume|surface|nombre)\b/i);
+  const cut2 = s.search(/\s+\d+\s*\.\s+/);
+  const cutAt = [cut, cut2].filter(n => n >= 0).sort((a, b) => a - b)[0];
+  if (cutAt != null) return s.slice(0, cutAt).replace(/[,:;\-\s]+$/, '').trim();
+  return s;
+}
 function rangeLabel(r: DecisionRow) {
   if (r.rawCondition?.trim()) return clean(r.rawCondition);
   const u = r.unit ? ` ${r.unit}` : '';
@@ -110,12 +118,12 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
 
     {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
       <Field label="Type / désignation de l’activité" required><div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => { setQuery(e.target.value); setError(''); }} placeholder="Désignation de l’activité ou N° de rubrique (ex. 1240)" />{query && <button type="button" onClick={reset} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div></Field>
-      {direct && <div className="mt-4 border border-emerald-200 bg-emerald-50 rounded-lg p-4 flex items-center gap-3"><div className="flex-1"><div className="text-sm font-semibold">{direct.rubrique} — {direct.designation}</div></div><button type="button" onClick={() => accept(direct)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>}
-      {!direct && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-96 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-4 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {c.designation}</div></div><button type="button" disabled={!r} onClick={() => r && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40"><Check size={14}/> Accepter</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
+      {direct && <div className="mt-4 border border-emerald-200 bg-emerald-50 rounded-lg p-4 flex items-center gap-3"><div className="flex-1"><div className="text-sm font-semibold">{direct.rubrique} — {shortDesignation(direct.designation)}</div></div><button type="button" onClick={() => accept(direct)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>}
+      {!direct && query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length ? <div className="border rounded-lg divide-y max-h-96 overflow-y-auto">{suggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-4 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div><button type="button" disabled={!r} onClick={() => r && accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold disabled:opacity-40"><Check size={14}/> Accepter</button></div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
     </div>}
 
     {selected && <>
-      <div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-5"><div className="text-sm font-semibold text-emerald-800">Rubrique acceptée</div><div className="text-xl font-bold mt-1">{selected.rubrique}</div><div className="text-sm text-gray-700 mt-1">{selected.designation}</div><button type="button" onClick={reset} className="mt-3 text-xs text-sky-700 hover:underline">Changer</button></div>
+      <div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-5"><div className="text-sm font-semibold text-emerald-800">Rubrique acceptée</div><div className="text-xl font-bold mt-1">{selected.rubrique}</div><div className="text-sm text-gray-700 mt-1">{shortDesignation(selected.designation)}</div><button type="button" onClick={reset} className="mt-3 text-xs text-sky-700 hover:underline">Changer</button></div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
         <div className="flex items-center gap-2 mb-4"><h2 className="font-semibold">Données nécessaires au classement</h2></div>
