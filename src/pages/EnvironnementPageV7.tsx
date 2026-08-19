@@ -81,7 +81,8 @@ export function EnvironnementPageV7({ clientName, dossierNumero, onBack }: { cli
       ?? dataset.rubriques.find(r => r.rubrique === candidate.rubrique);
     if (!row) return;
     const id = `${row.rubrique}|${row.designation}`;
-    setAccepted(prev => prev.some(a => a.id === id) ? prev : [...prev, { ...candidate, id, row }]);
+    const acceptedCandidate = { ...candidate, id, row };
+    setAccepted(prev => prev.some(a => a.id === id) ? prev : [...prev, acceptedCandidate]);
     setSelectedId(id);
     setValues(prev => ({ ...prev, [id]: prev[id] ?? {} }));
     setResults(prev => ({ ...prev, [id]: null }));
@@ -98,7 +99,7 @@ export function EnvironnementPageV7({ clientName, dossierNumero, onBack }: { cli
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"><ArrowLeft size={18}/></button>
+          <button type="button" onClick={onBack} className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"><ArrowLeft size={18}/></button>
           <div><h1 className="text-2xl font-bold text-gray-800">Module Environnement</h1><p className="text-sm text-gray-500">{dossierNumero ?? 'Nouveau projet'}{clientName ? ` — ${clientName}` : ''}</p></div>
         </div>
         <span className="text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Nomenclature 07-144</span>
@@ -106,7 +107,7 @@ export function EnvironnementPageV7({ clientName, dossierNumero, onBack }: { cli
 
       <div className="grid grid-cols-3 gap-2 text-xs">
         {['1. Rubrique','2. Classement','3. Dossier réglementaire'].map((step, i) => {
-          const active = i === 0 ? accepted.length === 0 : i === 1 ? accepted.length > 0 && !selected?.id || !!selected && !acceptedClass[selected.id] : !!selected && !!acceptedClass[selected.id];
+          const active = i === 0 ? accepted.length === 0 : i === 1 ? (accepted.length > 0 && !acceptedClass[selectedId ?? '']) : !!selected && !!acceptedClass[selected.id];
           return <div key={step} className={`rounded-lg border p-2 text-center ${active ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-gray-200 bg-gray-50 text-gray-500'}`}>{step}</div>;
         })}
       </div>
@@ -126,7 +127,7 @@ export function EnvironnementPageV7({ clientName, dossierNumero, onBack }: { cli
             <div className="border rounded-lg divide-y max-h-96 overflow-y-auto">
               {suggestions.map(c => <div key={`${c.rubrique}-${c.designation}`} className="px-4 py-3 flex items-center gap-3">
                 <div className="flex-1"><div className="text-sm font-medium text-gray-800">{c.designation}</div><div className="text-xs text-gray-500 mt-1">{c.familleLabel} · Rubrique {c.rubrique}</div></div>
-                <button onClick={() => acceptRubrique(c)} className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700"><Check size={14}/> Accepter</button>
+                <button type="button" onClick={() => acceptRubrique(c)} className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700"><Check size={14}/> Accepter</button>
               </div>)}
             </div>
           </div>
@@ -137,7 +138,7 @@ export function EnvironnementPageV7({ clientName, dossierNumero, onBack }: { cli
       {accepted.length > 0 && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
         <div className="flex items-center justify-between mb-4"><h2 className="font-semibold text-gray-800">Rubriques acceptées</h2><span className="text-xs text-gray-500">{accepted.length} rubrique(s)</span></div>
         <div className="space-y-2">{accepted.map(a => <div key={a.id} className={`border rounded-lg p-3 ${selectedId === a.id ? 'border-emerald-400 bg-emerald-50/40' : 'border-gray-200'}`}>
-          <div className="flex items-center gap-3"><button onClick={() => setSelectedId(a.id)} className="flex-1 text-left"><div className="font-semibold text-gray-800">Rubrique {a.rubrique}</div><div className="text-sm text-gray-700 mt-1">{a.designation}</div><div className="text-xs text-gray-500 mt-1">{a.familleLabel}</div></button><button onClick={() => setAccepted(prev => prev.filter(x => x.id !== a.id))} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"><X size={16}/></button></div>
+          <div className="flex items-center gap-3"><button type="button" onClick={() => setSelectedId(a.id)} className="flex-1 text-left"><div className="font-semibold text-gray-800">Rubrique {a.rubrique}</div><div className="text-sm text-gray-700 mt-1">{a.designation}</div><div className="text-xs text-gray-500 mt-1">{a.familleLabel}</div></button><button type="button" onClick={() => setAccepted(prev => prev.filter(x => x.id !== a.id))} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"><X size={16}/></button></div>
         </div>)}</div>
       </div>}
 
@@ -146,7 +147,7 @@ export function EnvironnementPageV7({ clientName, dossierNumero, onBack }: { cli
         <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 mb-4"><div className="font-semibold">{selected.designation}</div><div className="text-xs text-gray-500 mt-1">Seules les données prévues par cette rubrique doivent être renseignées.</div></div>
         {fields.length === 0 ? <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">Aucun critère de classement structuré n’est encore disponible pour cette rubrique. Le classement ne sera pas inventé.</div> : <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{fields.map(f => <div key={f.key}><Field label={`${f.label}${f.unit ? ` (${f.unit})` : ''}`} required={f.required}><input className={inputCls} type={f.type === 'number' ? 'number' : 'text'} min={f.type === 'number' ? '0' : undefined} value={values[selected.id]?.[f.key] ?? ''} onChange={e => { setValues(v => ({ ...v, [selected.id]: { ...(v[selected.id] ?? {}), [f.key]: e.target.value } })); setResults(v => ({ ...v, [selected.id]: null })); setAcceptedClass(v => ({ ...v, [selected.id]: false })); }} /></Field>{f.helper && <div className="mt-1 text-xs text-slate-500">Domaines : {f.helper}</div>}</div>)}</div>
-          <button disabled={!canCalculate} onClick={calculate} className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-600 text-white text-sm font-semibold disabled:opacity-40"><Calculator size={16}/> Calculer le classement</button>
+          <button type="button" disabled={!canCalculate} onClick={calculate} className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-600 text-white text-sm font-semibold disabled:opacity-40"><Calculator size={16}/> Calculer le classement</button>
         </>}
 
         {result && <div className="mt-5 border-t pt-5">
@@ -156,7 +157,7 @@ export function EnvironnementPageV7({ clientName, dossierNumero, onBack }: { cli
             <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3"><div><div className="text-xs text-emerald-700">Sous-rubrique</div><div className="font-semibold">{result.code}</div></div><div><div className="text-xs text-emerald-700">Intervalle</div><div className="font-semibold">{result.seuil}</div></div><div><div className="text-xs text-emerald-700">Rayon</div><div className="font-semibold">{result.rayon ?? '—'}</div></div></div>
             <div className="mt-4 font-semibold text-emerald-900">Le projet est classé sous la rubrique {selected.rubrique}, régime {result.regime}.</div>
           </div>
-          <button onClick={() => setAcceptedClass(v => ({ ...v, [selected.id]: true }))} className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold"><Check size={16}/> Accepter le classement</button>
+          <button type="button" onClick={() => setAcceptedClass(v => ({ ...v, [selected.id]: true }))} className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold"><Check size={16}/> Accepter le classement</button>
         </div>}
       </div>}
 
@@ -165,9 +166,7 @@ export function EnvironnementPageV7({ clientName, dossierNumero, onBack }: { cli
         {dossier && <div className="space-y-4"><div className="grid grid-cols-1 md:grid-cols-2 gap-3">{['Étude d’impact','Étude de dangers','Notice d’impact','Rapport sur les produits dangereux'].map(name => { const required = dossier.docs.includes(name); return <div key={name} className={`rounded-lg border p-4 ${required ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 bg-gray-50'}`}><div className="text-xs font-semibold">{required ? 'REQUIS' : 'Non identifié'}</div><div className="font-medium mt-1">{name}</div></div>})}</div><div className="text-sm text-slate-600">Les pièces sont déterminées à partir du classement retenu et des conditions disponibles dans la nomenclature locale.</div></div>}
       </div>}
 
-      {loadError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">Impossible de charger la nomenclature locale : {loadError}</div>}
-
-      <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 text-xs text-slate-600 flex items-center gap-2"><Sparkles size={15}/> Estimation IA : sera utilisée uniquement lorsqu’une valeur manque, et restera marquée comme « estimative » jusqu’à validation.</div>
+      {loadError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">Erreur de chargement : {loadError}</div>}
     </div>
   );
 }
