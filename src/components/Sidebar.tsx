@@ -40,6 +40,9 @@ const NAV: { key: PageKey; label: string; icon: typeof LayoutDashboard }[] = [
 ];
 
 export function Sidebar({ current, onNavigate, open, onClose, session, onLogout }: SidebarProps) {
+  const displayName = session?.nom_complet || session?.username || 'Utilisateur';
+  const initials = displayName.charAt(0).toUpperCase();
+
   return (
     <>
       {/* Overlay mobile */}
@@ -105,13 +108,13 @@ export function Sidebar({ current, onNavigate, open, onClose, session, onLogout 
           <div className="px-4 py-3 border-t border-slate-700">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center text-white text-sm font-bold">
-                {session.nom_complet.charAt(0).toUpperCase()}
+                {initials}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
-                  {session.nom_complet}
+                  {displayName}
                 </p>
-                <p className="text-[10px] text-slate-400">{session.role}</p>
+                <p className="text-[10px] text-slate-400">{session.role || 'Utilisateur'}</p>
               </div>
             </div>
             <button
