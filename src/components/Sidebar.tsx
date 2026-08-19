@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  PlusCircle,
   FolderKanban,
   Users,
   CreditCard,
@@ -31,6 +32,7 @@ interface SidebarProps {
 
 const NAV: { key: PageKey; label: string; icon: typeof LayoutDashboard }[] = [
   { key: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+  { key: 'dossiers', label: 'Nouveau dossier', icon: PlusCircle },
   { key: 'dossiers', label: 'Dossiers', icon: FolderKanban },
   { key: 'clients', label: 'Clients', icon: Users },
   { key: 'paiements', label: 'Paiements', icon: CreditCard },
@@ -76,11 +78,11 @@ export function Sidebar({ current, onNavigate, open, onClose, session, onLogout 
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-3">
-          {NAV.map(({ key, label, icon: Icon }) => {
+          {NAV.map(({ key, label, icon: Icon }, index) => {
             const active = current === key;
             return (
               <button
-                key={key}
+                key={`${key}-${index}`}
                 onClick={() => {
                   onNavigate(key);
                   onClose();
