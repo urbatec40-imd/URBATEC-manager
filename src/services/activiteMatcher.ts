@@ -17,6 +17,9 @@ export interface ActivityRowLike {
 }
 
 const SYNONYMS: Record<string, string[]> = {
+  minoterie: ['minoteries', 'semoulerie', 'moulin', 'moulins', 'farine', 'farines', 'cereales', 'blutage', 'broyage'],
+  minoteries: ['minoterie', 'semoulerie', 'moulin', 'moulins', 'farine', 'farines', 'cereales', 'blutage', 'broyage'],
+  semoulerie: ['minoterie', 'minoteries', 'moulin', 'farine', 'cereales', 'blutage', 'broyage'],
   poulet: ['volaille', 'volailles', 'elevage', 'avicole', 'gibier', 'plume'],
   poulets: ['volaille', 'volailles', 'elevage', 'avicole', 'gibier', 'plume'],
   dinde: ['volaille', 'volailles', 'avicole'],
@@ -51,25 +54,20 @@ const SYNONYMS: Record<string, string[]> = {
   gaz: ['gpl', 'gaz', 'inflammable', 'stockage'],
   gpl: ['gaz', 'inflammable', 'stockage'],
   ciment: ['construction', 'materiaux', 'minerais', 'fabrication'],
-  beton: ['béton', 'ciment', 'construction', 'materiaux'],
+  beton: ['beton', 'ciment', 'construction', 'materiaux'],
   briques: ['materiaux', 'fabrication', 'construction'],
   parpaing: ['materiaux', 'fabrication', 'construction'],
-  metal: ['metaux', 'métaux', 'minerais', 'usinage'],
-  metaux: ['metal', 'métaux', 'minerais'],
+  metal: ['metaux', 'minerais', 'usinage'],
+  metaux: ['metal', 'minerais'],
   recyclage: ['dechets', 'traitement', 'valorisation'],
   dechet: ['dechets', 'traitement', 'valorisation'],
-  déchets: ['dechets', 'traitement', 'valorisation'],
   forage: ['eau', 'captage', 'puits'],
   puits: ['forage', 'eau', 'captage'],
   pharmacie: ['produits pharmaceutiques', 'chimie'],
   medicament: ['pharmaceutique', 'produits pharmaceutiques', 'chimie'],
-  minoterie: ['minoteries', 'moulin', 'moulins', 'farine', 'farines', 'cereales', 'blutage', 'broyage'],
-  minoteries: ['minoterie', 'moulin', 'moulins', 'farine', 'farines', 'cereales', 'blutage', 'broyage'],
-  semoulerie: ['minoterie', 'minoteries', 'semoule', 'cereales', 'blutage', 'broyage'],
-  semoule: ['semoulerie', 'minoterie', 'cereales', 'blutage', 'broyage'],
 };
 
-const REFERRED_ONLY_RE = /\bvoir\s+([12]\d{3})\b/gi;
+const SEE_RE = /\bvoir\s+([12]\d{3})\b/gi;
 
 function normalize(value: string): string {
   return value
@@ -145,7 +143,14 @@ function scoreCandidate(queryTokens: string[], rowTokens: Set<string>): { score:
 }
 
 function referencedRubriques(text: string): string[] {
-  return Array.from(text.matchAll(REFERRED_ONLY_RE), match => match[1]);
+  return Array.from(text.matchAll(SEE_RE), match => match[1]);
+}
+
+function isPureCrossReference(text: string): boolean {
+  const normalized = normalize(text);
+  return /\bvoir\s+[12]\d{3}\b/.test(normalized) &&
+    /^(?:.*\bvoir\s+[12]\d{3}\b.*)$/.test(normalized) &&
+    !/(fabrication|stockage|transformation|elevage|abattage|installation|production|broyage|conditionnement|traitement)/.test(normalized.replace(/\bvoir\s+[12]\d{3}\b/g, ''));
 }
 
 export function buildActivityIndex<T extends ActivityRowLike>(rows: T[]) {
@@ -155,7 +160,8 @@ export function buildActivityIndex<T extends ActivityRowLike>(rows: T[]) {
       row,
       normalized: normalize(row.designation),
       tokens: new Set(tokens(row.designation)),
-      referenced: referencedRubriques(row.designation),
+      references: referencedRubriques(row.designation),
+      pureCrossReference: isPureCrossReference(row.designation),
     }));
 }
 
@@ -164,55 +170,65 @@ export function suggestActivities<T extends ActivityRowLike>(
   description: string,
   limit = 12,
 ): ActivityCandidate[] {
-  const parts = normalize(description)
-    .split(/\b(?:avec|et|plus|incluant|comprenant|compose de|avec stockage de|et distribution de)\b/i)
-    .map(p => p.trim())
-    .filter(Boolean);
+  const queryTokens = tokens(description);
+  if (!queryTokens.length) return [];
 
-  const queries = parts.length ? parts : [description];
+  const targetByRubrique = new Map<string, T>();
+  for (const item of index) {
+    if (!targetByRubrique.has(item.row.rubrique)) targetByRubrique.set(item.row.rubrique, item.row);
+  }
+
   const aggregate = new Map<string, ActivityCandidate>();
 
-  for (const part of queries) {
-    const queryTokens = tokens(part);
-    if (!queryTokens.length) continue;
-    for (const item of index) {
-      const result = scoreCandidate(queryTokens, item.tokens);
-      if (result.score <= 0) continue;
-
-      const hasDirectQueryToken = queryTokens.some(token => item.tokens.has(token));
-      const referencePenalty = item.referenced.length > 0 && !hasDirectQueryToken ? 0.18 : 1;
-      const exactBonus = item.normalized.includes(normalize(part)) ? 6 : 0;
-      const score = (result.score + exactBonus) * referencePenalty;
-
-      // A row saying "X (voir 2220)" is a cross-reference, not the primary legal match.
-      // When the user's text matches that cross-reference, suppress the misleading row.
-      if (item.referenced.length > 0 && !hasDirectQueryToken && score < 3) continue;
-
-      const existing = aggregate.get(item.row.rubrique + '|' + item.row.designation);
-      if (!existing || score > existing.score) {
-        aggregate.set(item.row.rubrique + '|' + item.row.designation, {
-          rubrique: item.row.rubrique,
-          famille: item.row.famille,
-          familleLabel: item.row.familleLabel,
-          designation: item.row.designation,
-          score,
-          matchedTerms: result.matched,
-          source: item.row.source,
-        });
-      }
-    }
-  }
-
-  // For a single clear activity, prioritize the true legal rubrique before long cross-reference rows.
-  const compact = Array.from(aggregate.values());
-  const primaryRubriqueBonus = new Map<string, number>();
   for (const item of index) {
-    if (item.referenced.length === 0) continue;
-    for (const ref of item.referenced) primaryRubriqueBonus.set(ref, (primaryRubriqueBonus.get(ref) ?? 0) + 0.5);
+    if (item.pureCrossReference) continue;
+
+    const result = scoreCandidate(queryTokens, item.tokens);
+    if (result.score <= 0) continue;
+
+    let score = result.score;
+    if (item.normalized.includes(normalize(description))) score += 8;
+
+    // Direct references such as "Minoteries (voir 2220)" should point to 2220.
+    const refs = item.references;
+    if (refs.length) {
+      for (const ref of refs) {
+        const target = targetByRubrique.get(ref);
+        if (!target) continue;
+        const targetTokens = new Set(tokens(target.designation));
+        const targetScore = scoreCandidate(queryTokens, targetTokens).score;
+        const finalScore = Math.max(score + 4, targetScore + 6);
+        const key = target.rubrique + '|' + target.designation;
+        const existing = aggregate.get(key);
+        const candidate: ActivityCandidate = {
+          rubrique: target.rubrique,
+          famille: target.famille,
+          familleLabel: target.familleLabel,
+          designation: target.designation,
+          score: finalScore,
+          matchedTerms: result.matched,
+          source: target.source,
+        };
+        if (!existing || candidate.score > existing.score) aggregate.set(key, candidate);
+      }
+      continue;
+    }
+
+    const key = item.row.rubrique + '|' + item.row.designation;
+    const existing = aggregate.get(key);
+    const candidate: ActivityCandidate = {
+      rubrique: item.row.rubrique,
+      famille: item.row.famille,
+      familleLabel: item.row.familleLabel,
+      designation: item.row.designation,
+      score,
+      matchedTerms: result.matched,
+      source: item.row.source,
+    };
+    if (!existing || candidate.score > existing.score) aggregate.set(key, candidate);
   }
 
-  return compact
-    .map(candidate => ({ ...candidate, score: candidate.score + (primaryRubriqueBonus.get(candidate.rubrique) ?? 0) }))
+  return Array.from(aggregate.values())
     .sort((a, b) => b.score - a.score || a.rubrique.localeCompare(b.rubrique) || a.designation.localeCompare(b.designation, 'fr'))
     .slice(0, limit);
 }
