@@ -12,6 +12,7 @@ import { EcheancesPage } from '@/pages/EcheancesPage';
 import { ExpertisesPage } from '@/pages/ExpertisesPage';
 import { DocumentsPage } from '@/pages/DocumentsPage';
 import { LaboratoirePage } from '@/pages/LaboratoirePage';
+import { EnvironnementPage } from '@/pages/EnvironnementPage';
 import { ParametresPage } from '@/pages/ParametresPage';
 import { DossierForm } from '@/components/DossierForm';
 import { AuthPage } from '@/pages/AuthPage';
@@ -239,6 +240,17 @@ function App() {
     if (error)
       return <ErrorState message={error} onRetry={loadAll} />;
 
+    if (page === 'environnement') {
+      return (
+        <EnvironnementPage
+          clientName={openDossierData?.client?.nom ?? ''}
+          dossierNumero={openDossierData?.numero}
+          initialPrestation={openDossierData?.prestation}
+          onBack={() => setPage('dossiers')}
+        />
+      );
+    }
+
     // Fiche dossier detail
     if (page === 'dossiers' && openDossierId && openDossierData) {
       return (
@@ -254,6 +266,7 @@ function App() {
             setEditFormOpen(true);
           }}
           onRefresh={refreshDossierDetail}
+          onOpenEnvironnement={() => setPage('environnement')}
           onCreatePaiement={handleCreatePaiement}
           onDeletePaiement={handleDeletePaiement}
           onCreateDocument={handleCreateDocument}
@@ -319,7 +332,7 @@ function App() {
             clients={clients}
             onOpenDossier={openDossier}
             onCreatePaiement={handleCreatePaiement}
-            onDelete={handleDeletePaiement}
+            onDeletePaiement={handleDeletePaiement}
           />
         );
       case 'echeances':
@@ -360,7 +373,7 @@ function App() {
         current={page}
         onNavigate={(p) => {
           setPage(p);
-          if (p !== 'dossiers') setOpenDossierId(null);
+          if (p !== 'dossiers' && p !== 'environnement') setOpenDossierId(null);
         }}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
