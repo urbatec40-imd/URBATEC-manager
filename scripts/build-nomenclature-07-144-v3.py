@@ -25,11 +25,9 @@ CODE_RE = re.compile(r"^(1\d{3}|2\d{3})\s*(.*)$")
 
 
 def normalize(text: str) -> str:
-    replacements = {
-        "dØ": "dé", "DØ": "Dé", "Ł": "é", "Œ": "œ", "": "’", "": "’", "": "œ", "oø": "où",
-        "prØ": "pré", "rØ": "ré", "Ø": "é", "Ł": "é", "Ľ": "è", "Ø": "é", "Â": "",
-        "Ã©": "é", "Ã¨": "è", "Ãª": "ê", "Ã®": "î", "Ã´": "ô", "Ã¹": "ù", "Ã§": "ç",
-    }
+    replacements = {"dØ": "dé", "DØ": "Dé", "Ł": "é", "Œ": "œ", "": "’", "": "œ", "oø": "où",
+                    "prØ": "pré", "rØ": "ré", "Ø": "é", "Ľ": "è", "Â": "", "Ã©": "é",
+                    "Ã¨": "è", "Ãª": "ê", "Ã®": "î", "Ã´": "ô", "Ã¹": "ù", "Ã§": "ç"}
     for a, b in replacements.items():
         text = text.replace(a, b)
     return re.sub(r"\s+", " ", text).strip()
@@ -53,7 +51,7 @@ def infer_profile(text: str) -> list[dict[str, str]]:
     return fields
 
 
-def add_record(rows: list[dict], page_no: int, code: str, text: str) -> dict:
+def add_record(page_no: int, code: str, text: str) -> dict:
     family = code[:2] + "00"
     return {
         "rubrique": code,
@@ -74,49 +72,57 @@ def parse() -> None:
     urllib.request.urlretrieve(PDF_URL, PDF)
     reader = PdfReader(str(PDF))
     rows: list[dict] = []
-    in_table = False
+    started = False
 
     for idx, page in enumerate(reader.pages, start=1):
-        text = page.extract_text() or ""
-        text = normalize(text)
+        raw = page.extract_text() or ""
+        text = normalize(raw)
+        # Annexe III starts around page 5 of the official PDF. Ignore the legislative preface.
         if "III. Nomenclature des installations classées" in text or "Désignation de l’activité" in text:
-            in_table = True
-        if not in_table:
-            continue
-        if "Désignation de l’activité" not in text and idx < 5:
+            started = True
+        if not started:
             continue
 
-        lines = [normalize(x) for x in (page.extract_text() or "").splitlines() if normalize(x)]
+        lines = [normalize(x) for x in raw.splitlines() if normalize(x)]
         current_code: str | None = None
         current_parts: list[str] = []
+
+        def close_current() -> None:
+            nonlocal current_code, current_parts
+            if current_code and current_parts:
+                designation = normalize(" ".join(current_parts))
+                # Keep only actual designation text; discard page headers and obvious legislative leftovers.
+                if designation and not designation.lower().startswith(("journal officiel", "rapport sur les produits dangereux", "désignation de l’activité")):
+                    rows.append(add_record(idx, current_code, designation))
+            current_code = None
+            current_parts = []
+
         for line in lines:
+            if line.lower().startswith(("journal officiel", "rapport sur les produits dangereux", "désignation de l’activité")):
+                continue
             m = CODE_RE.match(line)
             if m:
-                code, rest = m.groups()
-                if current_code and current_parts:
-                    rows.append(add_record(rows, idx, current_code, " ".join(current_parts)))
-                current_code = code
+                close_current()
+                current_code, rest = m.groups()
                 current_parts = [rest] if rest else []
                 continue
             if current_code:
                 if line.startswith("Régime") or line.startswith("Rayon") or line.startswith("Affichage"):
                     continue
                 current_parts.append(line)
-        if current_code and current_parts:
-            rows.append(add_record(rows, idx, current_code, " ".join(current_parts)))
+        close_current()
 
-    unique = []
-    seen = set()
-    for r in rows:
-        d = r["designation"].strip()
-        if not d:
+    unique: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    banned = {"substances", "très toxiques", "toxiques", "comburantes", "explosibles", "inflammables", "combustibles", "corrosives", "divers", "activité"}
+    for row in rows:
+        designation = row["designation"].strip()
+        if not designation or designation.lower() in banned:
             continue
-        if d.lower() in {"substances", "très toxiques", "toxiques", "comburantes", "explosibles", "inflammables", "combustibles", "corrosives", "divers", "activité"}:
-            continue
-        key = (r["rubrique"], d)
+        key = (row["rubrique"], designation.lower())
         if key not in seen:
             seen.add(key)
-            unique.append(r)
+            unique.append(row)
 
     data = {
         "version": "07-144",
@@ -125,7 +131,7 @@ def parse() -> None:
         "families": [{"code": k, "label": v} for k, v in FAMILIES.items()],
         "rubriques": unique,
         "generated": True,
-        "generatorNote": "Extraction limitée aux pages de l’annexe III (nomenclature). Les seuils restent à valider dans le texte officiel.",
+        "generatorNote": "Extraction limitée à l’annexe III (Nomenclature). Vérification juridique requise avant dépôt administratif.",
     }
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Generated {len(unique)} rubrique records -> {OUT}")
