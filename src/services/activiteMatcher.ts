@@ -63,7 +63,13 @@ const SYNONYMS: Record<string, string[]> = {
   puits: ['forage', 'eau', 'captage'],
   pharmacie: ['produits pharmaceutiques', 'chimie'],
   medicament: ['pharmaceutique', 'produits pharmaceutiques', 'chimie'],
+  minoterie: ['minoteries', 'moulin', 'moulins', 'farine', 'farines', 'cereales', 'blutage', 'broyage'],
+  minoteries: ['minoterie', 'moulin', 'moulins', 'farine', 'farines', 'cereales', 'blutage', 'broyage'],
+  semoulerie: ['minoterie', 'minoteries', 'semoule', 'cereales', 'blutage', 'broyage'],
+  semoule: ['semoulerie', 'minoterie', 'cereales', 'blutage', 'broyage'],
 };
+
+const REFERRED_ONLY_RE = /\bvoir\s+([12]\d{3})\b/gi;
 
 function normalize(value: string): string {
   return value
@@ -86,18 +92,15 @@ function editDistance(a: string, b: string): number {
   if (!b) return a.length;
   const prev = Array.from({ length: b.length + 1 }, (_, i) => i);
   for (let i = 1; i <= a.length; i++) {
-    let left = i;
     const next = [i];
     for (let j = 1; j <= b.length; j++) {
-      const value = Math.min(
+      next[j] = Math.min(
         prev[j] + 1,
         next[j - 1] + 1,
         prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
       );
-      next[j] = value;
     }
     prev.splice(0, prev.length, ...next);
-    void left;
   }
   return prev[b.length];
 }
@@ -141,10 +144,19 @@ function scoreCandidate(queryTokens: string[], rowTokens: Set<string>): { score:
   return { score, matched: Array.from(new Set(matched)) };
 }
 
+function referencedRubriques(text: string): string[] {
+  return Array.from(text.matchAll(REFERRED_ONLY_RE), match => match[1]);
+}
+
 export function buildActivityIndex<T extends ActivityRowLike>(rows: T[]) {
   return rows
     .filter(row => row.designation?.trim())
-    .map(row => ({ row, normalized: normalize(row.designation), tokens: new Set(tokens(row.designation)) }));
+    .map(row => ({
+      row,
+      normalized: normalize(row.designation),
+      tokens: new Set(tokens(row.designation)),
+      referenced: referencedRubriques(row.designation),
+    }));
 }
 
 export function suggestActivities<T extends ActivityRowLike>(
@@ -153,7 +165,7 @@ export function suggestActivities<T extends ActivityRowLike>(
   limit = 12,
 ): ActivityCandidate[] {
   const parts = normalize(description)
-    .split(/\b(?:avec|et|plus|incluant|comprenant|composé de|compose de|avec stockage de|et distribution de)\b/i)
+    .split(/\b(?:avec|et|plus|incluant|comprenant|compose de|avec stockage de|et distribution de)\b/i)
     .map(p => p.trim())
     .filter(Boolean);
 
@@ -166,8 +178,16 @@ export function suggestActivities<T extends ActivityRowLike>(
     for (const item of index) {
       const result = scoreCandidate(queryTokens, item.tokens);
       if (result.score <= 0) continue;
-      const bonus = item.normalized.includes(normalize(part)) ? 6 : 0;
-      const score = result.score + bonus;
+
+      const hasDirectQueryToken = queryTokens.some(token => item.tokens.has(token));
+      const referencePenalty = item.referenced.length > 0 && !hasDirectQueryToken ? 0.18 : 1;
+      const exactBonus = item.normalized.includes(normalize(part)) ? 6 : 0;
+      const score = (result.score + exactBonus) * referencePenalty;
+
+      // A row saying "X (voir 2220)" is a cross-reference, not the primary legal match.
+      // When the user's text matches that cross-reference, suppress the misleading row.
+      if (item.referenced.length > 0 && !hasDirectQueryToken && score < 3) continue;
+
       const existing = aggregate.get(item.row.rubrique + '|' + item.row.designation);
       if (!existing || score > existing.score) {
         aggregate.set(item.row.rubrique + '|' + item.row.designation, {
@@ -183,7 +203,16 @@ export function suggestActivities<T extends ActivityRowLike>(
     }
   }
 
-  return Array.from(aggregate.values())
-    .sort((a, b) => b.score - a.score || a.designation.localeCompare(b.designation, 'fr'))
+  // For a single clear activity, prioritize the true legal rubrique before long cross-reference rows.
+  const compact = Array.from(aggregate.values());
+  const primaryRubriqueBonus = new Map<string, number>();
+  for (const item of index) {
+    if (item.referenced.length === 0) continue;
+    for (const ref of item.referenced) primaryRubriqueBonus.set(ref, (primaryRubriqueBonus.get(ref) ?? 0) + 0.5);
+  }
+
+  return compact
+    .map(candidate => ({ ...candidate, score: candidate.score + (primaryRubriqueBonus.get(candidate.rubrique) ?? 0) }))
+    .sort((a, b) => b.score - a.score || a.rubrique.localeCompare(b.rubrique) || a.designation.localeCompare(b.designation, 'fr'))
     .slice(0, limit);
 }
