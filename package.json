@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "nomenclature:build": "python scripts/build-nomenclature-07-144-matrix.py"
+    "nomenclature:build": "python scripts/build-nomenclature-07-144-matrix.py && python scripts/repair-nomenclature-documents-x.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
