@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Menu } from 'lucide-react';
+import { Leaf, Menu } from 'lucide-react';
 import { Sidebar, type PageKey } from '@/components/Sidebar';
 import { GlobalSearch } from '@/components/GlobalSearch';
 import { Loading, ErrorState } from '@/components/States';
@@ -86,7 +86,6 @@ function App() {
     loadAll();
   }, [loadAll]);
 
-  // Load detail data when opening a dossier
   const openDossier = useCallback(async (id: string) => {
     setOpenDossierId(id);
     setPage('dossiers');
@@ -100,7 +99,6 @@ function App() {
       setDossierExpertise(e);
       setDossierDocuments(docs);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error(err);
     }
   }, []);
@@ -117,12 +115,10 @@ function App() {
       setDossierExpertise(e);
       setDossierDocuments(docs);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error(err);
     }
   }, [openDossierId]);
 
-  // ===== CRUD handlers =====
   const handleCreateDossier = async (d: Omit<Dossier, 'id' | 'created_at' | 'numero'>) => {
     await data.createDossier(d);
     await loadAll();
@@ -234,11 +230,11 @@ function App() {
   };
 
   const openDossierData = dossiers.find((d) => d.id === openDossierId) ?? null;
+  const isEnvironmentDossier = openDossierData?.domaine === 'Environnement';
 
   function renderPage() {
     if (loading) return <Loading message="Chargement des données..." />;
-    if (error)
-      return <ErrorState message={error} onRetry={loadAll} />;
+    if (error) return <ErrorState message={error} onRetry={loadAll} />;
 
     if (page === 'environnement') {
       return (
@@ -251,7 +247,6 @@ function App() {
       );
     }
 
-    // Fiche dossier detail
     if (page === 'dossiers' && openDossierId && openDossierData) {
       return (
         <FicheDossier
@@ -266,7 +261,6 @@ function App() {
             setEditFormOpen(true);
           }}
           onRefresh={refreshDossierDetail}
-          onOpenEnvironnement={() => setPage('environnement')}
           onCreatePaiement={handleCreatePaiement}
           onDeletePaiement={handleDeletePaiement}
           onCreateDocument={handleCreateDocument}
@@ -281,81 +275,21 @@ function App() {
 
     switch (page) {
       case 'dashboard':
-        return (
-          <Dashboard
-            dossiers={dossiers}
-            paiements={allPaiements}
-            onOpenDossier={openDossier}
-          />
-        );
+        return <Dashboard dossiers={dossiers} paiements={allPaiements} onOpenDossier={openDossier} />;
       case 'dossiers':
-        return (
-          <DossiersPage
-            dossiers={dossiers}
-            clients={clients}
-            onOpenDossier={openDossier}
-            onCreate={handleCreateDossier}
-            onUpdate={handleUpdateDossier}
-            onDelete={handleDeleteDossier}
-          />
-        );
+        return <DossiersPage dossiers={dossiers} clients={clients} onOpenDossier={openDossier} onCreate={handleCreateDossier} onUpdate={handleUpdateDossier} onDelete={handleDeleteDossier} />;
       case 'clients':
-        return (
-          <ClientsPage
-            clients={clients}
-            dossiers={dossiers}
-            paiements={allPaiements}
-            onOpenDossier={openDossier}
-            onCreate={handleCreateClient}
-            onUpdate={handleUpdateClient}
-            onDelete={handleDeleteClient}
-            onCreateDossier={handleCreateDossier}
-            onUpdateDossier={handleUpdateDossier}
-            onDeleteDossier={handleDeleteDossier}
-          />
-        );
+        return <ClientsPage clients={clients} dossiers={dossiers} paiements={allPaiements} onOpenDossier={openDossier} onCreate={handleCreateClient} onUpdate={handleUpdateClient} onDelete={handleDeleteClient} onCreateDossier={handleCreateDossier} onUpdateDossier={handleUpdateDossier} onDeleteDossier={handleDeleteDossier} />;
       case 'documents':
-        return (
-          <DocumentsPage
-            documents={allDocuments}
-            onOpenDossier={openDossier}
-            onDelete={handleDeleteDocument}
-            onUpdatePath={handleUpdateDocumentPath}
-            onVerify={handleVerifyDocument}
-          />
-        );
+        return <DocumentsPage documents={allDocuments} onOpenDossier={openDossier} onDelete={handleDeleteDocument} onUpdatePath={handleUpdateDocumentPath} onVerify={handleVerifyDocument} />;
       case 'paiements':
-        return (
-          <PaiementsPage
-            paiements={allPaiements}
-            dossiers={dossiers}
-            clients={clients}
-            onOpenDossier={openDossier}
-            onCreatePaiement={handleCreatePaiement}
-            onDeletePaiement={handleDeletePaiement}
-          />
-        );
+        return <PaiementsPage paiements={allPaiements} dossiers={dossiers} clients={clients} onOpenDossier={openDossier} onCreatePaiement={handleCreatePaiement} onDeletePaiement={handleDeletePaiement} />;
       case 'echeances':
         return <EcheancesPage dossiers={dossiers} onOpenDossier={openDossier} />;
       case 'expertises':
-        return (
-          <ExpertisesPage
-            expertises={expertises}
-            onOpenDossier={openDossier}
-            onCreate={handleCreateExpertise}
-            onUpdate={handleUpdateExpertise}
-            onDelete={handleDeleteExpertise}
-          />
-        );
+        return <ExpertisesPage expertises={expertises} onOpenDossier={openDossier} onCreate={handleCreateExpertise} onUpdate={handleUpdateExpertise} onDelete={handleDeleteExpertise} />;
       case 'laboratoire':
-        return (
-          <LaboratoirePage
-            essais={essais}
-            onCreate={handleCreateEssai}
-            onUpdate={handleUpdateEssai}
-            onDelete={handleDeleteEssai}
-          />
-        );
+        return <LaboratoirePage essais={essais} onCreate={handleCreateEssai} onUpdate={handleUpdateEssai} onDelete={handleDeleteEssai} />;
       case 'parametres':
         return <ParametresPage parametres={parametres} onSave={handleSaveParametres} />;
       default:
@@ -363,9 +297,7 @@ function App() {
     }
   }
 
-  if (!session) {
-    return <AuthPage onAuth={(s) => setSession(s)} />;
-  }
+  if (!session) return <AuthPage onAuth={(s) => setSession(s)} />;
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -385,15 +317,21 @@ function App() {
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
         <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 flex-shrink-0">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600"
-          >
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600">
             <Menu size={20} />
           </button>
           <GlobalSearch dossiers={dossiers} onSelectDossier={openDossier} />
+          {isEnvironmentDossier && page === 'dossiers' && (
+            <button
+              onClick={() => setPage('environnement')}
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100"
+              title="Ouvrir le module environnement"
+            >
+              <Leaf size={15} />
+              Module Environnement
+            </button>
+          )}
           {dossiers.length > 0 && allPaiements.length === 0 && (
             <span className="hidden md:inline-block text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full border border-amber-200">
               Données de démonstration
@@ -401,13 +339,9 @@ function App() {
           )}
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          {renderPage()}
-        </main>
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">{renderPage()}</main>
       </div>
 
-      {/* Edit dossier modal (from FicheDossier) */}
       <DossierForm
         open={editFormOpen}
         onClose={() => setEditFormOpen(false)}
