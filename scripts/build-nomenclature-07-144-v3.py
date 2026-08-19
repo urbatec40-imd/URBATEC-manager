@@ -4,7 +4,11 @@ import json
 import re
 import urllib.request
 from pathlib import Path
-from pypdf import PdfReader
+
+try:
+    import pdfplumber
+except ImportError as exc:
+    raise SystemExit("Installez pdfplumber : python -m pip install pdfplumber") from exc
 
 PDF_URL = "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.PDF"
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,122 +24,161 @@ FAMILIES = {
     "2500": "Matériaux, minerais et métaux", "2600": "Chimie, Caoutchouc", "2700": "Déchets et traitements des eaux",
     "2800": "Aquaculture et Pêche", "2900": "Divers",
 }
-
-CODE_RE = re.compile(r"^(1\d{3}|2\d{3})\s*(.*)$")
+REGIMES = {"AM", "AW", "APAPC", "D"}
 
 
 def normalize(text: str) -> str:
-    replacements = {"dØ": "dé", "DØ": "Dé", "Ł": "é", "Œ": "œ", "": "’", "": "œ", "oø": "où",
-                    "prØ": "pré", "rØ": "ré", "Ø": "é", "Ľ": "è", "Â": "", "Ã©": "é",
-                    "Ã¨": "è", "Ãª": "ê", "Ã®": "î", "Ã´": "ô", "Ã¹": "ù", "Ã§": "ç"}
-    for a, b in replacements.items():
-        text = text.replace(a, b)
+    replacements = {
+        "dØ": "dé", "DØ": "Dé", "Ł": "é", "Œ": "œ", "": "’", "": "œ", "oø": "où",
+        "prØ": "pré", "rØ": "ré", "Ø": "é", "Ľ": "è", "Â": "", "Ã©": "é", "Ã¨": "è",
+        "Ãª": "ê", "Ã®": "î", "Ã´": "ô", "Ã¹": "ù", "Ã§": "ç", "â€™": "’", "â€“": "–",
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
     return re.sub(r"\s+", " ", text).strip()
 
 
-def infer_profile(text: str) -> list[dict[str, str]]:
+def parse_number(text: str) -> float | None:
+    s = text.strip().replace("\u00a0", "").replace(" ", "")
+    if "," in s and "." in s:
+        s = s.replace(".", "").replace(",", ".")
+    else:
+        s = s.replace(",", ".")
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def infer_unit(text: str) -> str:
     t = normalize(text).lower()
-    rules = [
-        (("animaux", "animaux-equivalents", "élevage"), "nombreAnimaux", "Nombre d’animaux", "number", "animaux"),
-        (("m3/j", "m³/j", "m3 par jour"), "capaciteTraitement", "Capacité de traitement", "number", "m³/j"),
-        (("kg/j", "t/j", "tonne/j"), "capaciteProduction", "Capacité de production", "number", "kg/j ou t/j"),
-        (("puissance", "kw", "kva", "mw"), "puissance", "Puissance", "number", "kW/kVA/MW"),
-        (("surface", "m2", "m²", "superficie"), "surface", "Surface", "number", "m²"),
-        (("volume", "m3", "m³"), "volume", "Volume", "number", "m³"),
-        (("quantité", "kg", "tonne", "litre", "l"), "quantite", "Quantité", "number", "selon rubrique"),
+    if re.search(r"animaux[- ]?équivalents", t): return "animaux-équivalents"
+    if re.search(r"m\s*³\s*/\s*j|m3\s*/\s*j", t): return "m³/j"
+    if re.search(r"m\s*³|m3|mètres? cubes?", t): return "m³"
+    if re.search(r"kg\s*/\s*j|kilogrammes?.*jour", t): return "kg/j"
+    if re.search(r"t\s*/\s*j|tonnes?.*jour", t): return "t/j"
+    if re.search(r"\bkW\b|kVA|MW", text, re.I): return "kW"
+    if re.search(r"l\s*/\s*j|litres?.*jour", t): return "l/j"
+    if re.search(r"\bkg\b|kilogrammes?\b", t): return "kg"
+    if re.search(r"\bt\b|tonnes?\b", t): return "t"
+    return ""
+
+
+def bounds(text: str):
+    t = normalize(text)
+    unit = infer_unit(t)
+    m = re.search(r"de\s+([\d\s.,]+)\s+(?:à|a)\s+([\d\s.,]+)", t, re.I)
+    if m:
+        a, b = parse_number(m.group(1)), parse_number(m.group(2))
+        if a is not None and b is not None: return a, True, b, True, unit
+    patterns = [
+        (r"supérieure?\s+ou\s+égale\s+(?:à\s*)?([\d\s.,]+)", "min_inc"),
+        (r"supérieure?\s+(?:à\s*)?([\d\s.,]+)", "min"),
+        (r"plus\s+de\s+([\d\s.,]+)", "min"),
+        (r"inférieure?\s+ou\s+égale\s+(?:à\s*)?([\d\s.,]+)", "max_inc"),
+        (r"inférieure?\s+(?:à\s*)?([\d\s.,]+)", "max"),
+        (r"moins\s+de\s+([\d\s.,]+)", "max"),
     ]
-    fields = []
-    for tokens, key, label, typ, unit in rules:
-        if any(tok in t for tok in tokens) and not any(f["key"] == key for f in fields):
-            fields.append({"key": key, "label": label, "type": typ, "unit": unit})
-    return fields
+    for pattern, kind in patterns:
+        m = re.search(pattern, t, re.I)
+        if not m: continue
+        n = parse_number(m.group(1))
+        if n is None: continue
+        if kind == "min_inc": return n, True, None, False, unit
+        if kind == "min": return n, False, None, False, unit
+        if kind == "max_inc": return None, False, n, True, unit
+        return None, False, n, False, unit
+    return None
 
 
-def add_record(page_no: int, code: str, text: str) -> dict:
-    family = code[:2] + "00"
-    return {
-        "rubrique": code,
-        "famille": family,
-        "familleLabel": FAMILIES.get(family, "Installation classée"),
-        "designation": normalize(text),
-        "conditions": [],
-        "inputProfile": infer_profile(text),
-        "source": "Décret exécutif n° 07-144 du 19 mai 2007",
-        "sourceUrl": PDF_URL,
-        "sourcePage": page_no,
-    }
+def regime(value: str) -> str | None:
+    v = normalize(value).replace(" ", "").upper()
+    return v if v in REGIMES else None
 
 
-def parse() -> None:
+def is_x(value: str | None) -> bool:
+    return normalize(value or "").lower() in {"x", "×"}
+
+
+def criterion(text: str) -> str:
+    s = normalize(text)
+    s = re.split(r"(?:\ba\)\s*|\bb\)\s*|\b[123456789]\.\s*|supérieure|inférieure|plus de|moins de|de\s+[\d])", s, maxsplit=1, flags=re.I)[0]
+    return s.strip(" -:;,") or "Valeur de classement"
+
+
+def extract() -> list[dict]:
+    result: list[dict] = []
+    current_code: str | None = None
+    with pdfplumber.open(PDF) as pdf:
+        for page_no, page in enumerate(pdf.pages, start=1):
+            if page_no < 5: continue
+            tables = page.extract_tables({
+                "vertical_strategy": "lines", "horizontal_strategy": "lines",
+                "snap_tolerance": 3, "join_tolerance": 3, "intersection_tolerance": 5,
+                "text_tolerance": 2,
+            })
+            for table in tables:
+                for row in table:
+                    cells = [normalize(c or "") for c in (row or [])]
+                    if len(cells) < 6: continue
+                    cells += [""] * (8 - len(cells))
+                    m = re.search(r"\b(1\d{3}|2\d{3})\b", cells[0])
+                    if m: current_code = m.group(1)
+                    if not current_code: continue
+                    desc = cells[1]
+                    reg = regime(cells[2])
+                    if not desc or not reg: continue
+                    parsed = bounds(desc) or bounds(" ".join(cells[:4]))
+                    if not parsed: continue
+                    lo, lo_inc, hi, hi_inc, unit = parsed
+                    result.append({
+                        "rubrique": current_code,
+                        "criterion": criterion(desc),
+                        "rawCondition": desc,
+                        "min": lo, "minInclusive": lo_inc,
+                        "max": hi, "maxInclusive": hi_inc,
+                        "unit": unit or infer_unit(" ".join(cells)),
+                        "regime": reg,
+                        "rayon": cells[3],
+                        "documents": {
+                            "impact": is_x(cells[4]), "danger": is_x(cells[5]),
+                            "notice": is_x(cells[6]), "rapportDangereux": is_x(cells[7]),
+                        },
+                        "sourcePage": page_no,
+                    })
+    return result
+
+
+def build() -> None:
     TMP.mkdir(parents=True, exist_ok=True)
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    urllib.request.urlretrieve(PDF_URL, PDF)
-    reader = PdfReader(str(PDF))
-    rows: list[dict] = []
-    started = False
-
-    for idx, page in enumerate(reader.pages, start=1):
-        raw = page.extract_text() or ""
-        text = normalize(raw)
-        # Annexe III starts around page 5 of the official PDF. Ignore the legislative preface.
-        if "III. Nomenclature des installations classées" in text or "Désignation de l’activité" in text:
-            started = True
-        if not started:
-            continue
-
-        lines = [normalize(x) for x in raw.splitlines() if normalize(x)]
-        current_code: str | None = None
-        current_parts: list[str] = []
-
-        def close_current() -> None:
-            nonlocal current_code, current_parts
-            if current_code and current_parts:
-                designation = normalize(" ".join(current_parts))
-                # Keep only actual designation text; discard page headers and obvious legislative leftovers.
-                if designation and not designation.lower().startswith(("journal officiel", "rapport sur les produits dangereux", "désignation de l’activité")):
-                    rows.append(add_record(idx, current_code, designation))
-            current_code = None
-            current_parts = []
-
-        for line in lines:
-            if line.lower().startswith(("journal officiel", "rapport sur les produits dangereux", "désignation de l’activité")):
-                continue
-            m = CODE_RE.match(line)
-            if m:
-                close_current()
-                current_code, rest = m.groups()
-                current_parts = [rest] if rest else []
-                continue
-            if current_code:
-                if line.startswith("Régime") or line.startswith("Rayon") or line.startswith("Affichage"):
-                    continue
-                current_parts.append(line)
-        close_current()
-
-    unique: list[dict] = []
-    seen: set[tuple[str, str]] = set()
-    banned = {"substances", "très toxiques", "toxiques", "comburantes", "explosibles", "inflammables", "combustibles", "corrosives", "divers", "activité"}
+    if not PDF.exists(): urllib.request.urlretrieve(PDF_URL, PDF)
+    rows = extract()
+    grouped: dict[str, dict] = {}
     for row in rows:
-        designation = row["designation"].strip()
-        if not designation or designation.lower() in banned:
-            continue
-        key = (row["rubrique"], designation.lower())
-        if key not in seen:
-            seen.add(key)
-            unique.append(row)
-
+        item = grouped.setdefault(row["rubrique"], {
+            "rubrique": row["rubrique"], "famille": row["rubrique"][:2] + "00",
+            "familleLabel": FAMILIES.get(row["rubrique"][:2] + "00", "Installation classée"),
+            "designation": row["criterion"], "decisionRows": [],
+            "source": "Décret exécutif n° 07-144 du 19 mai 2007", "sourceUrl": PDF_URL,
+        })
+        item["decisionRows"].append(row)
+    rubriques = []
+    for item in grouped.values():
+        unique, seen = [], set()
+        for row in item["decisionRows"]:
+            key = json.dumps(row, ensure_ascii=False, sort_keys=True)
+            if key not in seen: seen.add(key); unique.append(row)
+        item["decisionRows"] = unique
+        rubriques.append(item)
     data = {
-        "version": "07-144",
-        "date": "19 mai 2007",
-        "sourceUrl": PDF_URL,
+        "version": "07-144", "date": "19 mai 2007", "sourceUrl": PDF_URL,
         "families": [{"code": k, "label": v} for k, v in FAMILIES.items()],
-        "rubriques": unique,
-        "generated": True,
-        "generatorNote": "Extraction limitée à l’annexe III (Nomenclature). Vérification juridique requise avant dépôt administratif.",
+        "rubriques": rubriques, "generated": True,
+        "generatorNote": "decisionRows = lignes de matrice avec intervalle, régime, rayon et X des quatre documents.",
     }
     OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Generated {len(unique)} rubrique records -> {OUT}")
-
+    print(f"Generated {len(rubriques)} rubriques / {len(rows)} lignes de classement -> {OUT}")
 
 if __name__ == "__main__":
-    parse()
+    build()
