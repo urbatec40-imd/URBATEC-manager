@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Calculator, Database, ExternalLink, FileText, SearchCheck } from 'lucide-react';
 import { Field, inputCls } from '@/components/Field';
 import { classerVolaille } from '@/services/environnementReglementation';
+import { findBestActivity, type ActivityRow } from '@/services/environnementActivityMatcher';
 
 interface ProfileField { key: string; label: string; type: string; unit: string; required?: boolean; options?: string[]; }
 interface Condition { condition?: string; texte?: string; regime: string; meta?: string; }
-interface Row { rubrique: string; code?: string; famille: string; familleLabel: string; designation: string; conditions?: Condition[]; inputProfile?: ProfileField[]; source: string; sourceUrl: string; }
+interface Row extends ActivityRow { source: string; sourceUrl: string; }
 interface Dataset { version: string; date: string; sourceUrl: string; familles: { code: string; label: string }[]; rubriques: Row[]; generated?: boolean; }
 
 const EMPTY: Dataset = {
@@ -20,7 +21,23 @@ function normalizeSearch(value: string) {
   return value.trim().toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-export function EnvironnementPageV3({ clientName, dossierNumero, initialPrestation, onBack }: { clientName: string; dossierNumero?: string; initialPrestation?: string; onBack: () => void; }) {
+function resetValues(row: Row | null) {
+  const initial: Record<string, string> = {};
+  for (const f of row?.inputProfile ?? []) initial[f.key] = '';
+  return initial;
+}
+
+export function EnvironnementPageV3({
+  clientName,
+  dossierNumero,
+  initialPrestation,
+  onBack,
+}: {
+  clientName: string;
+  dossierNumero?: string;
+  initialPrestation?: string;
+  onBack: () => void;
+}) {
   const [dataset, setDataset] = useState<Dataset>(EMPTY);
   const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState('');
@@ -32,19 +49,29 @@ export function EnvironnementPageV3({ clientName, dossierNumero, initialPrestati
 
   useEffect(() => {
     fetch('/data/nomenclature-07-144.json')
-      .then(async r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return (await r.json()) as Dataset; })
+      .then(async r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return (await r.json()) as Dataset;
+      })
       .then(setDataset)
       .catch(e => setLoadError((e as Error).message));
   }, []);
 
-  const results = useMemo(() => {
-    const q = normalizeSearch(query);
-    if (!q) return [];
-    return dataset.rubriques
-      .filter(r => normalizeSearch(r.designation).includes(q))
-      .filter((r, index, arr) => arr.findIndex(x => normalizeSearch(x.designation) === normalizeSearch(r.designation)) === index)
-      .slice(0, 80);
-  }, [query, dataset.rubriques]);
+  const match = useMemo(() => findBestActivity(query, dataset.rubriques), [query, dataset.rubriques]);
+
+  // Dès qu'une désignation correspond suffisamment à la nomenclature,
+  // le système classe automatiquement l'activité sans demander de sélectionner
+  // la rubrique, la famille ou l'unité à l'utilisateur.
+  useEffect(() => {
+    if (!query.trim() || !match.row || match.score < 500) {
+      setSelected(null);
+      setAnalyse(false);
+      return;
+    }
+    setSelected(match.row);
+    setValues(resetValues(match.row));
+    setAnalyse(false);
+  }, [query, match.row, match.score]);
 
   const fields = selected?.inputProfile ?? [];
   const autoUnits = Array.from(new Set(fields.map(f => f.unit).filter(Boolean)));
@@ -73,13 +100,16 @@ export function EnvironnementPageV3({ clientName, dossierNumero, initialPrestati
     return null;
   }, [selected, values]);
 
-  function selectRow(row: Row) {
+  const suggestions = useMemo(() => {
+    if (!query.trim() || !match.row || match.score >= 850) return [];
+    return match.alternatives;
+  }, [query, match]);
+
+  function chooseSuggestion(row: Row) {
     setSelected(row);
-    setQuery(row.designation);
+    setValues(resetValues(row));
     setAnalyse(false);
-    const initial: Record<string, string> = {};
-    for (const f of row.inputProfile ?? []) initial[f.key] = '';
-    setValues(initial);
+    setQuery(row.designation);
   }
 
   return (
@@ -104,17 +134,24 @@ export function EnvironnementPageV3({ clientName, dossierNumero, initialPrestati
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4"><SearchCheck size={18} className="text-emerald-600" /><h2 className="font-semibold text-gray-800">Recherche de l'activité</h2></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Activité / recherche" required>
-              <input className={inputCls} autoFocus value={query} onChange={e => { setQuery(e.target.value); setSelected(null); setAnalyse(false); }} placeholder="Ex. STATI / Ovins / Poulets / Station..." />
+            <Field label="Désignation de l'activité" required>
+              <input
+                className={inputCls}
+                autoFocus
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Ex. élevage de poulets, ovins, station de dessalement..."
+              />
             </Field>
             <Field label="Commune"><input className={inputCls} value={commune} onChange={e => setCommune(e.target.value)} placeholder="Commune du projet" /></Field>
           </div>
 
-          {query.trim() && results.length > 0 && (
-            <div className="relative mt-4">
-              <div className="border border-gray-200 rounded-lg divide-y max-h-80 overflow-y-auto bg-white shadow-sm">
-                {results.map(row => (
-                  <button key={`${row.rubrique}-${row.designation}`} onClick={() => selectRow(row)} className={`w-full text-left px-3 py-2.5 hover:bg-emerald-50 transition-colors ${selected?.rubrique === row.rubrique ? 'bg-emerald-50' : ''}`}>
+          {query.trim() && !selected && match.score >= 250 && match.alternatives.length > 0 && (
+            <div className="mt-4 rounded-lg border border-gray-200 bg-white shadow-sm">
+              <div className="px-3 py-2 text-xs font-semibold text-gray-500">Correspondances possibles</div>
+              <div className="divide-y max-h-56 overflow-y-auto">
+                {([match.row, ...suggestions].filter(Boolean) as Row[]).map(row => (
+                  <button key={`${row.rubrique}-${row.designation}`} onClick={() => chooseSuggestion(row)} className="w-full text-left px-3 py-2.5 hover:bg-emerald-50">
                     <div className="text-sm font-medium text-gray-800">{row.designation}</div>
                   </button>
                 ))}
@@ -122,13 +159,17 @@ export function EnvironnementPageV3({ clientName, dossierNumero, initialPrestati
             </div>
           )}
 
-          {query.trim() && results.length === 0 && <div className="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune activité correspondante dans la nomenclature.</div>}
+          {query.trim() && !selected && match.score === 0 && <div className="mt-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune activité correspondante dans la nomenclature.</div>}
 
           {selected && <div className="mt-5 border-t pt-5">
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 mb-4">
-              <div className="text-xs font-semibold text-slate-500 uppercase">Activité sélectionnée</div>
-              <div className="font-semibold text-slate-900 mt-1">{selected.designation}</div>
-              <div className="text-xs text-slate-500 mt-1">Rubrique : {selected.rubrique}</div>
+            <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 mb-4">
+              <div className="text-xs font-semibold text-emerald-700 uppercase">Classement automatique depuis la Nomenclature 07-144</div>
+              <div className="font-semibold text-emerald-950 mt-1">{selected.designation}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+                <Result label="Famille" value={selected.familleLabel} />
+                <Result label="Rubrique" value={selected.rubrique} />
+                <Result label="N°" value={selected.rubrique} />
+              </div>
               {autoUnits.length > 0 && <div className="mt-3 inline-flex items-center rounded-full bg-white border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700">Unité déterminée automatiquement : {autoUnits.join(' / ')}</div>}
             </div>
 
@@ -162,4 +203,6 @@ export function EnvironnementPageV3({ clientName, dossierNumero, initialPrestati
   );
 }
 
-function Result({ label, value }: { label: string; value: string }) { return <div className="rounded-lg border border-gray-200 bg-gray-50 p-3"><div className="text-[11px] font-semibold text-gray-500 uppercase">{label}</div><div className="mt-1 font-semibold text-gray-800">{value}</div></div>; }
+function Result({ label, value }: { label: string; value: string }) {
+  return <div className="rounded-lg border border-gray-200 bg-white p-3"><div className="text-[11px] font-semibold text-gray-500 uppercase">{label}</div><div className="mt-1 font-semibold text-gray-800">{value}</div></div>;
+}
