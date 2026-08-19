@@ -1,1 +1,1 @@
-export { EnvironnementPageV3 as EnvironnementPage } from './EnvironnementPageV3';
+export { EnvironnementPageV4 as EnvironnementPage } from './EnvironnementPageV4';
