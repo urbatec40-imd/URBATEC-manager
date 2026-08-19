@@ -7,6 +7,7 @@ on:
       - bolt-latest-2026-08-19
     paths:
       - 'scripts/build-nomenclature-07-144.py'
+      - 'scripts/build-nomenclature-07-144-v2.py'
       - '.github/workflows/build-nomenclature-07-144.yml'
 
 permissions:
@@ -23,12 +24,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y poppler-utils
 
       - name: Generate dataset from official PDF
-        run: python3 scripts/build-nomenclature-07-144.py
-
-      - name: Publish dataset where the app reads it
-        run: |
-          mkdir -p public/data
-          cp src/data/nomenclature-07-144.json public/data/nomenclature-07-144.json
+        run: python3 scripts/build-nomenclature-07-144-v2.py
 
       - name: Commit generated dataset
         run: |
@@ -38,6 +34,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Dataset unchanged"
           else
-            git commit -m "chore(environment): update generated 07-144 dataset"
+            git commit -m "chore(environment): update full 07-144 dataset"
             git push
           fi
