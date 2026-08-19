@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
-import { EnvironnementPageV10 } from './EnvironnementPageV10';
+import { EnvironnementPageV11 } from './EnvironnementPageV11';
 
-export function EnvironnementPage(props: ComponentProps<typeof EnvironnementPageV10>) {
-  return <EnvironnementPageV10 {...props} />;
+export function EnvironnementPage(props: ComponentProps<typeof EnvironnementPageV11>) {
+  return <EnvironnementPageV11 {...props} />;
 }
