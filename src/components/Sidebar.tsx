@@ -19,6 +19,7 @@ export type PageKey =
   | 'echeances'
   | 'expertises'
   | 'laboratoire'
+  | 'environnement'
   | 'parametres';
 
 interface SidebarProps {
@@ -40,12 +41,8 @@ const NAV: { key: PageKey; label: string; icon: typeof LayoutDashboard }[] = [
 ];
 
 export function Sidebar({ current, onNavigate, open, onClose, session, onLogout }: SidebarProps) {
-  const displayName = session?.nom_complet || session?.username || 'Utilisateur';
-  const initials = displayName.charAt(0).toUpperCase();
-
   return (
     <>
-      {/* Overlay mobile */}
       {open && (
         <div
           className="fixed inset-0 bg-black/40 z-30 lg:hidden"
@@ -58,28 +55,21 @@ export function Sidebar({ current, onNavigate, open, onClose, session, onLogout 
           open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        {/* Logo / Header */}
         <div className="px-5 py-5 border-b border-slate-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-lg">
               <Building2 size={22} className="text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-white text-lg leading-tight">
-                URATEC
-              </h1>
-              <p className="text-[10px] text-slate-400 leading-tight">
-                MANAGER
-              </p>
+              <h1 className="font-bold text-white text-lg leading-tight">URATEC</h1>
+              <p className="text-[10px] text-slate-400 leading-tight">MANAGER</p>
             </div>
           </div>
           <p className="text-[9px] text-slate-500 mt-3 leading-relaxed">
-            Bureau d'études • Topographie • Foncier • Architecture •
-            Environnement
+            Bureau d'études • Topographie • Foncier • Architecture • Environnement
           </p>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-3">
           {NAV.map(({ key, label, icon: Icon }, index) => {
             const active = current === key;
@@ -103,18 +93,17 @@ export function Sidebar({ current, onNavigate, open, onClose, session, onLogout 
           })}
         </nav>
 
-        {/* User + Logout */}
         {session && (
           <div className="px-4 py-3 border-t border-slate-700">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center text-white text-sm font-bold">
-                {initials}
+                {(session.nom_complet || session.username || 'U').charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
-                  {displayName}
+                  {session.nom_complet || session.username || 'Utilisateur'}
                 </p>
-                <p className="text-[10px] text-slate-400">{session.role || 'Utilisateur'}</p>
+                <p className="text-[10px] text-slate-400">{session.role}</p>
               </div>
             </div>
             <button
@@ -127,7 +116,6 @@ export function Sidebar({ current, onNavigate, open, onClose, session, onLogout 
           </div>
         )}
 
-        {/* Footer */}
         <div className="px-5 py-3 border-t border-slate-700 text-[10px] text-slate-500">
           URATEC Manager V0 — © {new Date().getFullYear()}
         </div>
