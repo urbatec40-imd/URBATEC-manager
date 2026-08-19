@@ -2,11 +2,7 @@ import {
   LayoutDashboard,
   FolderKanban,
   Users,
-  FileText,
   CreditCard,
-  CalendarClock,
-  Scale,
-  FlaskConical,
   Settings,
   Building2,
   LogOut,
@@ -37,11 +33,7 @@ const NAV: { key: PageKey; label: string; icon: typeof LayoutDashboard }[] = [
   { key: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { key: 'dossiers', label: 'Dossiers', icon: FolderKanban },
   { key: 'clients', label: 'Clients', icon: Users },
-  { key: 'documents', label: 'Documents', icon: FileText },
   { key: 'paiements', label: 'Paiements', icon: CreditCard },
-  { key: 'echeances', label: 'Échéances', icon: CalendarClock },
-  { key: 'expertises', label: 'Expertises judiciaires', icon: Scale },
-  { key: 'laboratoire', label: 'Laboratoire', icon: FlaskConical },
   { key: 'parametres', label: 'Paramètres', icon: Settings },
 ];
 
@@ -78,7 +70,7 @@ export function Sidebar({ current, onNavigate, open, onClose, session, onLogout 
           </div>
           <p className="text-[9px] text-slate-500 mt-3 leading-relaxed">
             Bureau d'études • Topographie • Foncier • Architecture •
-            Environnement • Laboratoire • Expertises judiciaires
+            Environnement
           </p>
         </div>
 
