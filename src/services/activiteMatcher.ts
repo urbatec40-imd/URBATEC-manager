@@ -53,8 +53,8 @@ const SYNONYMS: Record<string, string[]> = {
   gasoil: ['carburant', 'carburants', 'gazole', 'hydrocarbure', 'inflammable'],
   gaz: ['gpl', 'gaz', 'inflammable', 'stockage'],
   gpl: ['gaz', 'inflammable', 'stockage'],
-  ciment: ['construction', 'materiaux', 'minerais', 'fabrication'],
-  beton: ['beton', 'ciment', 'construction', 'materiaux'],
+  ciment: ['beton', 'construction', 'materiaux', 'minerais', 'fabrication'],
+  beton: ['ciment', 'construction', 'materiaux'],
   briques: ['materiaux', 'fabrication', 'construction'],
   parpaing: ['materiaux', 'fabrication', 'construction'],
   metal: ['metaux', 'minerais', 'usinage'],
@@ -67,16 +67,17 @@ const SYNONYMS: Record<string, string[]> = {
   medicament: ['pharmaceutique', 'produits pharmaceutiques', 'chimie'],
 };
 
-const SEE_RE = /\bvoir\s+([12]\d{3})\b/gi;
+const SEE_RE = /\\bvoir\\s+([12]\\d{3})\\b/gi;
+const SEE_WITH_CONTEXT_RE = /([^.;:()]{2,120})\\(\\s*voir\\s+([12]\\d{3})\\s*\\)/gi;
 
 function normalize(value: string): string {
   return value
     .toLocaleLowerCase('fr-FR')
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\\u0300-\\u036f]/g, '')
     .replace(/[’'`´]/g, ' ')
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
-    .replace(/\s+/g, ' ')
+    .replace(/[^\\p{L}\\p{N}]+/gu, ' ')
+    .replace(/\\s+/g, ' ')
     .trim();
 }
 
@@ -146,11 +147,17 @@ function referencedRubriques(text: string): string[] {
   return Array.from(text.matchAll(SEE_RE), match => match[1]);
 }
 
+function referenceContexts(text: string): Array<{ context: string; rubrique: string }> {
+  return Array.from(text.matchAll(SEE_WITH_CONTEXT_RE), match => ({
+    context: match[1].trim(),
+    rubrique: match[2],
+  }));
+}
+
 function isPureCrossReference(text: string): boolean {
   const normalized = normalize(text);
-  return /\bvoir\s+[12]\d{3}\b/.test(normalized) &&
-    /^(?:.*\bvoir\s+[12]\d{3}\b.*)$/.test(normalized) &&
-    !/(fabrication|stockage|transformation|elevage|abattage|installation|production|broyage|conditionnement|traitement)/.test(normalized.replace(/\bvoir\s+[12]\d{3}\b/g, ''));
+  return /\\bvoir\\s+[12]\\d{3}\\b/.test(normalized) &&
+    !/(fabrication|stockage|transformation|elevage|abattage|installation|production|broyage|conditionnement|traitement|vente|preparation|emploi|utilisation)/.test(normalized.replace(/\\bvoir\\s+[12]\\d{3}\\b/g, ''));
 }
 
 export function buildActivityIndex<T extends ActivityRowLike>(rows: T[]) {
@@ -161,6 +168,7 @@ export function buildActivityIndex<T extends ActivityRowLike>(rows: T[]) {
       normalized: normalize(row.designation),
       tokens: new Set(tokens(row.designation)),
       references: referencedRubriques(row.designation),
+      contexts: referenceContexts(row.designation),
       pureCrossReference: isPureCrossReference(row.designation),
     }));
 }
@@ -181,38 +189,40 @@ export function suggestActivities<T extends ActivityRowLike>(
   const aggregate = new Map<string, ActivityCandidate>();
 
   for (const item of index) {
-    if (item.pureCrossReference) continue;
+    const direct = scoreCandidate(queryTokens, item.tokens);
+    const directScore = direct.score;
 
-    const result = scoreCandidate(queryTokens, item.tokens);
-    if (result.score <= 0) continue;
+    // The most reliable signal when PDF columns are merged is a legal cross-reference:
+    // "Minoteries (voir 2220)" means the activity belongs to rubrique 2220.
+    if (item.contexts.length) {
+      for (const context of item.contexts) {
+        const contextScore = scoreCandidate(queryTokens, new Set(tokens(context.context))).score;
+        if (contextScore <= 0) continue;
 
-    let score = result.score;
-    if (item.normalized.includes(normalize(description))) score += 8;
-
-    // Direct references such as "Minoteries (voir 2220)" should point to 2220.
-    const refs = item.references;
-    if (refs.length) {
-      for (const ref of refs) {
-        const target = targetByRubrique.get(ref);
-        if (!target) continue;
-        const targetTokens = new Set(tokens(target.designation));
-        const targetScore = scoreCandidate(queryTokens, targetTokens).score;
-        const finalScore = Math.max(score + 4, targetScore + 6);
-        const key = target.rubrique + '|' + target.designation;
-        const existing = aggregate.get(key);
+        const target = targetByRubrique.get(context.rubrique);
+        const designation = target?.designation || context.context;
+        const family = target?.famille || item.row.famille;
+        const familyLabel = target?.familleLabel || item.row.familleLabel;
+        const source = target?.source || item.row.source;
+        const key = `${context.rubrique}|${designation}`;
         const candidate: ActivityCandidate = {
-          rubrique: target.rubrique,
-          famille: target.famille,
-          familleLabel: target.familleLabel,
-          designation: target.designation,
-          score: finalScore,
-          matchedTerms: result.matched,
-          source: target.source,
+          rubrique: context.rubrique,
+          famille: family,
+          familleLabel: familyLabel,
+          designation,
+          score: contextScore + 20,
+          matchedTerms: direct.matched.length ? direct.matched : tokens(context.context),
+          source,
         };
+        const existing = aggregate.get(key);
         if (!existing || candidate.score > existing.score) aggregate.set(key, candidate);
       }
-      continue;
     }
+
+    if (item.pureCrossReference || directScore <= 0) continue;
+
+    let score = directScore;
+    if (item.normalized.includes(normalize(description))) score += 8;
 
     const key = item.row.rubrique + '|' + item.row.designation;
     const existing = aggregate.get(key);
@@ -222,7 +232,7 @@ export function suggestActivities<T extends ActivityRowLike>(
       familleLabel: item.row.familleLabel,
       designation: item.row.designation,
       score,
-      matchedTerms: result.matched,
+      matchedTerms: direct.matched,
       source: item.row.source,
     };
     if (!existing || candidate.score > existing.score) aggregate.set(key, candidate);
