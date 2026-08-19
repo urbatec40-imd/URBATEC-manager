@@ -64,7 +64,7 @@ function documentsFor(row: DecisionRow) {
     ['Étude de dangers', !!row.documents?.danger],
     ['Notice d’impact', !!row.documents?.notice],
     ['Rapport sur les produits dangereux', !!row.documents?.rapportDangereux],
-  ] as const;
+  ].filter(([, required]) => required) as const;
 }
 function directRubrique(query: string, rows: Row[]) {
   const code = norm(query);
@@ -140,7 +140,7 @@ export function EnvironnementPageV10({ clientName, dossierNumero, onBack }: { cl
 
       {selectedCase && <>
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5"><div className="text-sm font-semibold text-emerald-800">Classement selon la Nomenclature 07-144</div><div className="text-2xl font-bold text-emerald-950 mt-1">{category(selectedCase.regime)} — {regimeLabel(selectedCase.regime)}</div><div className="grid md:grid-cols-4 gap-3 mt-4"><Result label="Rubrique" value={selectedCase.rubrique}/><Result label="Situation" value={rangeLabel(selectedCase)}/><Result label="Rayon d’affichage" value={selectedCase.rayon || '—'}/><Result label="Régime" value={selectedCase.regime}/></div></div>
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><FileText size={18} className="text-emerald-600"/><h2 className="font-semibold">Dossier réglementaire — documents marqués X</h2></div><div className="grid md:grid-cols-2 gap-3">{documentsFor(selectedCase).map(([name, required]) => <div key={name} className={`rounded-lg border p-4 ${required ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'}`}><div className="text-xs font-semibold">{required ? 'REQUIS — X' : 'Non requis'}</div><div className="font-medium mt-1">{name}</div></div>)}</div></div>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><FileText size={18} className="text-emerald-600"/><h2 className="font-semibold">التقارير اللازمة</h2></div>{documentsFor(selectedCase).length ? <div className="grid md:grid-cols-2 gap-3">{documentsFor(selectedCase).map(([name]) => <div key={name} className="rounded-lg border p-4 bg-emerald-50 border-emerald-200"><div className="text-xs font-semibold">مطلوب</div><div className="font-medium mt-1">{name}</div></div>)}</div> : <div className="text-sm text-gray-600">لا توجد تقارير محددة بعلامة X لهذه الحالة.</div>}</div>
       </>}
     </>}
 
