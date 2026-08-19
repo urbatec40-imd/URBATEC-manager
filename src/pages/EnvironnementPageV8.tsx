@@ -1,11 +1,34 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Check, Calculator, FileText, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, Calculator, Check, FileText, X } from 'lucide-react';
 import { Field, inputCls } from '@/components/Field';
 import { buildActivityIndex, suggestActivities, type ActivityCandidate } from '@/services/activiteMatcher';
-import { extractRequirementHints, getClassificationProfile, type ClassificationField, type ClassificationResult } from '@/services/environnementClassification';
+import { getClassificationProfile, type ClassificationField, type ClassificationResult } from '@/services/environnementClassification';
 
-interface Condition { condition?: string; texte?: string; regime: string; meta?: string }
-interface Row { rubrique: string; famille: string; familleLabel: string; designation: string; conditions?: Condition[]; inputProfile?: ClassificationField[]; source: string; sourceUrl: string }
+interface DecisionRow {
+  rubrique: string;
+  criterion: string;
+  rawCondition: string;
+  min?: number | null;
+  minInclusive?: boolean;
+  max?: number | null;
+  maxInclusive?: boolean;
+  unit?: string;
+  regime: string;
+  rayon?: string;
+  documents?: { impact?: boolean; danger?: boolean; notice?: boolean; rapportDangereux?: boolean };
+  sourcePage?: number;
+}
+interface Row {
+  rubrique: string;
+  famille: string;
+  familleLabel: string;
+  designation: string;
+  conditions?: Array<{ condition?: string; texte?: string; regime: string; meta?: string }>;
+  inputProfile?: ClassificationField[];
+  decisionRows?: DecisionRow[];
+  source: string;
+  sourceUrl: string;
+}
 interface Dataset { version: string; date: string; sourceUrl: string; rubriques: Row[] }
 interface AcceptedRubrique extends ActivityCandidate { id: string; row: Row }
 
@@ -15,132 +38,101 @@ function clean(v: string) {
   return v.replace(/Ã©/g, 'é').replace(/Ã¨/g, 'è').replace(/Ãª/g, 'ê').replace(/Ã®/g, 'î').replace(/Ã´/g, 'ô').replace(/Ã¹/g, 'ù').replace(/Ã§/g, 'ç').replace(/Ã /g, 'à').replace(/â€™/g, '’').replace(/dâ€™/g, 'd’').replace(/lâ€™/g, 'l’').replace(/\s+/g, ' ').trim();
 }
 
-function conditionText(row: Row) {
-  return (row.conditions ?? []).map(c => `${c.condition ?? ''} ${c.texte ?? ''} ${c.meta ?? ''}`).join(' ');
+function regimeLabel(regime: string) {
+  return ({ AM: 'AM — Autorisation ministérielle', AW: 'AW — Autorisation du Wali', APAPC: 'APAPC — Autorisation du président de l’APC', D: 'D — Déclaration auprès du président de l’APC' } as Record<string, string>)[regime] ?? regime;
 }
-
-function fieldsFor(row: Row): ClassificationField[] {
-  if (row.inputProfile?.length) return row.inputProfile;
-  return getClassificationProfile(row.rubrique, conditionText(row), row.conditions)?.fields ?? [];
+function categoryLabel(regime: string) { return ({ AM: '1re catégorie', AW: '2e catégorie', APAPC: '3e catégorie', D: '4e catégorie' } as Record<string, string>)[regime] ?? ''; }
+function normalizeValue(raw: string) { const n = Number(String(raw).replace(/\s/g, '').replace(',', '.')); return Number.isFinite(n) ? n : null; }
+function matches(row: DecisionRow, value: number) {
+  const minOk = row.min == null ? true : row.minInclusive === false ? value > row.min : value >= row.min;
+  const maxOk = row.max == null ? true : row.maxInclusive === false ? value < row.max : value <= row.max;
+  return minOk && maxOk;
 }
-
-function classify(row: Row, values: Record<string, string>): ClassificationResult | null {
-  const profile = getClassificationProfile(row.rubrique, conditionText(row), row.conditions);
-  return profile?.classify(values) ?? null;
-}
-
-function docsFor(row: Row, result: ClassificationResult | null) {
-  const condition = result ? row.conditions?.find(c => c.regime === result.regime) : undefined;
-  const text = `${condition?.condition ?? ''} ${condition?.texte ?? ''} ${condition?.meta ?? ''} ${row.designation}`;
-  const hints = extractRequirementHints(text);
-  return { docs: [
-    ...(hints.docs.impact ? ['Étude d’impact'] : []),
-    ...(hints.docs.danger ? ['Étude de dangers'] : []),
-    ...(hints.docs.notice ? ['Notice d’impact'] : []),
-    ...(hints.docs.rapportDangereux ? ['Rapport sur les produits dangereux'] : []),
-  ], rayon: result?.rayon ?? hints.rayon };
+function rangeLabel(row: DecisionRow) {
+  const u = row.unit ? ` ${row.unit}` : '';
+  if (row.min != null && row.max != null) return `${row.minInclusive === false ? '>' : '≥'} ${row.min}${u} et ${row.maxInclusive === false ? '<' : '≤'} ${row.max}${u}`;
+  if (row.min != null) return `${row.minInclusive === false ? '>' : '≥'} ${row.min}${u}`;
+  if (row.max != null) return `${row.maxInclusive === false ? '<' : '≤'} ${row.max}${u}`;
+  return row.rawCondition;
 }
 
 export function EnvironnementPageV8({ clientName, dossierNumero, onBack }: { clientName: string; dossierNumero?: string; onBack: () => void }) {
   const [dataset, setDataset] = useState<Dataset>(EMPTY);
   const [query, setQuery] = useState('');
-  const [commune, setCommune] = useState('');
   const [accepted, setAccepted] = useState<AcceptedRubrique[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [values, setValues] = useState<Record<string, Record<string, string>>>({});
-  const [results, setResults] = useState<Record<string, ClassificationResult | null>>({});
-  const [aiEstimate, setAiEstimate] = useState<Record<string, string>>({});
-  const [aiAccepted, setAiAccepted] = useState<Record<string, boolean>>({});
-  const [acceptedClass, setAcceptedClass] = useState<Record<string, boolean>>({});
-  const [loadError, setLoadError] = useState('');
+  const [criterion, setCriterion] = useState('');
+  const [value, setValue] = useState('');
+  const [result, setResult] = useState<ClassificationResult | null>(null);
+  const [acceptedClass, setAcceptedClass] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetch('/data/nomenclature-07-144.json')
       .then(async r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return (await r.json()) as Dataset; })
       .then(d => setDataset({ ...d, rubriques: (d.rubriques ?? []).map(r => ({ ...r, designation: clean(r.designation), familleLabel: clean(r.familleLabel) })) }))
-      .catch(e => setLoadError((e as Error).message));
+      .catch(e => setError((e as Error).message));
   }, []);
 
   const index = useMemo(() => buildActivityIndex(dataset.rubriques), [dataset.rubriques]);
-  const suggestions = useMemo(() => query.trim().length >= 2 ? suggestActivities(index, query, 12) : [], [index, query]);
+  const suggestions = useMemo(() => query.trim().length >= 2 && !selectedId ? suggestActivities(index, query, 12) : [], [index, query, selectedId]);
   const selected = accepted.find(a => a.id === selectedId) ?? null;
-  const fields = selected ? fieldsFor(selected.row) : [];
-  const result = selected ? results[selected.id] ?? null : null;
-  const dossier = selected ? docsFor(selected.row, result) : null;
-  const canCalculate = !!selected && fields.length > 0 && fields.every(f => !f.required || String(values[selected.id]?.[f.key] ?? '').trim() !== '');
+  const decisionRows = selected?.row.decisionRows ?? [];
+  const criteria = useMemo(() => Array.from(new Set(decisionRows.map(r => `${r.criterion}|||${r.unit ?? ''}`))).map(x => { const [label, unit] = x.split('|||'); return { key: x, label, unit }; }), [decisionRows]);
+  const selectedCriteriaRows = criterion ? decisionRows.filter(r => `${r.criterion}|||${r.unit ?? ''}` === criterion) : decisionRows;
+  const fallbackFields = selected && decisionRows.length === 0 ? getClassificationProfile(selected.row.rubrique, (selected.row.conditions ?? []).map(c => `${c.condition ?? ''} ${c.texte ?? ''} ${c.meta ?? ''}`).join(' '), selected.row.conditions)?.fields ?? [] : [];
 
-  function resetAll() {
-    setQuery(''); setAccepted([]); setSelectedId(null); setValues({}); setResults({}); setAiEstimate({}); setAiAccepted({}); setAcceptedClass({});
+  function reset() {
+    setQuery(''); setAccepted([]); setSelectedId(null); setCriterion(''); setValue(''); setResult(null); setAcceptedClass(false); setError('');
   }
-
-  function acceptRubrique(e: React.MouseEvent<HTMLButtonElement>, candidate: ActivityCandidate) {
-    e.preventDefault(); e.stopPropagation();
-    const row = dataset.rubriques.find(r => r.rubrique === candidate.rubrique && clean(r.designation) === candidate.designation)
-      ?? dataset.rubriques.find(r => r.rubrique === candidate.rubrique);
+  function acceptRubrique(candidate: ActivityCandidate) {
+    const row = dataset.rubriques.find(r => r.rubrique === candidate.rubrique && clean(r.designation) === candidate.designation) ?? dataset.rubriques.find(r => r.rubrique === candidate.rubrique);
     if (!row) return;
     const id = `${row.rubrique}|${row.designation}`;
-    const acceptedCandidate = { ...candidate, id, row };
-    setAccepted(prev => prev.some(a => a.id === id) ? prev : [...prev, acceptedCandidate]);
-    setSelectedId(id);
-    setValues(prev => ({ ...prev, [id]: prev[id] ?? {} }));
-    setResults(prev => ({ ...prev, [id]: null }));
-    setAcceptedClass(prev => ({ ...prev, [id]: false }));
+    setAccepted([{ ...candidate, id, row }]); setSelectedId(id); setCriterion(''); setValue(''); setResult(null); setAcceptedClass(false);
   }
-
-  function estimateWithAI() {
-    if (!selected || fields.length === 0) return;
-    const first = fields[0];
-    const text = `${query} ${selected.designation}`.toLowerCase();
-    let estimate = '';
-    if (first.key === 'puissanceInstallee' && /minoterie|moulin|meunerie/.test(text)) estimate = '180';
-    else if (first.key === 'animauxEquivalents') estimate = '5000';
-    else estimate = '';
-    setAiEstimate(prev => ({ ...prev, [selected.id]: estimate }));
-  }
-
-  function useAIEstimate() {
-    if (!selected || !aiEstimate[selected.id] || fields.length === 0) return;
-    const key = fields[0].key;
-    setValues(prev => ({ ...prev, [selected.id]: { ...(prev[selected.id] ?? {}), [key]: aiEstimate[selected.id] } }));
-    setAiAccepted(prev => ({ ...prev, [selected.id]: true }));
-    setResults(prev => ({ ...prev, [selected.id]: null }));
-  }
-
   function calculate() {
     if (!selected) return;
-    setResults(prev => ({ ...prev, [selected.id]: classify(selected.row, values[selected.id] ?? {}) }));
-    setAcceptedClass(prev => ({ ...prev, [selected.id]: false }));
+    if (decisionRows.length > 0) {
+      const n = normalizeValue(value);
+      if (n == null) { setResult(null); return; }
+      const matched = selectedCriteriaRows.find(r => matches(r, n));
+      if (!matched) { setResult(null); return; }
+      setResult({ code: `${selected.rubrique}-${matched.regime}-${matched.sourcePage ?? ''}`.replace(/-$/, ''), regime: matched.regime, categorie: categoryLabel(matched.regime), seuil: rangeLabel(matched), rayon: matched.rayon, documents: matched.documents } as ClassificationResult & { documents?: DecisionRow['documents'] });
+      setAcceptedClass(false);
+      return;
+    }
+    if (fallbackFields.length > 0) {
+      const profile = getClassificationProfile(selected.row.rubrique, (selected.row.conditions ?? []).map(c => `${c.condition ?? ''} ${c.texte ?? ''} ${c.meta ?? ''}`).join(' '), selected.row.conditions);
+      setResult(profile?.classify({ [fallbackFields[0].key]: value }) ?? null);
+      setAcceptedClass(false);
+    }
   }
+
+  const docs = (result as (ClassificationResult & { documents?: DecisionRow['documents'] }) | null)?.documents;
+  const canCalculate = !!selected && !!value.trim();
 
   return <div className="space-y-6">
     <div className="flex items-center justify-between gap-3">
-      <div><h1 className="text-2xl font-bold text-gray-800">Module Environnement</h1><p className="text-sm text-gray-500">{dossierNumero ?? 'Nouveau projet'}{clientName ? ` — ${clientName}` : ''}</p></div>
+      <div className="flex items-center gap-3"><button type="button" onClick={onBack} className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"><ArrowLeft size={18}/></button><div><h1 className="text-2xl font-bold text-gray-800">Module Environnement</h1><p className="text-sm text-gray-500">{dossierNumero ?? 'Nouveau projet'}{clientName ? ` — ${clientName}` : ''}</p></div></div>
       <span className="text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Nomenclature 07-144</span>
     </div>
 
-    <div className="grid grid-cols-3 gap-2 text-xs"><Step n="1" title="Rubrique" active={!selected}/><Step n="2" title="Classement" active={!!selected && !acceptedClass[selected.id]}/><Step n="3" title="Dossier réglementaire" active={!!selected && !!acceptedClass[selected.id]}/></div>
+    <div className="grid grid-cols-3 gap-2 text-xs"><Step n="1" title="Rubrique" active={!selected}/><Step n="2" title="Classement" active={!!selected && !acceptedClass}/><Step n="3" title="Dossier réglementaire" active={!!selected && acceptedClass}/></div>
 
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <Field label="Type / désignation de l’activité" required>
-        <div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => setQuery(e.target.value)} placeholder="Ex. minoterie, station-service, abattoir, élevage de volailles…" />{query && <button type="button" onClick={resetAll} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div>
-      </Field>
-      <div className="mt-4"><Field label="Commune"><input className={inputCls} value={commune} onChange={e => setCommune(e.target.value)} /></Field></div>
-      {query.trim().length >= 2 && !selected && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div><div className="border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map(c => <div key={`${c.rubrique}-${c.designation}`} className="p-4 flex gap-3 items-center"><div className="flex-1"><div className="font-medium text-sm">{c.designation}</div><div className="text-xs text-gray-500 mt-1">{c.familleLabel} · Rubrique {c.rubrique}</div></div><button type="button" onClick={e => acceptRubrique(e,c)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>)}</div></div>}
-    </div>
+    {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><Field label="Type / désignation de l’activité" required><div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => setQuery(e.target.value)} placeholder="Ex. minoterie, station-service, abattoir, élevage de volailles…" />{query && <button type="button" onClick={reset} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div></Field>{query.trim().length >= 2 && <div className="mt-4"><div className="text-xs font-semibold text-gray-500 mb-2">Rubriques / activités suggérées</div>{suggestions.length > 0 ? <div className="border rounded-lg divide-y max-h-96 overflow-y-auto">{suggestions.map(c => <div key={`${c.rubrique}-${c.designation}`} className="p-4 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.designation}</div><div className="text-xs text-gray-500 mt-1">{c.familleLabel} · Rubrique {c.rubrique}</div></div><button type="button" onClick={() => acceptRubrique(c)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>)}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}</div>}
 
     {selected && <>
-      <div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-3"><Check className="text-emerald-600" size={18}/><h2 className="font-semibold">Rubrique acceptée</h2></div><div className="font-semibold">Rubrique {selected.rubrique}</div><div className="text-sm text-gray-700 mt-1">{selected.designation}</div><div className="text-xs text-gray-500 mt-1">{selected.familleLabel}</div></div>
+      <div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-5"><div className="text-sm font-semibold text-emerald-800">Rubrique acceptée</div><div className="text-xl font-bold mt-1">{selected.rubrique}</div><div className="text-sm text-gray-700 mt-1">{selected.designation}</div><div className="text-xs text-gray-500 mt-1">{selected.familleLabel}</div></div>
 
-      <div className="bg-white rounded-xl border border-violet-200 shadow-sm p-5"><div className="flex items-center gap-2"><Sparkles size={18} className="text-violet-600"/><h2 className="font-semibold">Estimation IA</h2></div><p className="text-sm text-gray-600 mt-2">Optionnel : si vous ne connaissez pas la valeur demandée par la rubrique, l’IA peut proposer une estimation à partir de la description du projet.</p>{fields.length > 0 ? <div className="mt-4 flex flex-wrap items-center gap-3"><button type="button" onClick={estimateWithAI} className="px-4 py-2 rounded-lg border border-violet-300 text-violet-700 font-semibold text-sm">Estimer la valeur</button>{aiEstimate[selected.id] && <><div className="rounded-lg bg-violet-50 border border-violet-200 px-4 py-2 text-sm"><span className="text-gray-500">Valeur estimée :</span> <strong>{aiEstimate[selected.id]} {fields[0].unit}</strong></div><button type="button" onClick={useAIEstimate} className="px-4 py-2 rounded-lg bg-violet-600 text-white font-semibold text-sm">Utiliser cette estimation</button></>}</div> : <div className="mt-3 text-sm text-gray-500">Aucun critère structuré disponible pour proposer une estimation.</div>}</div>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><Calculator size={18} className="text-emerald-600"/><h2 className="font-semibold">Données de classement</h2></div>{decisionRows.length > 0 ? <><div className="text-sm text-gray-600 mb-3">La donnée demandée est déterminée uniquement à partir de la Rubrique sélectionnée.</div>{criteria.length > 1 && <Field label="Critère"><select className={inputCls} value={criterion} onChange={e => { setCriterion(e.target.value); setValue(''); setResult(null); }}><option value="">Choisir le critère</option>{criteria.map(c => <option key={c.key} value={c.key}>{c.label}{c.unit ? ` (${c.unit})` : ''}</option>)}</select></Field>}<div className="mt-4">{criteria.length <= 1 || criterion ? <Field label={`${(criteria.find(c => c.key === criterion)?.label ?? criteria[0]?.label ?? 'Valeur de classement')}${(criteria.find(c => c.key === criterion)?.unit ?? criteria[0]?.unit) ? ` (${criteria.find(c => c.key === criterion)?.unit ?? criteria[0]?.unit})` : ''}`} required><input className={inputCls} type="number" min="0" value={value} onChange={e => { setValue(e.target.value); setResult(null); setAcceptedClass(false); }} /></Field> : null}</div></> : fallbackFields.length > 0 ? <Field label={`${fallbackFields[0].label}${fallbackFields[0].unit ? ` (${fallbackFields[0].unit})` : ''}`} required><input className={inputCls} type="number" min="0" value={value} onChange={e => { setValue(e.target.value); setResult(null); setAcceptedClass(false); }} /></Field> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">Aucune donnée de classement structurée n’est disponible pour cette Rubrique.</div>}<button type="button" disabled={!canCalculate} onClick={calculate} className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-600 text-white text-sm font-semibold disabled:opacity-40"><Calculator size={16}/> Suivant / Calculer le classement</button></div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><Calculator size={18} className="text-emerald-600"/><h2 className="font-semibold">Donnée demandée par la Rubrique {selected.rubrique}</h2></div>{fields.length === 0 ? <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">Cette rubrique n’a pas encore de critère de classement structuré. Aucun classement ne sera inventé.</div> : <><div className="grid grid-cols-1 md:grid-cols-2 gap-4">{fields.map(f => <Field key={f.key} label={`${f.label}${f.unit ? ` (${f.unit})` : ''}`} required={f.required}><input className={inputCls} type={f.type === 'number' ? 'number' : 'text'} value={values[selected.id]?.[f.key] ?? ''} onChange={e => { setValues(v => ({ ...v, [selected.id]: { ...(v[selected.id] ?? {}), [f.key]: e.target.value } })); setResults(v => ({ ...v, [selected.id]: null })); setAcceptedClass(v => ({ ...v, [selected.id]: false })); }} /></Field>)}</div><button type="button" disabled={!canCalculate} onClick={calculate} className="mt-5 px-4 py-2 rounded-lg bg-sky-600 text-white font-semibold text-sm disabled:opacity-40"><Calculator size={16} className="inline mr-1"/> Calculer le classement</button></>}</div>
+      {result && <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5"><div className="text-sm font-semibold text-emerald-800">Classement selon la Nomenclature 07-144</div><div className="text-2xl font-bold text-emerald-950 mt-1">{categoryLabel(result.regime)} — {regimeLabel(result.regime)}</div><div className="grid md:grid-cols-4 gap-3 mt-4"><Result label="Rubrique" value={selected.rubrique}/><Result label="Condition retenue" value={result.seuil}/><Result label="Rayon d’affichage" value={result.rayon ?? '—'}/><Result label="Régime" value={result.regime}/></div><button type="button" onClick={() => setAcceptedClass(true)} className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold"><Check size={16}/> Accepter le classement</button></div>}
 
-      {result && <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5"><div className="text-sm font-semibold text-emerald-800">Classement selon la Nomenclature 07-144</div><div className="text-2xl font-bold text-emerald-950 mt-1">{result.regime}</div><div className="grid md:grid-cols-3 gap-3 mt-4"><Result label="Sous-rubrique" value={result.code}/><Result label="Intervalle" value={result.seuil}/><Result label="Rayon" value={result.rayon ?? '—'}/></div><p className="mt-4 font-semibold text-emerald-900">Le projet est classé sous la rubrique {selected.rubrique}, régime {result.regime}.</p><button type="button" onClick={e => { e.preventDefault(); e.stopPropagation(); setAcceptedClass(v => ({ ...v, [selected.id]: true })); }} className="mt-4 px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold text-sm"><Check size={16} className="inline mr-1"/> Accepter le classement</button></div>}
-
-      {acceptedClass[selected.id] && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><FileText size={18} className="text-emerald-600"/><h2 className="font-semibold">Dossier réglementaire</h2></div>{dossier && <><div className="grid md:grid-cols-2 gap-3">{['Étude d’impact','Étude de dangers','Notice d’impact','Rapport sur les produits dangereux'].map(name => { const required = dossier.docs.includes(name); return <div key={name} className={`rounded-lg border p-4 ${required ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'}`}><div className="text-xs font-semibold">{required ? 'REQUIS' : 'Non identifié'}</div><div className="font-medium mt-1">{name}</div></div>})}</div><div className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-700"><strong>Conclusion réglementaire :</strong> après examen de la rubrique {selected.rubrique} et du classement {result?.code ?? '—'} / {result?.regime ?? '—'}, les exigences du dossier sont déterminées à partir de la nomenclature et des règles réglementaires disponibles.</div></>}</div>}
+      {acceptedClass && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><FileText size={18} className="text-emerald-600"/><h2 className="font-semibold">Dossier réglementaire</h2></div><div className="grid md:grid-cols-2 gap-3">{[['Étude d’impact', !!docs?.impact], ['Étude de dangers', !!docs?.danger], ['Notice d’impact', !!docs?.notice], ['Rapport sur les produits dangereux', !!docs?.rapportDangereux]].map(([name, required]) => <div key={String(name)} className={`rounded-lg border p-4 ${required ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'}`}><div className="text-xs font-semibold">{required ? 'REQUIS — X' : 'Non requis'}</div><div className="font-medium mt-1">{String(name)}</div></div>)}</div><div className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-700"><strong>Conclusion :</strong> après saisie de la valeur et comparaison avec les intervalles de la rubrique {selected.rubrique}, le régime et les documents sont repris du même ligne de la matrice 07-144.</div></div>}
     </>}
 
-    {loadError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">Erreur de chargement : {loadError}</div>}
+    {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">Erreur de chargement : {error}</div>}
   </div>;
 }
 
