@@ -8,6 +8,7 @@ on:
     paths:
       - 'scripts/build-nomenclature-07-144.py'
       - 'scripts/build-nomenclature-07-144-v2.py'
+      - 'scripts/build-nomenclature-07-144-v3.py'
       - '.github/workflows/build-nomenclature-07-144.yml'
 
 permissions:
@@ -24,7 +25,7 @@ jobs:
         run: python3 -m pip install pypdf
 
       - name: Generate dataset from official PDF
-        run: python3 scripts/build-nomenclature-07-144-v2.py
+        run: python3 scripts/build-nomenclature-07-144-v3.py
 
       - name: Commit generated dataset
         run: |
@@ -34,6 +35,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Dataset unchanged"
           else
-            git commit -m "chore(environment): update full 07-144 dataset"
+            git commit -m "chore(environment): update clean 07-144 dataset"
             git push
           fi
