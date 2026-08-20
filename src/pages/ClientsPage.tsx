@@ -289,7 +289,7 @@ function ClientDetail({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             {client.telephone && (
               <div>
-                <p className="text-xs font-semibold text-gray-500">TÃ©lÃ©phone</p>
+                <p className="text-xs font-semibold text-gray-500">Téléphone</p>
                 <p className="text-gray-800">{client.telephone}</p>
               </div>
             )}
@@ -317,7 +317,7 @@ function ClientDetail({
               <p className="text-gray-800">{client.wilaya ?? 'Khenchela'}</p>
             </div>
             <div>
-              <p className="text-xs font-semibold text-gray-500">DaÃ¯ra</p>
+              <p className="text-xs font-semibold text-gray-500">Daïra</p>
               <p className="text-gray-800">{client.daira || 'â€”'}</p>
             </div>
             <div>
@@ -329,7 +329,7 @@ function ClientDetail({
               <p className="text-gray-800">{client.section || 'â€”'}</p>
             </div>
             <div>
-              <p className="text-xs font-semibold text-gray-500">ÃŽlot</p>
+              <p className="text-xs font-semibold text-gray-500">Îlot</p>
               <p className="text-gray-800">{client.ilot || 'â€”'}</p>
             </div>
           </div>
@@ -553,7 +553,7 @@ function ClientForm({
           />
         </Field>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="TÃ©lÃ©phone">
+          <Field label="Téléphone">
             <input
               className={inputCls}
               value={form.telephone}
@@ -597,10 +597,10 @@ function ClientForm({
                 readOnly
               />
               <p className="text-xs text-gray-400 mt-1">
-                Wilaya fixÃ©e automatiquement
+                Wilaya fixée automatiquement
               </p>
             </Field>
-            <Field label="DaÃ¯ra">
+            <Field label="Daïra">
               <input
                 className={`${inputCls} bg-gray-100`}
                 value={form.daira}
@@ -614,7 +614,7 @@ function ClientForm({
                 value={form.commune}
                 onChange={(e) => handleCommuneChange(e.target.value)}
               >
-                <option value="">â€” SÃ©lectionner â€”</option>
+                <option value="">â€” Sélectionner â€”</option>
                 {COMMUNES_KHENCHELA.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -630,15 +630,15 @@ function ClientForm({
                   onChange={(e) =>
                     setForm({ ...form, section: e.target.value })
                   }
-                  placeholder="NÂ° de section"
+                  placeholder="N° de section"
                 />
               </Field>
-              <Field label="ÃŽlot">
+              <Field label="Îlot">
                 <input
                   className={inputCls}
                   value={form.ilot}
                   onChange={(e) => setForm({ ...form, ilot: e.target.value })}
-                  placeholder="NÂ° d'Ã®lot"
+                  placeholder="N° d'îlot"
                 />
               </Field>
             </div>
@@ -677,4 +677,5 @@ function ClientForm({
     </Modal>
   );
 }
+
 
