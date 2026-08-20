@@ -5,7 +5,8 @@ pub fn run() {
             open_file,
             open_folder,
             file_exists,
-            get_file_metadata
+            get_file_metadata,
+            read_topographie_bundle
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -90,5 +91,49 @@ fn get_file_metadata(path: String) -> Result<serde_json::Value, String> {
                 .unwrap_or(0))
             .unwrap_or(0),
         "path": path
+    }))
+}
+
+#[tauri::command]
+fn read_topographie_bundle(shp_path: String) -> Result<serde_json::Value, String> {
+    use std::fs;
+    use std::path::{Path, PathBuf};
+
+    fn b64(bytes: &[u8]) -> String {
+        const TABLE: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        let mut out = String::with_capacity((bytes.len() + 2) / 3 * 4);
+        let mut i = 0;
+        while i < bytes.len() {
+            let a = bytes[i] as u32;
+            let b = if i + 1 < bytes.len() { bytes[i + 1] as u32 } else { 0 };
+            let c = if i + 2 < bytes.len() { bytes[i + 2] as u32 } else { 0 };
+            out.push(TABLE[(a >> 2) as usize] as char);
+            out.push(TABLE[(((a & 3) << 4) | (b >> 4)) as usize] as char);
+            out.push(if i + 1 < bytes.len() { TABLE[(((b & 15) << 2) | (c >> 6)) as usize] as char } else { '=' });
+            out.push(if i + 2 < bytes.len() { TABLE[(c & 63) as usize] as char } else { '=' });
+            i += 3;
+        }
+        out
+    }
+
+    let shp = PathBuf::from(&shp_path);
+    if shp.extension().and_then(|e| e.to_str()).unwrap_or("").to_lowercase() != "shp" {
+        return Err("Le fichier source doit être un .shp".to_string());
+    }
+    let stem = shp.file_stem().and_then(|s| s.to_str()).ok_or_else(|| "Nom SHP invalide".to_string())?;
+    let dir = shp.parent().unwrap_or_else(|| Path::new("."));
+    let shx_path = dir.join(format!("{stem}.shx"));
+    let dbf_path = dir.join(format!("{stem}.dbf"));
+    let prj_path = dir.join(format!("{stem}.prj"));
+    let shp_bytes = fs::read(&shp).map_err(|e| format!("Lecture SHP impossible: {e}"))?;
+    let shx_bytes = fs::read(&shx_path).map_err(|e| format!("Lecture SHX impossible: {e}"))?;
+    let dbf_bytes = fs::read(&dbf_path).map_err(|e| format!("Lecture DBF impossible: {e}"))?;
+    let prj = fs::read_to_string(&prj_path).unwrap_or_default();
+    Ok(serde_json::json!({
+        "shp": b64(&shp_bytes),
+        "shx": b64(&shx_bytes),
+        "dbf": b64(&dbf_bytes),
+        "prj": prj,
+        "sourcePath": shp_path
     }))
 }
