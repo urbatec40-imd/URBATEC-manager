@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "nomenclature:build": "python scripts/run-nomenclature-build.py && python scripts/repair-nomenclature-documents-x.py"
+    "nomenclature:build": "python scripts/run-nomenclature-build.py && python scripts/repair-nomenclature-documents-x.py",
+    "nomenclature:reverse-test": "python scripts/build-nomenclature-07-144-reverse-test.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
