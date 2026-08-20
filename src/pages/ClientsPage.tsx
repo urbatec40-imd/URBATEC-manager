@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import {
   Plus,
   Search,
@@ -121,7 +121,7 @@ export function ClientsPage({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.length === 0 && (
           <p className="text-gray-400 text-center py-8 col-span-full">
-            Aucun client trouvé
+            Aucun client trouvÃ©
           </p>
         )}
         {filtered.map((c) => {
@@ -143,9 +143,6 @@ export function ClientsPage({
                     >
                       {c.nom}
                     </h3>
-                    {c.nif_rc && (
-                      <p className="text-xs text-gray-400">NIF/RC: {c.nif_rc}</p>
-                    )}
                   </div>
                 </div>
                 <div className="flex gap-1">
@@ -191,7 +188,7 @@ export function ClientsPage({
                     <MapPin size={14} className="text-gray-400" />
                     <span className="truncate">
                       {c.commune}
-                      {c.daira ? ` — ${c.daira}` : ''}
+                      {c.daira ? ` â€” ${c.daira}` : ''}
                     </span>
                   </div>
                 )}
@@ -203,11 +200,11 @@ export function ClientsPage({
                   <p className="font-bold text-gray-800">{stats.nbDossiers}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Facturé</p>
+                  <p className="text-gray-400">FacturÃ©</p>
                   <p className="font-bold text-gray-800">{formatMontant(stats.totalFacture)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Payé</p>
+                  <p className="text-gray-400">PayÃ©</p>
                   <p className="font-bold text-green-600">{formatMontant(stats.totalPaye)}</p>
                 </div>
                 <div>
@@ -247,7 +244,7 @@ export function ClientsPage({
 
       <ConfirmDialog
         open={!!deleteId}
-        message="Voulez-vous réellement supprimer cet élément ?"
+        message="Voulez-vous rÃ©ellement supprimer cet Ã©lÃ©ment ?"
         onConfirm={async () => {
           if (deleteId) {
             await onDelete(deleteId);
@@ -286,13 +283,13 @@ function ClientDetail({
   return (
     <Modal open={true} onClose={onClose} title={client.nom} size="lg">
       <div className="space-y-5">
-        {/* Coordonnées */}
+        {/* CoordonnÃ©es */}
         <div>
-          <h4 className="font-bold text-gray-700 mb-2 text-sm">Coordonnées</h4>
+          <h4 className="font-bold text-gray-700 mb-2 text-sm">CoordonnÃ©es</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             {client.telephone && (
               <div>
-                <p className="text-xs font-semibold text-gray-500">Téléphone</p>
+                <p className="text-xs font-semibold text-gray-500">TÃ©lÃ©phone</p>
                 <p className="text-gray-800">{client.telephone}</p>
               </div>
             )}
@@ -308,12 +305,6 @@ function ClientDetail({
                 <p className="text-gray-800">{client.adresse}</p>
               </div>
             )}
-            {client.nif_rc && (
-              <div>
-                <p className="text-xs font-semibold text-gray-500">NIF / RC</p>
-                <p className="text-gray-800">{client.nif_rc}</p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -326,20 +317,20 @@ function ClientDetail({
               <p className="text-gray-800">{client.wilaya ?? 'Khenchela'}</p>
             </div>
             <div>
-              <p className="text-xs font-semibold text-gray-500">Daïra</p>
-              <p className="text-gray-800">{client.daira || '—'}</p>
+              <p className="text-xs font-semibold text-gray-500">DaÃ¯ra</p>
+              <p className="text-gray-800">{client.daira || 'â€”'}</p>
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-500">Commune</p>
-              <p className="text-gray-800">{client.commune || '—'}</p>
+              <p className="text-gray-800">{client.commune || 'â€”'}</p>
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-500">Section</p>
-              <p className="text-gray-800">{client.section || '—'}</p>
+              <p className="text-gray-800">{client.section || 'â€”'}</p>
             </div>
             <div>
-              <p className="text-xs font-semibold text-gray-500">Îlot</p>
-              <p className="text-gray-800">{client.ilot || '—'}</p>
+              <p className="text-xs font-semibold text-gray-500">ÃŽlot</p>
+              <p className="text-gray-800">{client.ilot || 'â€”'}</p>
             </div>
           </div>
         </div>
@@ -441,7 +432,7 @@ function ClientDetail({
 
       <ConfirmDialog
         open={!!deleteDossierId}
-        message="Voulez-vous réellement supprimer ce dossier ?"
+        message="Voulez-vous rÃ©ellement supprimer ce dossier ?"
         onConfirm={async () => {
           if (deleteDossierId) {
             await onDeleteDossier(deleteDossierId);
@@ -562,7 +553,7 @@ function ClientForm({
           />
         </Field>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Téléphone">
+          <Field label="TÃ©lÃ©phone">
             <input
               className={inputCls}
               value={form.telephone}
@@ -606,10 +597,10 @@ function ClientForm({
                 readOnly
               />
               <p className="text-xs text-gray-400 mt-1">
-                Wilaya fixée automatiquement
+                Wilaya fixÃ©e automatiquement
               </p>
             </Field>
-            <Field label="Daïra">
+            <Field label="DaÃ¯ra">
               <input
                 className={`${inputCls} bg-gray-100`}
                 value={form.daira}
@@ -623,7 +614,7 @@ function ClientForm({
                 value={form.commune}
                 onChange={(e) => handleCommuneChange(e.target.value)}
               >
-                <option value="">— Sélectionner —</option>
+                <option value="">â€” SÃ©lectionner â€”</option>
                 {COMMUNES_KHENCHELA.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -639,15 +630,15 @@ function ClientForm({
                   onChange={(e) =>
                     setForm({ ...form, section: e.target.value })
                   }
-                  placeholder="N° de section"
+                  placeholder="NÂ° de section"
                 />
               </Field>
-              <Field label="Îlot">
+              <Field label="ÃŽlot">
                 <input
                   className={inputCls}
                   value={form.ilot}
                   onChange={(e) => setForm({ ...form, ilot: e.target.value })}
-                  placeholder="N° d'îlot"
+                  placeholder="NÂ° d'Ã®lot"
                 />
               </Field>
             </div>
@@ -686,3 +677,4 @@ function ClientForm({
     </Modal>
   );
 }
+
