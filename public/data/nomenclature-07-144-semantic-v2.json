@@ -1,0 +1,3691 @@
+{
+  "version": "07-144-semantic-v2",
+  "rubriques": [
+    {
+      "rubrique": "1110",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Très toxiques (fabrication industrielle",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1111",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Très toxiques (emploi ou stockage de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1112",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Acide cyanhydrique (fabrication,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1113",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Acide fluorhydrique (fabrication de l')",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1113 Acide fluorhydrique (fabrication de l') et des fluorures",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1114",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Acide fluorhydrique (dépôts d')",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1115",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Brome (fabrication du)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1115 Brome (fabrication du)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1116",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Chloropicrine (fabrication, emploi ou",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1117",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Dichlorure de carbonyle ou phosgène",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1118",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Dichlorure de carbonyle ou phosgène",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1119",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Mercure (stockage de) et des composés",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1120",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Pesticides, produits de préservation du",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1121",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Pesticides, produits de préservation du",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1122",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Pesticides, produits de préservation",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1123",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Pesticides (dépôts de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1124",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Plomb tétraméthyle ou plomb",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1125",
+      "famille": "1100",
+      "familleLabel": "Très toxiques",
+      "designation": "Sulfure d'hydrogène (fabrication,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1210",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Toxiques (fabrication industrielle de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1211",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Toxiques (emploi ou stockage de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1212",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Acide salicylique (fabrication de l') au",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "0,5",
+          "condition": "1212 Acide salicylique (fabrication de l') au moyen du phénol Acide sulfureux (fabrication de l') (voir 1211) Alcaloïdes (extraction des) par les solvants non inflammables, mais odorants ou toxiques (voir 1259) 5 Joumada El Oula 1428 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 11 22 mai 2007 N° Rayon Rapport sur Type d’affichage Etude Etude de Notice de la Désignation de l’activité les produits d’autorisation (Km) d’impact danger d’impact rubrique dangereux",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1213",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Alcool méthylique (fabrication de l')",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1213 Alcool méthylique (fabrication de l') par synthèse",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1214",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Alcools (ateliers de rectification des)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1214 Alcools (ateliers de rectification des) méthyliques, éthyliques et propyliques",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1215",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Aldéhyde formique (fabrication, mise",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1216",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Amiante (utilisation de l') pour la",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1217",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Aminodiphényle (fabrication, mise en",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1218",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Ammoniac (fabrication industrielle de l')",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1219",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Ammoniac (emploi ou stockage de l')",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1220",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Anhydride sulfureux (utilisation et",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1221",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Antimoine, argent, baryum, bore,",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1221 Antimoine, argent, baryum, bore, cadmium, chrome, cobalt, cuivre, étain (à l'exclusion des composés organostanniques), molybdène, nickel, plomb, tellure, titane, vanadium, zinc. (Fabrication industrielle de composés d'anlimoine (fabrication du sulfure (voir 1221). Argent (fabrication du nitrate d') (voir 1221, 1711) Arséniates métalliques (Fabrication des) (voir 1269) Arsenic (fabrication des sulfures d') (voir 1269) Azote (mise en œuvre, stockage des oxydes d') (voir 1260) Benzidine et sels de benzidine (fabrication, mise en œuvre, stockage de) (voir 1269) Brome (emploi du) pour la fabrication de dérivés bromés (voir 1258) Brome (Emploi de dérivés du) comme solvants (voir 1259)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1222",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Bromure de méthyle (fabrication,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1223",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Carbone (fabrication de sulfure de)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1223 Carbone (fabrication de sulfure de) Carbone (tétrachlorure de) (fabrication du) par chloruration directe (voir 1259) Carbone (tétrachlorure de) (Emploi du) (voir 1259)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1224",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Céruse (fabrication de la)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "0,5",
+          "condition": "1224 Céruse (fabrication de la) Chlore (Emploi de dérivés du) comme solvants (voir 1248, 2226, 2318, 2622, 2922) 5 Joumada El Oula 1428 14 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 22 mai 2007 N° Rayon Rapport sur Type d’affichage Etude Etude de Notice de la Désignation de l’activité les produits d’autorisation (Km) d’impact danger d’impact rubrique dangereux",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1225",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Chlore (fabrication industrielle de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1226",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Chlore (emploi ou stockage du)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1227",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Chlorofluorocarbures « CFC », halons",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1228",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Chlorophénols, produits chlorophénoliques",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1229",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Chlorophénols, produits chlorophénoliques",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1230",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Chlorophénols, produits chlorophénoliques",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1231",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Chlorure d’hydrogène anhydre",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1232",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Chlorure de trichlorométhylsulfényle",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1233",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Chrome (fabrication des dérivés du)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "0,5",
+          "condition": "1233 Chrome (fabrication des dérivés du) tels que chromates, acide chromique, oxyde de chrome",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1234",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Cuivre (fabrication du sulfate de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1235",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Cyanamide calcique (fabrication de la)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1235 Cyanamide calcique (fabrication de la)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1236",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Diacétate de 1-propène-2-chloro-1,3-",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1237",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Difluorure d'oxygène (fabrication,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1238",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Diméthylnitrosamine (fabrication,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1239",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Diisocyanate de diphénylméthane",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1240",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Dioxyde de chlore (fabrication,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1241",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Ether méthylique monochloré (fabrication,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1242",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Ethyléneimine (fabrication, mise en",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1243",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Formaldéhyde de concentration",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1244",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Hexafluorure de sélénium (Fabrication,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1245",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Hexafluorure de tellure (fabrication,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1246",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Iode (fabrication de l')",
+      "decisionRows": [
+        {
+          "regime": "AM",
+          "rayon": "4",
+          "condition": "1246 Iode (fabrication de l') Isocyanate de méthyle (voir 1269)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1247",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Laboratoires utilisant des produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1248",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Liquides halogénés (fabrication de) par",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1249",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Liquides halogénés et autres liquides",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1250",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Litharge (fabrication de la)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "0,5",
+          "condition": "1250 Litharge (fabrication de la)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1251",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Massicot (fabrication du)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "0,5",
+          "condition": "1251 Massicot (fabrication du) Mercure (Dorure et argenture des métaux au) (voir 1211)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1252",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Mercuriels (fabrication de sels et",
+      "decisionRows": [
+        {
+          "regime": "AM",
+          "rayon": "3",
+          "condition": "1252 Mercuriels (fabrication de sels et composés) et des préparations en contenant",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1253",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Mercuriels (Emploi de catalyseurs)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1253 Mercuriels (Emploi de catalyseurs) dans des procédés industriels",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1254",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Méthylènes (raffinage des)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "0,5",
+          "condition": "1254 Méthylènes (raffinage des)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1255",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Minium (fabrication du)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "0,5",
+          "condition": "1255 Minium (fabrication du) 2 - Naphtylamine (fabrication, mise en œuvre, stockage de) (voir 1269) 5 Joumada El Oula 1428 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 21 22 mai 2007 N° Rayon Rapport sur Type d’affichage Etude Etude de Notice de la Désignation de l’activité les produits d’autorisation (Km) d’impact danger d’impact rubrique dangereux",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1256",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Nickel carbonyle (tétracarbonyl -",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1257",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Nitrates métalliques (fabrication des)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "0,5",
+          "condition": "1257 Nitrates métalliques (fabrication des) obtenus par l'action de l'acide sur le métal",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1258",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Organohalogénés, organophosphorés,",
+      "decisionRows": [
+        {
+          "regime": "AM",
+          "rayon": "3",
+          "condition": "1258 Organohalogénés, organophosphorés, organostanniques (Fabrication industrielle de composés) à l'exclusion des substances et préparations très toxiques, toxiques ou des substances toxiques particulières visées par les rubriques 1110, 1210 et 1269",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1259",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Organohalogénés, (Emploi de liquides)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1260",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Oxydes d'azote autres que l'hémioxyde",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1261",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Pentaborane (fabrication, mise en",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1262",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Phénols (fabrication des) par extraction",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "0,5",
+          "condition": "1262 Phénols (fabrication des) par extraction des goudrons ou par synthèse",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1263",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Phosphore (fabrication du)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1263 Phosphore (fabrication du)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1264",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Phosphore (dépôts de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1265",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Plomb (fonderies de chlorure de)",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "1",
+          "condition": "1265 Plomb (fonderies de chlorure de)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1266",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Polychlorobiphényles,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1267",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Propyléneimine (fabrication, mise en",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1268",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Sodium (fabrication, mise en oeuvre,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1269",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Substances et préparations toxiques",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1270",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Sulfure de bis (2-chloroéthyle)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1271",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Trioxyde de soufre (emploi ou stockage",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1272",
+      "famille": "1200",
+      "familleLabel": "Toxiques",
+      "designation": "Varech (fabrication de soudes brutes",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1310",
+      "famille": "1300",
+      "familleLabel": "Comburantes",
+      "designation": "Comburantes (fabrication, emploi ou",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1320",
+      "famille": "1300",
+      "familleLabel": "Comburantes",
+      "designation": "Peroxydes organiques (définition et",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1321",
+      "famille": "1300",
+      "familleLabel": "Comburantes",
+      "designation": "Peroxydes organiques (fabrication des)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1322",
+      "famille": "1300",
+      "familleLabel": "Comburantes",
+      "designation": "Peroxydes organiques (emploi et",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1330",
+      "famille": "1300",
+      "familleLabel": "Comburantes",
+      "designation": "Oxygène (emploi et stockage d')",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1410",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "Poudres, explosifs et autres produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1411",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "Poudres, explosifs et autres produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1412",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "Poudres, explosifs et autres produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1413",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "Poudres, explosifs et autres produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1415",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "correspondant au 27 août 1994 fixant les attributions",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1419",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "correspondant au",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1420",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "Substances et préparations explosibles",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1421",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "Substances et préparations explosibles",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1427",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "correspondant au 25 mai 2006 portant nomination sous-classification des postes supérieurs des établissements",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1428",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "correspondant au",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1430",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "Nitrate d'ammonium (stockage de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1431",
+      "famille": "1400",
+      "familleLabel": "Explosibles",
+      "designation": "Engrais simples solides à base de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1510",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Gaz inflammables (fabrication",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1511",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Gazomètres et réservoirs de gaz",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1512",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Gaz inflammables liquéfiés (stockage en",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1513",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Gaz inflammables liquéfiés",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1514",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Gazoduc",
+      "decisionRows": [
+        {
+          "regime": "AM",
+          "rayon": "4",
+          "condition": "1514 Gazoduc",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1515",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Acétylène (fabrication de l') par",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1516",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Acétylène (stockage ou emploi de l')",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1517",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Hydrogène (fabrication industrielle",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1518",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Hydrogène (stockage ou emploi de l')",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1519",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Oxyde d'éthylène ou de propylène",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1520",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Amines inflammables liquéfiées",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1530",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Liquides inflammables (définition), à",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1531",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Liquides inflammables (fabrication",
+      "decisionRows": [
+        {
+          "regime": "AM",
+          "rayon": "3",
+          "condition": "1531 Liquides inflammables (fabrication industrielle de, dont traitement de pétrole et de ses dérivés, désulfuration)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1532",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Liquides inflammables (stockage en",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1533",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Liquides inflammables (installations de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1534",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Liquides inflammables (installation de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1535",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Vernis (dépôts de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1540",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Solides facilement inflammables à",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1541",
+      "famille": "1500",
+      "familleLabel": "Inflammables",
+      "designation": "Carbure de calcium (stockage)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1610",
+      "famille": "1600",
+      "familleLabel": "Combustibles",
+      "designation": "Dépôts d'allumettes chimiques à",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1611",
+      "famille": "1600",
+      "familleLabel": "Combustibles",
+      "designation": "Dépôts de bois, papier, carton ou",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1612",
+      "famille": "1600",
+      "familleLabel": "Combustibles",
+      "designation": "Entrepôts couverts (stockage de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1613",
+      "famille": "1600",
+      "familleLabel": "Combustibles",
+      "designation": "Goudrons, asphalte, brais et matières",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1614",
+      "famille": "1600",
+      "familleLabel": "Combustibles",
+      "designation": "Houille, coke, lignite, charbon de bois,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1615",
+      "famille": "1600",
+      "familleLabel": "Combustibles",
+      "designation": "Lubrifiants",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1616",
+      "famille": "1600",
+      "familleLabel": "Combustibles",
+      "designation": "Soufre (fabrication industrielle, fusion",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1617",
+      "famille": "1600",
+      "familleLabel": "Combustibles",
+      "designation": "Stockages, par voie humide",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1710",
+      "famille": "1700",
+      "familleLabel": "Corrosives",
+      "designation": "Acides acétiques à plus de 50% en",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1711",
+      "famille": "1700",
+      "familleLabel": "Corrosives",
+      "designation": "Acide acétique à plus de 50 % en poids",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1712",
+      "famille": "1700",
+      "familleLabel": "Corrosives",
+      "designation": "Acide chlorhydrique anhydre liquéfié",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1713",
+      "famille": "1700",
+      "familleLabel": "Corrosives",
+      "designation": "Acide chlorosulfurique, oléums (emploi",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1714",
+      "famille": "1700",
+      "familleLabel": "Corrosives",
+      "designation": "Carbonate de sodium (fabrication du)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "1714 Carbonate de sodium (fabrication du)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1715",
+      "famille": "1700",
+      "familleLabel": "Corrosives",
+      "designation": "Chlorure d'hydrogène anhydre liquéfié",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1716",
+      "famille": "1700",
+      "familleLabel": "Corrosives",
+      "designation": "Soude ou potasse caustique (emploi ou",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1810",
+      "famille": "1800",
+      "familleLabel": "Divers",
+      "designation": "Substances ou préparations réagissant",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1811",
+      "famille": "1800",
+      "familleLabel": "Divers",
+      "designation": "Substances ou préparations dégageant",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "1812",
+      "famille": "1800",
+      "familleLabel": "Divers",
+      "designation": "Acide oxalique (fabrication de l')",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2110",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Animaux (Elevage d’) autres que ceux",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2111",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Animaux carnassiers à fourrure",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2112",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Bovins (Elevage, vente, transit, etc..., de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2113",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Chevaux (Elevage, vente, transit,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2114",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Chèvreries et Bergeries de plus de 10",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2114 Chèvreries et Bergeries de plus de 10 animaux, à l’exclusion des agneaux et des chevreaux, lorsqu’elles sont situées à une distance inférieure ou égale à 100 mètres d’un immeuble habité ou occupé par des tiers.",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2115",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Chiens (Elevage, vente, transit, garde,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2116",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Couvoirs",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2117",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Faune sauvage « Espèces non",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2118",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Lapins (Elevage, vente, transit, etc..., de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2119",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Ovins, Caprins (Elevage, vente,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2120",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Verminières (Elevage de larves, de",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "3",
+          "condition": "2120 Verminières (Elevage de larves, de mouches, asticots)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2121",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Volailles, gibier à plume (Elevage,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2122",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Champignons de souche (mise en place",
+      "decisionRows": [
+        {
+          "regime": "D",
+          "rayon": "",
+          "condition": "2122 Champignons de souche (mise en place de la culture et/ou production de)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2123",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Engrais et supports de culture",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2124",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Engrais liquide (Dépôts d')",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2125",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Fumier, engrais et supports de culture",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2126",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Silos et installations de stockage de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2127",
+      "famille": "2100",
+      "familleLabel": "Élevage d’animaux & Activité agricole",
+      "designation": "Tabac (Fabrication et dépôts de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2210",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Abattage d'animaux",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2211",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Acides butyrique, citrique, glutamique,",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2211 Acides butyrique, citrique, glutamique, lactique et autres acides organiques alimentaires (Fabrication d') Acide butyrique (fabrication de l') (voir 2211) Acides gras (fabrication des) par saponification des huiles ou des graisses (voir 2211) Acide lactique (fabrication de l') (voir 2211) Acide oléique (voir 2211) Acides stéarique, palmitique et oléique (fabrication des) (voir 2211)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2212",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Alcools d'origine agricole, eaux-de-vie",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2213",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Alcools de bouche d'origine agricole,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2214",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Alimentaires (Préparation ou",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2215",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Alimentaires (Préparation ou",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2216",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Amidonneries, féculeries",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2216 Amidonneries, féculeries Amidon grillé (fabrication de l') (voir 2222) 5 Joumada El Oula 1428 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 57 22 mai 2007 N° Rayon Rapport sur Type Etude Etude de Notice de la Désignation de l’activité d’affichage les produits d’autorisation d’impact danger d’impact rubrique (Km) dangereux Bananes (ateliers de maturation ou mûrissage des) (voir 2214) Betteraves (dépôts de pulpes humides de) (voir 2229) Betteraves (râperies de) (voir 2214) Beurreries (voir 2227) Blanc dit de Meudon par broyage, séchage et blutage de carbonate de chaux naturel (fabrication du) (voir 2220) Blutage (voir 2220)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2217",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Boissons (Préparation, condition-",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2218",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Boulangerie industrielle (fabrication",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2219",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Boulangerie (fabrication de pain et",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2220",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Broyage, concassage, criblage,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2221",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Cidre (Préparation, conditionnement",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2222",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Dextrines (fabrication des) par",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2222 Dextrines (fabrication des) par hydrolyse aux acides ou par grillage de l'amidon Distilleries (voir 2212) Eaux grasses (extraction des matières grasses contenues dans les) (voir 2226)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2223",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Eaux minérales, eaux de source, eaux",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2224",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Fermentation acétique en milieu",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2225",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Fromages (Affinage des)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2226",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Huiles végétales, huiles animales, corps",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2227",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Lait (Réception, stockage, traitement,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2228",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Levures (Fabrication de)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2228 Levures (Fabrication de) Levures ou autres produits d'origine végétale ou animale (fabrication et traitement de) (voir 2228) Liège (trituration du) (voir 2220) Lies de vin (séchage des) (voir 2231) Linoléum (fabrication du) 1° Avec cuisson d'huile (voir 2226) 2° Sans cuisson d'huile (voir 2922) Malteries (voir 2229) Marcs fermentescibles de fruits tels que raisins, pommes, etc. (dépôts de) (voir 2231) 5 Joumada El Oula 1428 62 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 22 mai 2007 N° Rayon Rapport sur Type Etude Etude de Notice de la Désignation de l’activité d’affichage les produits d’autorisation d’impact danger d’impact rubrique (Km) dangereux Mélange de produits pulvérulents (voir 2220, 2515) Minoteries (voir 2220) Œufs (casseries d') (voir 2215) Oignons (dessiccation à l'étuve des) (voir 2214) Olives (confiseries d') (voir 2214) Pommes de terre (friteries de) (voir 2214) Résidus industriels (traitement des) (voir 2230) Salaison et transformation de produits carnés (ateliers de) (voir 2215) Salaisons (dépôts de) (voir 2215) Salins de betteraves (fabrication des) (voir 2214) Saucisson (fabrication du) (voir 2215) Sirop de glucose (fabrication du) (voir 2214) Sucre (concassage et pulvérisation du) (voir 2229) Sucre (raffineries de) (voir 2229)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2229",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Sucreries, raffineries de sucre, malteries",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2229 Sucreries, raffineries de sucre, malteries Suif brun (fabrication du) (voir 2226, 1531) Suifs bruts non alimentaires (dépôts de) (voir 2226) Suifs d'os (fabrication du) (voir 2226) Suifs en branches (Fonderies des, ou Refonte des) (voir 2226) Tamisage de produits pulvérulents (voir 2220, 2515) Toiles cirées (fabrication des) 1. Avec cuisson d'huiles (voir 2226) 2. Sans cuisson d'huiles (voir 2922) Tourteaux d'olives ou de graines (traitement des) par les hydrocarbures (voir 1533, 2212, 2231) 5 Joumada El Oula 1428 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 63 22 mai 2007 N° Rayon Rapport sur Type Etude Etude de Notice de la Désignation de l’activité d’affichage les produits d’autorisation d’impact danger d’impact rubrique (Km) dangereux Triperies (voir 2215) Tueries de volailles (voir 2210) Viandes (ateliers à enfumer les) (voir 2215) Viandes (extraits et concentrés de) (voir 2624) Viandes et abats (salaison et préparation des) (voir 2215)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2230",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Vinasses ou résidus analogues",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "5",
+          "condition": "2230 Vinasses ou résidus analogues d'origine végétale (Traitement des) par fermentation pour la production d'ammoniaque ou de sels ammoniacaux, d'ammoniaques composées, d'acides organiques ou cyanures, etc...",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2231",
+      "famille": "2200",
+      "familleLabel": "Agro alimentaires",
+      "designation": "Vins (Préparation, conditionnement de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2310",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Blanchisseries, laveries de linge, à",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2311",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Chiffons (effilochage et pulvérisation",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2311 Chiffons (effilochage et pulvérisation des) Chiffons et tissus (traitement des) par l'acide chlorhydrique gazeux (voir 2318) Chiffons et tissus (traitement des) par l'acide sulfurique dilué (voir 2318) Cocons (filatures de) avec emploi d'au moins 6 bassines fileuses (voir 2312) Coton (ateliers spéciaux pour la fabrication de l'ouate) (voir 2313) Crins 1. Battage, cardage et épuration des (voir 2313) 2. Teinture des (voir 2317, 2413, 2922) Déchets de filature (battage, lavage, séchage de) (voir 2313) Dégraissage des peaux, étoffes, métaux (voir 1259, 1533) Étoffes 1° Dégraissage des (voir 1533) 2° Impressions sur (voir 2318, 2413, 2922) Feutre (fabrication du) sans tissage (voir 2319)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2312",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Fibres minérales ou végétales",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2313",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Fibres d'origine végétale ou animale,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2314",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Lavage des laines de peaux, laines",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2314 Lavage des laines de peaux, laines brutes, laines en suint Laveries de linge (voir 2310) Lavoirs à laine (voir 2314) Lin (Rouissage de, ou Teillage de) (voir 2317)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2315",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Moulinage (Atelier de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2316",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Nettoyage à sec pour le traitement des",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2317",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Rouissage (hors rouissage à terre) ou",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2317 Rouissage (hors rouissage à terre) ou teillage du lin, du chanvre et autres plantes textiles Soie artificielle (fabrication de la) (voir 1533, 2212, 2319) Teillage du lin, du chanvre et autres plantes textiles (voir 2317)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2318",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Teinture, impression, apprêt,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2319",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Tissus, feutre, articles de maille,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2320",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Ateliers de fabrication de chaussures,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2321",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Extraits tannants (fabrication d')",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2321 Extraits tannants (fabrication d') Maroquinerie (ateliers de) (voir 2320) 5 Joumada El Oula 1428 68 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 22 mai 2007 N° Rayon Rapport sur Type Etude Etude de Notice de la Désignation de l’activité d’affichage les produits d’autorisation d’impact danger d’impact rubrique (Km) dangereux Mégisseries (voir 2324) Peaux (apprêtage des) (voir 2324) Peaux (dégraissage des) (voir 1259, 1533, 2212)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2322",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Peaux (dépôts de) y compris les dépôts",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2323",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Peaux (teinture et pigmentation de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2324",
+      "famille": "2300",
+      "familleLabel": "Textiles, Cuirs et Peaux",
+      "designation": "Tanneries, mégisseries, et toute opération",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2324 Tanneries, mégisseries, et toute opération de préparation des cuirs et peaux Tissus (voir 1259, 1533, 2212, 2318) 5 Joumada El Oula 1428 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 69 22 mai 2007 N° Rayon Rapport sur Type Etude Etude de Notice de la Désignation de l’activité d’affichage les produits d’autorisation d’impact danger d’impact rubrique (Km) dangereux",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2410",
+      "famille": "2400",
+      "familleLabel": "Bois, papier, carton, imprimerie",
+      "designation": "Bois ou matériaux combustibles",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2411",
+      "famille": "2400",
+      "familleLabel": "Bois, papier, carton, imprimerie",
+      "designation": "Bois et matériaux dérivés (installations",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2412",
+      "famille": "2400",
+      "familleLabel": "Bois, papier, carton, imprimerie",
+      "designation": "Charbon de bois (fabrication du)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2413",
+      "famille": "2400",
+      "familleLabel": "Bois, papier, carton, imprimerie",
+      "designation": "Imprimeries ou ateliers de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2415",
+      "famille": "2400",
+      "familleLabel": "Bois, papier, carton, imprimerie",
+      "designation": "Papier, carton (fabrication de)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2415 Papier, carton (fabrication de)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2416",
+      "famille": "2400",
+      "familleLabel": "Bois, papier, carton, imprimerie",
+      "designation": "et 2413 ;",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2417",
+      "famille": "2400",
+      "familleLabel": "Bois, papier, carton, imprimerie",
+      "designation": "Papiers usés ou souillés (Dépôt de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2418",
+      "famille": "2400",
+      "familleLabel": "Bois, papier, carton, imprimerie",
+      "designation": "Pâte à papier (préparation de la)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2510",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Abrasives (Emploi de matières) telles que",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2511",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Acier, fer, fonte, ferroalliages",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2512",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Agglomération de houille, charbon de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2513",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Aluminium (Fabrication du sulfate d')",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2514",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Bains de sels fondus (Chauffage et",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2515",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Broyage, concassage, criblage,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2516",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Carrières (exploitation de),",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2517",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Céramiques et réfractaires",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "1",
+          "condition": "2517 bis Chaux, ciments et plâtres (dépôts de) dans les agglomérations Chaux, plâtres, pouzzolanes (fabrication de) (voir 2518) 5 Joumada El Oula 1428 76 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 22 mai 2007 N° Rayon Rapport sur Type Etude Etude de Notice de la Désignation de l’activité d’affichage les produits d’autorisation d’impact danger d’impact rubrique (Km) dangereux Chromages des métaux et alliages (voir 2535)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2518",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Ciments, chaux, plâtres (Fabrication de)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2519",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Coke (fabrication du)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "3",
+          "condition": "2519 Coke (fabrication du) Concassage des matières minérales ou organiques (voir 2220, 2515) Constructions métalliques (ateliers de) avec rivetage pneumatique ou à main (voir 2530) Crasses métalliques (traitement en fonderie de) (voir 2523, 2524) Cristal et verre au plomb (fabrication et travail du) (voir 2541) Cristalleries (voir 2542) Cuivrage électrolytique des métaux (voir 2535) Cuivre, laiton et bronze (fonderies de) (voir 2523, 2524) Cuivre (trituration des composés du) (voir 2515) Cuivre ou de nickel (grillage des minerais de) (voir 2540) Cuivre ou de nickel (traitement des minerais de) (voir 2540) Cuivre ou de nickel (traitement des mattes de) (voir 2540) Décapage des métaux 1. Par les acides (voir 2535) 2. Au sable ou par la grenaille métallique (voir 2510) 5 Joumada El Oula 1428 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 77 22 mai 2007 N° Rayon Rapport sur Type Etude Etude de Notice de la Désignation de l’activité d’affichage les produits d’autorisation d’impact danger d’impact rubrique (Km) dangereux Décapage de matériaux divers au sable ou par la grenaille métallique (voir 2510) Déchets métalliques (voir 2523, 2524) Décolletage de métaux (voir 2530) Découpage des métaux (voir 2530) Dérochage des métaux (voir 2535) Dorure électrolytique des métaux (voir 2535) Electrodes pour l'électrochimie et l'électrométallurgie (fabrication des) (voir 2512) Electrolytique (traitement) de métaux (voir 2535)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2520",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Email",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2521",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Enrobage au bitume de matériaux",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0.5",
+          "condition": "2521 bis Etamage des glaces (ateliers d') Etamage du fer (voir 2529) Etirage des métaux (voir 2530) Faïence (fabrication de la) (voir 2517) Ferrailles (dépôt, triage, emballage, etc. de) et de vieux métaux, tels que déchets d'usinage, pièces, ustensiles, appareils véhicules hors d'usage, etc. (voir 2531) Ferro-alliages (fabrication des) (voir 2511)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2522",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Ferro-silicium (Dépôts de)",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2522 Ferro-silicium (Dépôts de)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2523",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Fonderie (Fabrication de produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2524",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Fonderie (Fabrication de produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2525",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Fonderie (Fabrication de produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2526",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Houille, minerais, minéraux ou résidus",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2527",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Matériel vibrant (Emploi de) pour la",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2528",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Métaux (Décapage ou nettoyage des)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2528 Métaux (Décapage ou nettoyage des) par traitement thermique",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2529",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Métaux (Galvanisation, étamage de) ou",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2529 Métaux (Galvanisation, étamage de) ou revêtement métallique d'un matériau quelconque par immersion ou par pulvérisation de métal fondu.",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2530",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Métaux et alliages (Travail mécanique",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2531",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Métaux (Stockages et activités de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2532",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Métaux et alliages (Trempés, recuits ou",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2532 Métaux et alliages (Trempés, recuits ou revenus)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2533",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Métaux, matières plastiques, etc...",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2534",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Minéraux naturels ou artificiels tels",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2535",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Revêtement métallique ou traitement",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2536",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Sablière",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2537",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Silico-alliages ou carbure de silicium",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2538",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Station de transit de produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2539",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Station de transit de produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2540",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Traitement des minerais non ferreux,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2541",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Verre (fabrication et travail du)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2542",
+      "famille": "2500",
+      "familleLabel": "Matériaux, minerais et métaux",
+      "designation": "Verre (travail chimique du), ou cristal",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2610",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Accumulateurs et piles (fabrication d')",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2610 Accumulateurs et piles (fabrication d') contenant du plomb, du cadmium ou du mercure Accumulateurs (fabrication des plaques d') au plomb (voir 2610) Acétates de cellulose (fabrication des) (voir 2621) Acide stéarique (moulage d'objet en) (voir 2611) Alizarine artificielle (fabrication de l') au moyen de l'anthracène (voir 2614)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2611",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Bougies ou autres objets en cire,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2612",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Caoutchouc, élastomères, polymères",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2613",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Caoutchouc (Récupération ou",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2614",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Colorants et pigments organiques,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2615",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Détergents et savons (fabrication",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2616",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Médicaments (fabrication et division",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2617",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Micro-organismes naturels pathogènes",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2618",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Parfums, huiles essentielles (extraction",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2619",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Pétrole (exploitation et transport du)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "5",
+          "condition": "2619 Pétrole (exploitation et transport du) Pétrole (stockage et raffinage du) (voir 1531, 1532, 1533) Plastomères (voir 2621, 1550) Plaques d'accumulateurs (fabrication des) (voir 2610) 5 Joumada El Oula 1428 JOURNAL OFFICIEL DE LA REPUBLIQUE ALGERIENNE N° 34 91 22 mai 2007 N° Rayon Rapport sur Type d’affichage Etude Etude de Notice de la Désignation de l’activité les produits d’autorisation (Km) d’impact danger d’impact rubrique dangereux",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2620",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Pneumatiques et produits dont 50 %",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2621",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Polymères (matières plastiques,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2622",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Polymères (matières plastiques,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2623",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Polymères (matières plastiques,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2624",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Produits opothérapiques d'extraits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2625",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Sulfurés (Ateliers de fabrication de",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2626",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Sulfures mono et disodiques",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2626 Sulfures mono et disodiques (Fabrication des) Superphosphates minéraux et superphosphates d'os (fabrication des) (voir 2625, 2627)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2627",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Superphosphates (Fabrication des)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "3",
+          "condition": "2627 Superphosphates (Fabrication des)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2628",
+      "famille": "2600",
+      "familleLabel": "Chimie, Caoutchouc",
+      "designation": "Traitement et développement des",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2710",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Bains et boues provenant du dérochage",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2710 Bains et boues provenant du dérochage des métaux (Traitement des) par l'acide nitrique Boyaux et pieds d'animaux abattus (dépôts de) (voir 2713) Carbonisation des matières animales (voir 2711)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2711",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Cadavres, déchets ou sous-produits",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2712",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Cadavres d'animaux de compagnie",
+      "decisionRows": [
+        {
+          "regime": "AM",
+          "rayon": "1",
+          "condition": "2712 Cadavres d'animaux de compagnie (incinération de)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2713",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Cadavres, chairs, débris d'origine",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2714",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Chiffons usagés ou souillés (Dépôts ou",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2715",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Déchets d’activité de soins",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2716",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Déchets industriels provenant",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2717",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Déchets industriels et résidus urbains",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2719",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Ordures ménagères et autres résidus",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2720",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Station d'épuration collective d'eaux",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "2",
+          "condition": "2720 Station d'épuration collective d'eaux résiduaires industrielles en provenance d'au moins deux établissements classés",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2721",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Station d'épuration collective de",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "1",
+          "condition": "2721 Station d'épuration collective de déjections animales",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2722",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Station d'épuration des eaux",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2723",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Station d'épuration mixte (recevant",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "",
+          "condition": "2723 Station d'épuration mixte (recevant 1 des eaux résiduaires domestiques et des eaux résiduaires industrielles) ayant une capacité nominale de traitement d'au moins 10 000 équivalents-habitants, lorsque la charge des eaux résiduaires industrielles en provenance d'installations classées autorisées est supérieure à 70% de la capacité de la station en demande chimique en oxygène",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2724",
+      "famille": "2700",
+      "familleLabel": "Déchets et traitements des eaux",
+      "designation": "Station de dessalement d’eau de mer",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2810",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Algoculture d’eau douce (mode",
+      "decisionRows": [
+        {
+          "regime": "D",
+          "rayon": "",
+          "condition": "2810 Algoculture d’eau douce (mode extensif), quelle que soit la capacité",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2811",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Creveticulture d’eau douce (mode semi",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2812",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Pisciculture d’eau douce (mode",
+      "decisionRows": [
+        {
+          "regime": "D",
+          "rayon": "",
+          "condition": "2812 Pisciculture d’eau douce (mode extensif), quelque soit la capacité",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2813",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Pisciculture d’eau douce (mode semi",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2814",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Algoculture marine (mode extensif),",
+      "decisionRows": [
+        {
+          "regime": "D",
+          "rayon": "",
+          "condition": "2814 Algoculture marine (mode extensif), quelle que soit la capacité",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2815",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Conchyliculture (mode extensif),",
+      "decisionRows": [
+        {
+          "regime": "D",
+          "rayon": "",
+          "condition": "2815 Conchyliculture (mode extensif), quelle que soit la capacité",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2816",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Creveticulture marine (mode semi",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2817",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Pisciculture marine (mode semi",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2818",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Aquarium Public",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "3",
+          "condition": "2818 Aquarium Public Pêche et Industrie de la pêche",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2819",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Etablissements d’exploitation",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2819 Etablissements d’exploitation (madrague et bordigue) Crustacés (préparation des conserves de) (voir 2215) Huiles de poisson (extraction des) (voir 2226) Huiles de poisson (traitement des) (voir 2226) Mollusques (voir 2215)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2820",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Poissons (fabrication d’aliments de)",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "3",
+          "condition": "2820 Poissons (fabrication d’aliments de) Poissons (extraits ou concentrés de) (voir 2624) Poissons (fabrication de farines, tourteaux et engrais à base de ou provenant de déchets de) (voir 2215) Poissons frais, crustacés et mollusques (préparation des) (voir 2215) Poissons salés, saurés ou séchés (ateliers de préparation des) (voir 2215) Poissons salés, saurés ou séchés (dépôts de) (voir 2215) Poissons (friteries de) (voir 2215) Sardines (fabriques de conserves de) (voir 2215)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2821",
+      "famille": "2800",
+      "familleLabel": "Aquaculture et Pêche",
+      "designation": "Transformation des produits de la",
+      "decisionRows": [
+        {
+          "regime": "AW",
+          "rayon": "3",
+          "condition": "2821 Transformation des produits de la pêche (conservation, salaison, etc…)",
+          "documents": {
+            "impact": true,
+            "danger": true,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2910",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Accumulateurs (Ateliers de charge d’)",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2911",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Antenne relais de téléphonie mobile",
+      "decisionRows": [
+        {
+          "regime": "D",
+          "rayon": "",
+          "condition": "2911 Antenne relais de téléphonie mobile",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": false,
+            "rapportDangereux": false
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2912",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Ateliers de réparations et d’entretien",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2913",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Chauffage (procédés de) utilisant",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2914",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Combustion",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2915",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Eponge (lavage, décoloration et",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0.5",
+          "condition": "2915 Eponge (lavage, décoloration et séchage des) Essais de moteurs (voir 2917) Feutres et visières vernies (fabrication des) (voir 2922) Garage de véhicules automobiles (voir 2912, 2919) Gravure chimique avec application de vernis aux hydrocarbures (voir 2922) Gomme (fabrication de sondes et autres objets en) (voir 2922) Huiles siccatives (application des) sur support quelconque (voir 2922) Impressions avec des encres préparées au moyen de liquides inflammables, odorants ou toxiques (voir 2922) Laque (fabrication d'objets dits en) (voir 2922)",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2916",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Lessives alcalines des papeteries",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2916 Lessives alcalines des papeteries (Incinération des).",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2917",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Moteurs à explosion, à combustion",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2918",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Orseille (Fabrication de l')",
+      "decisionRows": [
+        {
+          "regime": "APAPC",
+          "rayon": "0,5",
+          "condition": "2918 Orseille (Fabrication de l')",
+          "documents": {
+            "impact": false,
+            "danger": false,
+            "notice": true,
+            "rapportDangereux": true
+          }
+        }
+      ],
+      "isSelectable": true,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2919",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Parcs de stationnement couverts et",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2920",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Réfrigération ou compression",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2921",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Traitement et développement des",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    },
+    {
+      "rubrique": "2922",
+      "famille": "2900",
+      "familleLabel": "Divers",
+      "designation": "Vernis, peinture, apprêt, colle, enduit,",
+      "decisionRows": [],
+      "isSelectable": false,
+      "source": "Décret exécutif n° 07-144 du 19 mai 2007",
+      "sourceUrl": "https://www.joradp.dz/FTP/jo-francais/2007/F2007034.pdf"
+    }
+  ]
+}
