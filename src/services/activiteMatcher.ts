@@ -48,17 +48,31 @@ function editDistance(a: string, b: string): number {
   return prev[b.length];
 }
 function expandedTerms(queryTokens: string[]): Set<string> { const set = new Set(queryTokens); for (const token of queryTokens) for (const synonym of SYNONYMS[token] ?? []) set.add(normalize(synonym)); return set; }
-function scoreCandidate(queryTokens: string[], rowTokens: Set<string>) {
-  if (!queryTokens.length) return { score: 0, matched: [] as string[] };
-  const expanded = expandedTerms(queryTokens); const matched: string[] = []; let score = 0;
+
+function scoreCandidate(queryTokens: string[], normalizedDesignation: string, rowTokens: Set<string>) {
+  if (!queryTokens.length) return { score: 0, matched: [] as string[], priority: 0 };
+  const expanded = expandedTerms(queryTokens); const matched: string[] = []; let score = 0; let priority = 0;
+  const words = normalizedDesignation.split(' ').filter(Boolean);
+  const firstWord = words[0] ?? '';
+  const firstPhrase = queryTokens.join(' ');
+  const designationStartsWithQuery = normalizedDesignation.startsWith(firstPhrase);
+  const firstWordStartsWithQuery = firstWord.startsWith(firstPhrase);
+
+  // Recherche naturelle : priorité forte à ce qui commence par la saisie.
+  if (designationStartsWithQuery) priority += 1000;
+  else if (firstWordStartsWithQuery) priority += 700;
+  else if (words.some(word => word.startsWith(firstPhrase))) priority += 350;
+  else if (normalizedDesignation.includes(firstPhrase)) priority += 120;
+
   for (const term of expanded) {
     if (rowTokens.has(term)) { matched.push(term); score += queryTokens.includes(term) ? 5 : 2; continue; }
     for (const candidate of rowTokens) {
-      if (term.length >= 5 && (candidate.startsWith(term) || term.startsWith(candidate))) { matched.push(term); score += 1.5; break; }
+      if (term.length >= 2 && candidate.startsWith(term)) { matched.push(term); score += queryTokens.includes(term) ? 3 : 1.5; break; }
+      if (term.length >= 5 && term.startsWith(candidate)) { matched.push(term); score += 1; break; }
       if (term.length >= 6 && candidate.length >= 6 && editDistance(term, candidate) <= Math.max(1, Math.floor(Math.min(term.length, candidate.length) * 0.2))) { matched.push(term); score += 1; break; }
     }
   }
-  return { score, matched: Array.from(new Set(matched)) };
+  return { score, matched: Array.from(new Set(matched)), priority };
 }
 
 export function buildActivityIndex<T extends ActivityRowLike>(rows: T[]) {
@@ -69,8 +83,6 @@ export function suggestActivities<T extends ActivityRowLike>(index: ReturnType<t
   const raw = description.trim();
   if (!raw) return [];
 
-  // Numeric search is deliberately restricted to rubrique numbers. It never searches
-  // the regulatory text, quantities, dates, page numbers or document references.
   const numeric = raw.replace(/\s+/g, '');
   if (/^\d+$/.test(numeric)) {
     return index.filter(item => item.row.rubrique.includes(numeric)).map(item => ({
@@ -80,16 +92,34 @@ export function suggestActivities<T extends ActivityRowLike>(index: ReturnType<t
     })).sort((a, b) => b.score - a.score || a.rubrique.localeCompare(b.rubrique, 'fr', { numeric: true })).slice(0, limit);
   }
 
-  const parts = normalize(description).split(/\b(?:avec|et|plus|incluant|comprenant|compose de|avec stockage de|et distribution de)\b/i).map(p => p.trim()).filter(Boolean);
-  const aggregate = new Map<string, ActivityCandidate>();
-  for (const part of parts.length ? parts : [description]) {
-    const queryTokens = tokens(part); if (!queryTokens.length) continue;
-    for (const item of index) {
-      const result = scoreCandidate(queryTokens, item.tokens); if (result.score <= 0) continue;
-      const bonus = item.normalized.includes(normalize(part)) ? 6 : 0; const score = result.score + bonus;
-      const key = item.row.rubrique + '|' + item.row.designation; const existing = aggregate.get(key);
-      if (!existing || score > existing.score) aggregate.set(key, { rubrique: item.row.rubrique, famille: item.row.famille, familleLabel: item.row.familleLabel, designation: item.row.designation, score, matchedTerms: result.matched, source: item.row.source ?? 'Nomenclature 07-144' });
-    }
+  const queryNormalized = normalize(description);
+  const queryTokens = tokens(description);
+  if (!queryTokens.length) return [];
+
+  const aggregate: ActivityCandidate[] = [];
+  for (const item of index) {
+    const result = scoreCandidate(queryTokens, item.normalized, item.tokens);
+    if (result.score <= 0 && result.priority <= 0) continue;
+
+    // Bonus de correspondance exacte au début + petite récompense pour chaque mot demandé au début d'un mot.
+    const exactPhraseBonus = item.normalized.startsWith(queryNormalized) ? 500 : 0;
+    const startsWordBonus = queryTokens.every((token, i) => {
+      const word = item.normalized.split(' ')[i] ?? '';
+      return word.startsWith(token);
+    }) ? 180 : 0;
+
+    aggregate.push({
+      rubrique: item.row.rubrique,
+      famille: item.row.famille,
+      familleLabel: item.row.familleLabel,
+      designation: item.row.designation,
+      score: result.priority + result.score + exactPhraseBonus + startsWordBonus,
+      matchedTerms: result.matched,
+      source: item.row.source ?? 'Nomenclature 07-144'
+    });
   }
-  return Array.from(aggregate.values()).sort((a, b) => b.score - a.score || a.designation.localeCompare(b.designation, 'fr')).slice(0, limit);
+
+  return aggregate
+    .sort((a, b) => b.score - a.score || a.designation.localeCompare(b.designation, 'fr'))
+    .slice(0, limit);
 }
