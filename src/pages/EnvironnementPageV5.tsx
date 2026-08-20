@@ -12,13 +12,24 @@ const SOURCE = 'https://www.joradp.dz/FTP/jo-francais/2007/F2007034.PDF';
 const EMPTY: Dataset = { version: '07-144-semantic-v3', rubriques: [], sourceUrl: SOURCE };
 
 function clean(v: string) {
-  return (v || '').replace(/Ã©/g, 'é').replace(/Ã¨/g, 'è').replace(/Ãª/g, 'ê').replace(/Ã®/g, 'î').replace(/Ã´/g, 'ô').replace(/Ã¹/g, 'ù').replace(/Ã§/g, 'ç').replace(/Ã /g, 'à').replace(/â€™/g, '’').replace(/\s+/g, ' ').trim();
+  return (v || '')
+    .replace(/Ã©/g, 'é').replace(/Ã¨/g, 'è').replace(/Ãª/g, 'ê').replace(/Ã®/g, 'î')
+    .replace(/Ã´/g, 'ô').replace(/Ã¹/g, 'ù').replace(/Ã§/g, 'ç').replace(/Ã /g, 'à')
+    .replace(/â€™/g, '’').replace(/â€œ/g, '“').replace(/â€/g, '”')
+    .replace(/\s+/g, ' ').trim();
 }
 function norm(v: string) {
-  return clean(v).toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’'`´]/g, ' ').replace(/[^\p{L}\p{N}.,<>=-]+/gu, ' ').replace(/\s+/g, ' ').trim();
+  return clean(v).toLocaleLowerCase('fr-FR').normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').replace(/[’'`´]/g, ' ')
+    .replace(/[^\p{L}\p{N}.,<>=-]+/gu, ' ').replace(/\s+/g, ' ').trim();
 }
 function regimeLabel(v: string) {
-  return ({ AM: 'Autorisation ministérielle', AW: 'Autorisation du wali / wali délégué', APAPC: 'Autorisation du Président de l’APC', D: 'Déclaration auprès du Président de l’APC' } as Record<string, string>)[v] ?? v;
+  return ({
+    AM: 'Autorisation ministérielle',
+    AW: 'Autorisation du wali / wali délégué',
+    APAPC: 'Autorisation du Président de l’APC',
+    D: 'Déclaration auprès du Président de l’APC',
+  } as Record<string, string>)[v] ?? v;
 }
 function category(v: string) {
   return ({ AM: 'Catégorie 1', AW: 'Catégorie 2', APAPC: 'Catégorie 3', D: 'Catégorie 4' } as Record<string, string>)[v] ?? 'Catégorie à déterminer';
@@ -29,20 +40,23 @@ function documentsFor(r: DecisionRow) {
 }
 
 function unitFromCondition(condition: string) {
-  const c = condition.toLocaleLowerCase('fr-FR');
+  const c = clean(condition).toLocaleLowerCase('fr-FR');
   const patterns: Array<[RegExp, string]> = [
-    [/animaux[- ]?équivalents|animaux-équivalents|animaux\b/, 'animaux'],
-    [/kg\/j|kg par jour/, 'kg/j'], [/t\/j|tonnes?\s*(?:par|\/)\s*jour/, 't/j'],
-    [/m³\/j|m3\/j|m3 par jour/, 'm³/j'], [/m³|m3/, 'm³'], [/m²|m2/, 'm²'],
-    [/kw/, 'kW'], [/kva/, 'kVA'], [/mw/, 'MW'], [/litres?|\bl\b/, 'L'],
-    [/tonnes?|\bt\b/, 't'], [/kg/, 'kg'], [/bar/, 'bar'], [/°c|celsius/, '°C'], [/km/, 'km'],
+    [/animaux[- ]?équivalents|animaux\b/, 'animaux'],
+    [/kg\s*\/\s*j|kg\s+par\s+jour/, 'kg/j'],
+    [/t\s*\/\s*j|tonnes?\s*(?:par|\/)\s*jour/, 't/j'],
+    [/m[³3]\s*\/\s*j|m[³3]\s+par\s+jour/, 'm³/j'],
+    [/m[³3]/, 'm³'], [/m[²2]/, 'm²'],
+    [/kwh/, 'kWh'], [/kw/, 'kW'], [/kva/, 'kVA'], [/mw/, 'MW'],
+    [/litres?|\bl\b/, 'L'], [/tonnes?|\bt\b/, 't'], [/kg/, 'kg'],
+    [/bar/, 'bar'], [/°c|celsius/, '°C'], [/km/, 'km'],
   ];
   return patterns.find(([re]) => re.test(c))?.[1] ?? '';
 }
 function labelFromCondition(condition: string, unit: string) {
-  const c = condition.toLocaleLowerCase('fr-FR');
+  const c = clean(condition).toLocaleLowerCase('fr-FR');
   if (/animaux/.test(c)) return 'Nombre / capacité d’animaux';
-  if (/puissance|kw|kva|mw/.test(c)) return 'Puissance';
+  if (/puissance|kw|kva|mw|kwh/.test(c)) return 'Puissance / capacité';
   if (/surface|m²|m2/.test(c)) return 'Surface';
   if (/volume|m³|m3/.test(c)) return 'Volume';
   if (/pression|bar/.test(c)) return 'Pression';
@@ -51,9 +65,15 @@ function labelFromCondition(condition: string, unit: string) {
   if (/capacité/.test(c)) return 'Capacité';
   return unit === 'kg' || unit === 't' || unit === 'L' ? 'Quantité / poids' : 'Valeur réglementaire';
 }
-function numberAfter(text: string, phrase: RegExp) {
-  const m = text.match(phrase); if (!m) return null;
-  const n = m[1].replace(/\s/g, '').replace(',', '.'); const value = Number(n); return Number.isFinite(value) ? value : null;
+
+function parseNumber(s: string) {
+  const cleaned = s.replace(/\s/g, '').replace(/\.(?=\d{3}(?:\D|$))/g, '').replace(',', '.');
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : null;
+}
+function extractNumbers(text: string) {
+  const matches = text.match(/\d+(?:[\s.]\d{3})*(?:,\d+)?/g) ?? [];
+  return matches.map(parseNumber).filter((n): n is number => n != null);
 }
 function toComparable(value: number, inputUnit: string, conditionUnit: string) {
   if (!conditionUnit || !inputUnit || inputUnit === conditionUnit) return value;
@@ -63,25 +83,58 @@ function toComparable(value: number, inputUnit: string, conditionUnit: string) {
   if (inputUnit === 'm³' && conditionUnit === 'L') return value * 1000;
   return value;
 }
+
+/**
+ * Reads the regulatory wording itself. The first number in a sentence such as
+ * "1. Supérieure ou égale à 20 t ..." is the item number, not the threshold.
+ * We therefore remove the leading numbered item before extracting thresholds.
+ */
 function matchesCondition(condition: string, rawValue: string, inputUnit: string) {
-  const value = Number(rawValue.replace(',', '.')); if (!Number.isFinite(value)) return false;
-  const c = norm(condition);
-  const unit = unitFromCondition(condition);
+  const value = Number(String(rawValue).replace(',', '.'));
+  if (!Number.isFinite(value)) return false;
+
+  const original = clean(condition);
+  const c = norm(original).replace(/^\d+\s*[.)-]\s*/, '');
+  const unit = unitFromCondition(original);
   const v = toComparable(value, inputUnit, unit);
 
-  const minInclusive = numberAfter(c, /superieure(?: ou egale)? a\s*([0-9][0-9\s.,]*)/i);
-  const maxInclusive = numberAfter(c, /inferieure(?: ou egale)? a\s*([0-9][0-9\s.,]*)/i);
-  const more = numberAfter(c, /plus de\s*([0-9][0-9\s.,]*)/i);
-  const less = numberAfter(c, /moins de\s*([0-9][0-9\s.,]*)/i);
-  const range = c.match(/de\s*([0-9][0-9\s.,]*)\s*a\s*([0-9][0-9\s.,]*)/i);
-  if (minInclusive != null) return v >= minInclusive;
-  if (maxInclusive != null) return v <= maxInclusive;
-  if (more != null) return v > more;
-  if (less != null) return v < less;
-  if (range) {
-    const a = Number(range[1].replace(/\s/g, '').replace(',', '.')); const b = Number(range[2].replace(/\s/g, '').replace(',', '.'));
-    if (Number.isFinite(a) && Number.isFinite(b)) return v >= a && v <= b;
+  // Explicit ranges: "de X à Y", "entre X et Y", including "de X à moins de Y".
+  let m = c.match(/\bde\s+([0-9][0-9\s.,]*)\s+(?:a|à)\s+(?:moins de\s+)?([0-9][0-9\s.,]*)/i);
+  if (m) {
+    const a = parseNumber(m[1]); const b = parseNumber(m[2]);
+    if (a != null && b != null) return v >= a && v < b;
   }
+  m = c.match(/\bentre\s+([0-9][0-9\s.,]*)\s+et\s+([0-9][0-9\s.,]*)/i);
+  if (m) {
+    const a = parseNumber(m[1]); const b = parseNumber(m[2]);
+    if (a != null && b != null) return v >= a && v <= b;
+  }
+
+  // Lower / upper bounds.
+  m = c.match(/(?:sup[eé]rieure?|sup[eé]rieur)\s+(?:ou\s+)?(?:[eé]gale?|[eé]gal)\s+[*]*\s*(?:a|à)\s*([0-9][0-9\s.,]*)/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v >= n; }
+  m = c.match(/(?:sup[eé]rieure?|sup[eé]rieur)\s+(?:a|à)\s*([0-9][0-9\s.,]*)/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v > n; }
+  m = c.match(/(?:inf[eé]rieure?|inf[eé]rieur)\s+(?:ou\s+)?(?:[eé]gale?|[eé]gal)\s+(?:a|à)\s*([0-9][0-9\s.,]*)/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v <= n; }
+  m = c.match(/(?:inf[eé]rieure?|inf[eé]rieur)\s+(?:a|à)\s*([0-9][0-9\s.,]*)/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v < n; }
+
+  m = c.match(/\bplus\s+de\s+([0-9][0-9\s.,]*)/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v > n; }
+  m = c.match(/\bmoins\s+de\s+([0-9][0-9\s.,]*)/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v < n; }
+  m = c.match(/\b(?:au\s+plus|maximum|maximale?|jusqu[\u2019']a)\s*([0-9][0-9\s.,]*)/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v <= n; }
+  m = c.match(/\b(?:au\s+moins|minimum|minimale?)\s*([0-9][0-9\s.,]*)/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v >= n; }
+
+  // Fallback for common legal formulations: "X et plus" / "X ou plus" / "X et moins".
+  m = c.match(/\b([0-9][0-9\s.,]*)\s*(?:et|ou)\s+plus\b/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v >= n; }
+  m = c.match(/\b([0-9][0-9\s.,]*)\s*(?:et|ou)\s+moins\b/i);
+  if (m) { const n = parseNumber(m[1]); if (n != null) return v <= n; }
+
   return false;
 }
 function inferUnit(rows: DecisionRow[]) {
@@ -129,7 +182,7 @@ export function EnvironnementPageV5({ clientName, dossierNumero, onBack }: { cli
     <div className="flex items-center gap-3"><button type="button" onClick={onBack} className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"><ArrowLeft size={18}/></button><div><h1 className="text-2xl font-bold text-gray-800">Module Environnement</h1><p className="text-sm text-gray-500">{dossierNumero ?? 'Nouveau projet'}{clientName ? ` — ${clientName}` : ''}</p></div></div>
     <div className="grid grid-cols-3 gap-2 text-xs"><Step n="1" title="Choix de l’activité" active={!selected}/><Step n="2" title="Valeur / seuil" active={!!selected && !result}/><Step n="3" title="Classement & rapports" active={!!result}/></div>
 
-    {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><SearchCheck size={18} className="text-emerald-600"/><h2 className="font-semibold">Choisir l’activité</h2></div><Field label="Activité / rubrique" required><input className={inputCls} autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder="Ex. élevage de volailles, tannerie, 2121..." /></Field>{query.trim() && suggestions.length > 0 && <div className="mt-4 border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map((s: ActivityCandidate, i) => <div key={`${s.rubrique}-${i}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="text-sm font-semibold"><span className="text-emerald-700">{s.rubrique}</span> — {s.designation}</div><div className="text-xs text-gray-500 mt-1">{s.familleLabel}</div></div><button type="button" onClick={() => acceptActivity(s)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>)}</div>}{query.trim() && suggestions.length === 0 && <div className="mt-4 text-sm text-gray-500">Aucune rubrique trouvée.</div>}</div>}
+    {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><SearchCheck size={18} className="text-emerald-600"/><h2 className="font-semibold">Choisir l’activité</h2></div><Field label="Activité / rubrique" required><input className={inputCls} autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder="Ex. élevage de volailles, tannerie, 2111..." /></Field>{query.trim() && suggestions.length > 0 && <div className="mt-4 border rounded-lg divide-y max-h-80 overflow-y-auto">{suggestions.map((s: ActivityCandidate, i) => <div key={`${s.rubrique}-${i}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="text-sm font-semibold"><span className="text-emerald-700">{s.rubrique}</span> — {s.designation}</div><div className="text-xs text-gray-500 mt-1">{s.familleLabel}</div></div><button type="button" onClick={() => acceptActivity(s)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button></div>)}</div>}{query.trim() && suggestions.length === 0 && <div className="mt-4 text-sm text-gray-500">Aucune rubrique trouvée.</div>}</div>}
 
     {selected && <div className="space-y-5">
       <div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-5"><div className="text-xs font-semibold text-emerald-700 uppercase">Activité acceptée</div><div className="text-xl font-bold text-gray-900 mt-1">{selected.rubrique} — {selected.designation}</div><div className="text-sm text-gray-500 mt-1">{selected.familleLabel}</div><button type="button" onClick={reset} className="mt-3 text-xs text-sky-700 hover:underline">Changer l’activité</button></div>
@@ -141,4 +194,7 @@ export function EnvironnementPageV5({ clientName, dossierNumero, onBack }: { cli
     </div>}
   </div>;
 }
-function Step({ n, title, active }: { n: string; title: string; active: boolean }) { return <div className={`rounded-lg border p-2 text-center ${active ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-gray-200 bg-gray-50 text-gray-500'}`}>{n}. {title}</div>; }
+
+function Step({ n, title, active }: { n: string; title: string; active: boolean }) {
+  return <div className={`rounded-lg border p-2 text-center ${active ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-gray-50 text-gray-400'}`}><span className="font-bold">{n}.</span> {title}</div>;
+}
