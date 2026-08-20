@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2, Search, FolderOpen, Layers3 } from 'lucide-react';
 import { MapContainer, TileLayer, LayersControl, GeoJSON, useMap } from 'react-leaflet';
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
+import L from 'leaflet';
 import shp from 'shpjs';
 import 'leaflet/dist/leaflet.css';
 
@@ -15,13 +16,23 @@ const numeric = (v: unknown) => { const n = Number(String(v ?? '').replace(/\s/g
 
 function FitToFeature({ feature }: { feature?: Feature<Geometry> }) {
   const map = useMap();
-  if (feature) {
-    const L = (window as any).L;
-    if (L) {
-      const layer = L.geoJSON(feature);
-      if (layer.getBounds().isValid()) map.fitBounds(layer.getBounds(), { padding: [40, 40], maxZoom: 18 });
-    }
-  }
+  useEffect(() => {
+    if (!feature) return;
+    const layer = L.geoJSON(feature);
+    const bounds = layer.getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 18 });
+  }, [feature, map]);
+  return null;
+}
+
+function FitToCollection({ data }: { data: CadastreCollection | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!data?.features.length) return;
+    const layer = L.geoJSON(data as any);
+    const bounds = layer.getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [25, 25], maxZoom: 16 });
+  }, [data, map]);
   return null;
 }
 
@@ -60,7 +71,7 @@ export function TopographiePage() {
   const loadShpFiles = async (files: FileList | null) => {
     if (!files?.length) return;
     setLoading(true);
-    setStatus('Lecture des fichiers cadastraux...');
+    setStatus('Lecture du SHP et transformation du système de coordonnées...');
     try {
       const all = Array.from(files);
       const shpFiles = all.filter(f => f.name.toLowerCase().endsWith('.shp'));
@@ -72,20 +83,21 @@ export function TopographiePage() {
       const dbfFile = sibling('.dbf');
       const prjFile = sibling('.prj');
       if (!dbfFile) throw new Error(`Le fichier DBF associé à ${shpFile.name} est manquant.`);
-      const [shpBuffer, dbfBuffer, prjText] = await Promise.all([
-        shpFile.arrayBuffer(), dbfFile.arrayBuffer(), prjFile?.text() ?? Promise.resolve(undefined)
-      ]);
+      if (!prjFile) throw new Error(`Le fichier PRJ associé à ${shpFile.name} est nécessaire pour transformer les coordonnées UTM vers WGS84.`);
+      const [shpBuffer, dbfBuffer, prjText] = await Promise.all([shpFile.arrayBuffer(), dbfFile.arrayBuffer(), prjFile.text()]);
       const parser = shp as any;
+      // shpjs uses the PRJ definition to reproject source coordinates (for example UTM 32N) to WGS84.
       const geometry = await parser.parseShp(shpBuffer, prjText);
       const attributes = await parser.parseDbf(dbfBuffer);
       const combined = parser.combine([geometry, attributes]) as CadastreCollection;
+      if (!combined.features.length) throw new Error('Le SHP a été lu mais ne contient aucune géométrie.');
       setCadastre(combined);
       setSelected([]);
       setFocus(undefined);
-      setStatus(`${combined.features.length.toLocaleString('fr-FR')} entités cadastrales chargées depuis ${shpFile.name}.`);
+      setStatus(`${combined.features.length.toLocaleString('fr-FR')} entités chargées. Coordonnées transformées vers WGS84 pour Leaflet.`);
     } catch (e) {
       setCadastre(null);
-      setStatus(`Erreur SHP : ${(e as Error).message}`);
+      setStatus(`Erreur SHP/CRS : ${(e as Error).message}`);
     } finally {
       setLoading(false);
     }
@@ -114,7 +126,7 @@ export function TopographiePage() {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div><h1 className="text-2xl font-bold text-slate-800">Topographie / Cadastre</h1><p className="text-sm text-slate-500 mt-1">Import libre des fichiers cadastraux, recherche parcellaire et cartes en ligne</p></div>
+        <div><h1 className="text-2xl font-bold text-slate-800">Topographie / Cadastre</h1><p className="text-sm text-slate-500 mt-1">Import libre des fichiers cadastraux, transformation UTM → WGS84 et cartes en ligne</p></div>
         <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
           <FolderOpen size={17}/> Importer fichiers SHP
           <input type="file" className="hidden" multiple accept=".shp,.shx,.dbf,.prj" onChange={e => loadShpFiles(e.target.files)} />
@@ -149,12 +161,13 @@ export function TopographiePage() {
             {cadastre && <LayersControl.Overlay checked name="Cadastre SHP"><GeoJSON data={cadastre as any} style={() => ({ color: '#2563eb', weight: 1, fillOpacity: 0.08 })} /></LayersControl.Overlay>}
             {selected.length > 0 && <LayersControl.Overlay checked name="Parcelles sélectionnées"><div>{selected.map(p => <GeoJSON key={p.id} data={p.feature as any} style={() => ({ color: '#dc2626', weight: 3, fillOpacity: 0.18 })} />)}</div></LayersControl.Overlay>}
           </LayersControl>
+          <FitToCollection data={cadastre} />
           {focus && <FitToFeature feature={focus} />}
         </MapContainer>
       </div></div>
 
       {selected.length > 0 && <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden"><div className="px-4 py-3 border-b font-semibold text-slate-800">Parcelles affichées ({selected.length})</div><div className="divide-y">{selected.map(p => <div key={p.id} className="flex items-center justify-between px-4 py-3 text-sm"><span><strong>{p.commune}</strong> — Section {p.section} — Îlot {p.ilot} — {p.surface !== null ? `${p.surface.toLocaleString('fr-FR')} m²` : 'surface non renseignée'}</span><button onClick={() => setSelected(v => v.filter(x => x.id !== p.id))} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button></div>)}</div></div>}
-      {!cadastre && <div className="text-xs text-slate-500 bg-slate-50 border rounded-lg p-3">يمكنك اختيار ملفات SHP من أي مجلد في الجهاز. حدد .SHP ومعه الملفات المرتبطة بنفس الاسم: .SHX و .DBF و .PRJ.</div>}
+      {!cadastre && <div className="text-xs text-slate-500 bg-slate-50 border rounded-lg p-3">اختر ملفات SHP من أي مجلد في الجهاز. حدد .SHP ومعه الملفات المرتبطة بنفس الاسم: .SHX و .DBF و .PRJ. إذا كان الـPRJ يعرّف UTM، يتم تحويل الإحداثيات تلقائيًا إلى WGS84 لعرضها في الخريطة.</div>}
     </div>
   );
 }
