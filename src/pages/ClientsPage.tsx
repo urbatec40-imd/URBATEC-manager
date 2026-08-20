@@ -614,7 +614,7 @@ function ClientForm({
                 value={form.commune}
                 onChange={(e) => handleCommuneChange(e.target.value)}
               >
-                <option value="">â€” Sélectionner â€”</option>
+                <option value="">- Sélectionner -</option>
                 {COMMUNES_KHENCHELA.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -677,5 +677,4 @@ function ClientForm({
     </Modal>
   );
 }
-
 
