@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "nomenclature:raw-test": "python scripts/diagnose-nomenclature-raw.py",
     "nomenclature:geometry-test": "python scripts/diagnose-nomenclature-geometry.py",
-    "nomenclature:semantic-test": "python scripts/build-nomenclature-semantic-v1.py"
+    "nomenclature:semantic-test": "python scripts/build-nomenclature-semantic-v1.py",
+    "nomenclature:semantic-test:v2": "python scripts/build-nomenclature-semantic-v2.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
