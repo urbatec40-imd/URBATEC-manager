@@ -36,9 +36,9 @@ export function Clients() {
     email: "",
     adresse: "",
     numeroCarteIdentite: "",
-    numeroIdentificationNational: "",
     dateDelivranceCarteIdentite: "",
     autoriteDelivranceCarteIdentite: "",
+    numeroIdentificationNational: "",
     observations: "",
     wilaya: "Khenchela",
     daïra: "",
@@ -53,9 +53,9 @@ export function Clients() {
       email: "",
       adresse: "",
       numeroCarteIdentite: "",
-      numeroIdentificationNational: "",
       dateDelivranceCarteIdentite: "",
       autoriteDelivranceCarteIdentite: "",
+      numeroIdentificationNational: "",
       observations: "",
       wilaya: "Khenchela",
       daïra: "",
@@ -73,9 +73,9 @@ export function Clients() {
       email: client.email,
       adresse: client.adresse,
       numeroCarteIdentite: clientWithIdentity.numeroCarteIdentite || "",
-      numeroIdentificationNational: clientWithIdentity.numeroIdentificationNational || "",
       dateDelivranceCarteIdentite: clientWithIdentity.dateDelivranceCarteIdentite || "",
       autoriteDelivranceCarteIdentite: clientWithIdentity.autoriteDelivranceCarteIdentite || "",
+      numeroIdentificationNational: clientWithIdentity.numeroIdentificationNational || "",
       observations: client.observations,
       wilaya: client.wilaya || "Khenchela",
       daïra: client.daïra || "",
@@ -255,16 +255,16 @@ export function Clients() {
                       <p className="font-medium text-slate-900">{selectedClientWithIdentity?.numeroCarteIdentite || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">N° Identification national</p>
-                      <p className="font-medium text-slate-900">{selectedClientWithIdentity?.numeroIdentificationNational || "-"}</p>
-                    </div>
-                    <div>
                       <p className="text-xs text-slate-500">Date de délivrance</p>
                       <p className="font-medium text-slate-900">{selectedClientWithIdentity?.dateDelivranceCarteIdentite || "-"}</p>
                     </div>
-                    <div className="md:col-span-3">
+                    <div>
                       <p className="text-xs text-slate-500">Autorité de délivrance</p>
                       <p className="font-medium text-slate-900">{selectedClientWithIdentity?.autoriteDelivranceCarteIdentite || "-"}</p>
+                    </div>
+                    <div className="md:col-span-3">
+                      <p className="text-xs text-slate-500">N° Identification national</p>
+                      <p className="font-medium text-slate-900">{selectedClientWithIdentity?.numeroIdentificationNational || "-"}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -346,6 +346,22 @@ export function Clients() {
               <Input value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })} />
             </div>
             <div>
+              <Label>N° Carte d'identité nationale</Label>
+              <Input value={form.numeroCarteIdentite} onChange={(e) => setForm({ ...form, numeroCarteIdentite: e.target.value })} placeholder="Numéro de la carte" />
+            </div>
+            <div>
+              <Label>Date de délivrance de la carte</Label>
+              <Input type="date" value={form.dateDelivranceCarteIdentite} onChange={(e) => setForm({ ...form, dateDelivranceCarteIdentite: e.target.value })} />
+            </div>
+            <div>
+              <Label>Autorité de délivrance</Label>
+              <Input value={form.autoriteDelivranceCarteIdentite} onChange={(e) => setForm({ ...form, autoriteDelivranceCarteIdentite: e.target.value })} placeholder="Autorité émettrice" />
+            </div>
+            <div>
+              <Label>N° Identification national (NIN)</Label>
+              <Input value={form.numeroIdentificationNational} onChange={(e) => setForm({ ...form, numeroIdentificationNational: e.target.value })} placeholder="NIN" />
+            </div>
+            <div>
               <Label>Téléphone</Label>
               <Input value={form.telephone} onChange={(e) => setForm({ ...form, telephone: e.target.value })} />
             </div>
@@ -356,23 +372,6 @@ export function Clients() {
             <div className="col-span-2">
               <Label>Adresse</Label>
               <Input value={form.adresse} onChange={(e) => setForm({ ...form, adresse: e.target.value })} />
-            </div>
-
-            <div>
-              <Label>N° Carte d'identité nationale</Label>
-              <Input value={form.numeroCarteIdentite} onChange={(e) => setForm({ ...form, numeroCarteIdentite: e.target.value })} placeholder="Numéro de la carte" />
-            </div>
-            <div>
-              <Label>N° Identification national</Label>
-              <Input value={form.numeroIdentificationNational} onChange={(e) => setForm({ ...form, numeroIdentificationNational: e.target.value })} placeholder="NIN" />
-            </div>
-            <div>
-              <Label>Date de délivrance de la carte</Label>
-              <Input type="date" value={form.dateDelivranceCarteIdentite} onChange={(e) => setForm({ ...form, dateDelivranceCarteIdentite: e.target.value })} />
-            </div>
-            <div>
-              <Label>Autorité de délivrance</Label>
-              <Input value={form.autoriteDelivranceCarteIdentite} onChange={(e) => setForm({ ...form, autoriteDelivranceCarteIdentite: e.target.value })} placeholder="Autorité émettrice" />
             </div>
 
             <div>
