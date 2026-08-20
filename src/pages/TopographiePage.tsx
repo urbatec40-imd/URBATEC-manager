@@ -16,23 +16,12 @@ const numeric = (v: unknown) => { const n = Number(String(v ?? '').replace(/\s/g
 
 function FitToFeature({ feature }: { feature?: Feature<Geometry> }) {
   const map = useMap();
-  useEffect(() => {
-    if (!feature) return;
-    const layer = L.geoJSON(feature);
-    const bounds = layer.getBounds();
-    if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 18 });
-  }, [feature, map]);
+  useEffect(() => { if (!feature) return; const layer = L.geoJSON(feature); const bounds = layer.getBounds(); if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 18 }); }, [feature, map]);
   return null;
 }
-
 function FitToCollection({ data }: { data: CadastreCollection | null }) {
   const map = useMap();
-  useEffect(() => {
-    if (!data?.features.length) return;
-    const layer = L.geoJSON(data as any);
-    const bounds = layer.getBounds();
-    if (bounds.isValid()) map.fitBounds(bounds, { padding: [25, 25], maxZoom: 16 });
-  }, [data, map]);
+  useEffect(() => { if (!data?.features.length) return; const layer = L.geoJSON(data as any); const bounds = layer.getBounds(); if (bounds.isValid()) map.fitBounds(bounds, { padding: [25, 25], maxZoom: 16 }); }, [data, map]);
   return null;
 }
 
@@ -47,127 +36,56 @@ export function TopographiePage() {
   const [loading, setLoading] = useState(false);
   const [showCommunes, setShowCommunes] = useState(false);
 
-  const filteredCommunes = useMemo(() => {
-    const q = normalize(commune);
-    if (!q) return COMMUNES;
-    return COMMUNES.filter(c => normalize(c).includes(q));
-  }, [commune]);
-
+  const filteredCommunes = useMemo(() => { const q = normalize(commune); if (!q) return COMMUNES; return COMMUNES.filter(c => normalize(c).includes(q)); }, [commune]);
   const matching = useMemo(() => {
     if (!cadastre || !section.trim() || !ilot.trim()) return [];
-    const sec = normalize(section);
-    const ilo = normalize(ilot);
-    return cadastre.features.filter(feature => {
-      const p = (feature.properties ?? {}) as Record<string, unknown>;
-      return normalize(prop(p, ['SECTION', 'SECTION_CAD', 'SEC', 'SECT'])) === sec &&
-        normalize(prop(p, ['ILOT', 'ILOTS', 'ILOT_CAD', 'NUMILOT', 'NUM_ILOT', 'PARCELLE', 'PARCEL'])) === ilo;
-    });
+    const sec = normalize(section), ilo = normalize(ilot);
+    return cadastre.features.filter(feature => { const p = (feature.properties ?? {}) as Record<string, unknown>; return normalize(prop(p, ['SECTION','SECTION_CAD','SEC','SECT'])) === sec && normalize(prop(p, ['ILOT','ILOTS','ILOT_CAD','NUMILOT','NUM_ILOT','PARCELLE','PARCEL'])) === ilo; });
   }, [cadastre, section, ilot]);
-
-  const surface = matching.length
-    ? numeric(prop((matching[0].properties ?? {}) as Record<string, unknown>, ['SURFACE', 'SUPERFICIE', 'AREA', 'AIRE', 'CONTENANCE']))
-    : null;
+  const surface = matching.length ? numeric(prop((matching[0].properties ?? {}) as Record<string, unknown>, ['SURFACE','SUPERFICIE','AREA','AIRE','CONTENANCE'])) : null;
 
   const loadShpFiles = async (files: FileList | null) => {
     if (!files?.length) return;
-    setLoading(true);
-    setStatus('Lecture du SHP et transformation du système de coordonnées...');
+    setLoading(true); setStatus('Lecture du SHP et transformation du système de coordonnées...');
     try {
-      const all = Array.from(files);
-      const shpFiles = all.filter(f => f.name.toLowerCase().endsWith('.shp'));
+      const all = Array.from(files); const shpFiles = all.filter(f => f.name.toLowerCase().endsWith('.shp'));
       if (!shpFiles.length) throw new Error('Aucun fichier .SHP sélectionné. Sélectionnez le SHP et ses fichiers associés (.SHX, .DBF, .PRJ).');
       if (shpFiles.length > 1) throw new Error('Plusieurs .SHP sélectionnés. Importez une seule couche cadastrale à la fois.');
-      const shpFile = shpFiles[0];
-      const base = shpFile.name.replace(/\.shp$/i, '').toLowerCase();
+      const shpFile = shpFiles[0]; const base = shpFile.name.replace(/\.shp$/i, '').toLowerCase();
       const sibling = (ext: string) => all.find(f => f.name.replace(/\.[^.]+$/, '').toLowerCase() === base && f.name.toLowerCase().endsWith(ext));
-      const dbfFile = sibling('.dbf');
-      const prjFile = sibling('.prj');
+      const dbfFile = sibling('.dbf'), prjFile = sibling('.prj');
       if (!dbfFile) throw new Error(`Le fichier DBF associé à ${shpFile.name} est manquant.`);
       if (!prjFile) throw new Error(`Le fichier PRJ associé à ${shpFile.name} est nécessaire pour transformer les coordonnées UTM vers WGS84.`);
       const [shpBuffer, dbfBuffer, prjText] = await Promise.all([shpFile.arrayBuffer(), dbfFile.arrayBuffer(), prjFile.text()]);
       const parser = shp as any;
-      // shpjs uses the PRJ definition to reproject source coordinates (for example UTM 32N) to WGS84.
-      const geometry = await parser.parseShp(shpBuffer, prjText);
-      const attributes = await parser.parseDbf(dbfBuffer);
+      const geometry = await parser.parseShp(shpBuffer, prjText); const attributes = await parser.parseDbf(dbfBuffer);
       const combined = parser.combine([geometry, attributes]) as CadastreCollection;
       if (!combined.features.length) throw new Error('Le SHP a été lu mais ne contient aucune géométrie.');
-      setCadastre(combined);
-      setSelected([]);
-      setFocus(undefined);
-      setStatus(`${combined.features.length.toLocaleString('fr-FR')} entités chargées. Coordonnées transformées vers WGS84 pour Leaflet.`);
-    } catch (e) {
-      setCadastre(null);
-      setStatus(`Erreur SHP/CRS : ${(e as Error).message}`);
-    } finally {
-      setLoading(false);
-    }
+      setCadastre(combined); setSelected([]); setFocus(undefined); setStatus(`${combined.features.length.toLocaleString('fr-FR')} entités chargées. Coordonnées transformées vers WGS84 pour Leaflet.`);
+    } catch (e) { setCadastre(null); setStatus(`Erreur SHP/CRS : ${(e as Error).message}`); } finally { setLoading(false); }
   };
-
-  const searchParcel = () => {
-    if (!matching.length) {
-      setStatus('Aucune parcelle trouvée pour cette Section / Îlot.');
-      return;
-    }
-    setFocus(matching[0]);
-    setStatus(`${matching.length} parcelle(s) trouvée(s). Zoom automatique.`);
-  };
-
+  const searchParcel = () => { if (!matching.length) { setStatus('Aucune parcelle trouvée pour cette Section / Îlot.'); return; } setFocus(matching[0]); setStatus(`${matching.length} parcelle(s) trouvée(s). Zoom automatique.`); };
   const addParcel = () => {
-    const added: Parcel[] = matching.map((feature, index) => {
-      const p = (feature.properties ?? {}) as Record<string, unknown>;
-      const s = String(prop(p, ['SECTION', 'SECTION_CAD', 'SEC', 'SECT']) ?? section).trim();
-      const i = String(prop(p, ['ILOT', 'ILOTS', 'ILOT_CAD', 'NUMILOT', 'NUM_ILOT', 'PARCELLE', 'PARCEL']) ?? ilot).trim();
-      return { id: `${commune}-${s}-${i}-${index}`, commune, section: s, ilot: i, surface: numeric(prop(p, ['SURFACE', 'SUPERFICIE', 'AREA', 'AIRE', 'CONTENANCE'])), feature };
-    });
-    setSelected(old => { const ids = new Set(old.map(x => x.id)); return [...old, ...added.filter(x => !ids.has(x.id))]; });
-    if (matching.length) setFocus(matching[0]);
+    const added: Parcel[] = matching.map((feature,index) => { const p=(feature.properties??{}) as Record<string,unknown>; const s=String(prop(p,['SECTION','SECTION_CAD','SEC','SECT'])??section).trim(); const i=String(prop(p,['ILOT','ILOTS','ILOT_CAD','NUMILOT','NUM_ILOT','PARCELLE','PARCEL'])??ilot).trim(); return { id:`${commune}-${s}-${i}-${index}`, commune, section:s, ilot:i, surface:numeric(prop(p,['SURFACE','SUPERFICIE','AREA','AIRE','CONTENANCE'])), feature }; });
+    setSelected(old=>{const ids=new Set(old.map(x=>x.id));return [...old,...added.filter(x=>!ids.has(x.id))]}); if(matching.length)setFocus(matching[0]);
   };
 
-  return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div><h1 className="text-2xl font-bold text-slate-800">Topographie / Cadastre</h1><p className="text-sm text-slate-500 mt-1">Import libre des fichiers cadastraux, transformation UTM → WGS84 et cartes en ligne</p></div>
-        <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
-          <FolderOpen size={17}/> Importer fichiers SHP
-          <input type="file" className="hidden" multiple accept=".shp,.shx,.dbf,.prj" onChange={e => loadShpFiles(e.target.files)} />
-        </label>
-      </div>
-
-      <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative text-sm font-medium text-slate-700">
-            <label htmlFor="commune">Commune</label>
-            <input id="commune" value={commune} onFocus={() => setShowCommunes(true)} onChange={e => { setCommune(e.target.value); setShowCommunes(true); }} onBlur={() => setTimeout(() => setShowCommunes(false), 150)} placeholder="Tapez K..." autoComplete="off" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5" />
-            {showCommunes && filteredCommunes.length > 0 && <div className="absolute z-[1000] left-0 right-0 top-[68px] max-h-56 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">{filteredCommunes.map(c => <button type="button" key={c} onMouseDown={() => { setCommune(c); setShowCommunes(false); }} className="block w-full px-3 py-2.5 text-left text-sm hover:bg-slate-100">{c}</button>)}</div>}
-          </div>
-          <label className="text-sm font-medium text-slate-700">Section<input value={section} onChange={e => setSection(e.target.value)} placeholder="Ex. A" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5" /></label>
-          <label className="text-sm font-medium text-slate-700">Îlot<input value={ilot} onChange={e => setIlot(e.target.value)} placeholder="Ex. 125" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5" /></label>
-        </div>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button disabled={!cadastre || loading} onClick={searchParcel} className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"><Search size={16}/> Rechercher / Zoom</button>
-          <button disabled={!matching.length} onClick={addParcel} className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"><Plus size={16}/> Ajouter à la carte</button>
-          <div className="inline-flex items-center gap-2 rounded-lg border bg-slate-50 px-3 py-2 text-sm"><Layers3 size={16}/> OSM • Satellite • Topographique</div>
-          <div className="ml-auto rounded-lg bg-slate-50 border px-4 py-2.5 text-sm"><span className="text-slate-500">Surface :</span> <strong>{surface !== null ? `${surface.toLocaleString('fr-FR')} m²` : '—'}</strong></div>
-        </div>
-        {status && <div className="mt-3 text-sm text-slate-600">{status}</div>}
-      </div>
-
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm"><div className="h-[600px]">
-        <MapContainer center={[35.435, 7.143]} zoom={11} className="h-full w-full">
-          <LayersControl position="topright">
-            <LayersControl.BaseLayer checked name="OpenStreetMap"><TileLayer attribution="© OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" /></LayersControl.BaseLayer>
-            <LayersControl.BaseLayer name="Satellite"><TileLayer attribution="Tiles © Esri" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" /></LayersControl.BaseLayer>
-            <LayersControl.BaseLayer name="Topographique"><TileLayer attribution="© OpenTopoMap contributors" url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" /></LayersControl.BaseLayer>
-            {cadastre && <LayersControl.Overlay checked name="Cadastre SHP"><GeoJSON data={cadastre as any} style={() => ({ color: '#2563eb', weight: 1, fillOpacity: 0.08 })} /></LayersControl.Overlay>}
-            {selected.length > 0 && <LayersControl.Overlay checked name="Parcelles sélectionnées"><div>{selected.map(p => <GeoJSON key={p.id} data={p.feature as any} style={() => ({ color: '#dc2626', weight: 3, fillOpacity: 0.18 })} />)}</div></LayersControl.Overlay>}
-          </LayersControl>
-          <FitToCollection data={cadastre} />
-          {focus && <FitToFeature feature={focus} />}
-        </MapContainer>
-      </div></div>
-
-      {selected.length > 0 && <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden"><div className="px-4 py-3 border-b font-semibold text-slate-800">Parcelles affichées ({selected.length})</div><div className="divide-y">{selected.map(p => <div key={p.id} className="flex items-center justify-between px-4 py-3 text-sm"><span><strong>{p.commune}</strong> — Section {p.section} — Îlot {p.ilot} — {p.surface !== null ? `${p.surface.toLocaleString('fr-FR')} m²` : 'surface non renseignée'}</span><button onClick={() => setSelected(v => v.filter(x => x.id !== p.id))} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button></div>)}</div></div>}
-      {!cadastre && <div className="text-xs text-slate-500 bg-slate-50 border rounded-lg p-3">اختر ملفات SHP من أي مجلد في الجهاز. حدد .SHP ومعه الملفات المرتبطة بنفس الاسم: .SHX و .DBF و .PRJ. إذا كان الـPRJ يعرّف UTM، يتم تحويل الإحداثيات تلقائيًا إلى WGS84 لعرضها في الخريطة.</div>}
-    </div>
-  );
+  return <div className="space-y-5">
+    <div className="flex flex-wrap items-start justify-between gap-3"><div><h1 className="text-2xl font-bold text-slate-800">Topographie / Cadastre</h1><p className="text-sm text-slate-500 mt-1">Import libre des fichiers cadastraux, transformation UTM → WGS84 et cartes en ligne</p></div><label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"><FolderOpen size={17}/> Importer fichiers SHP<input type="file" className="hidden" multiple accept=".shp,.shx,.dbf,.prj" onChange={e=>loadShpFiles(e.target.files)}/></label></div>
+    <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm"><div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="relative text-sm font-medium text-slate-700"><label htmlFor="commune">Commune</label><input id="commune" value={commune} onFocus={()=>setShowCommunes(true)} onChange={e=>{setCommune(e.target.value);setShowCommunes(true)}} onBlur={()=>setTimeout(()=>setShowCommunes(false),150)} placeholder="Tapez K..." autoComplete="off" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5"/>{showCommunes&&filteredCommunes.length>0&&<div className="absolute z-[1000] left-0 right-0 top-[68px] max-h-56 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">{filteredCommunes.map(c=><button type="button" key={c} onMouseDown={()=>{setCommune(c);setShowCommunes(false)}} className="block w-full px-3 py-2.5 text-left text-sm hover:bg-slate-100">{c}</button>)}</div>}</div>
+      <label className="text-sm font-medium text-slate-700">Section<input value={section} onChange={e=>setSection(e.target.value)} placeholder="Ex. A" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5"/></label><label className="text-sm font-medium text-slate-700">Îlot<input value={ilot} onChange={e=>setIlot(e.target.value)} placeholder="Ex. 125" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5"/></label></div>
+      <div className="mt-4 flex flex-wrap items-center gap-3"><button disabled={!cadastre||loading} onClick={searchParcel} className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"><Search size={16}/> Rechercher / Zoom</button><button disabled={!matching.length} onClick={addParcel} className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"><Plus size={16}/> Ajouter à la carte</button><div className="inline-flex items-center gap-2 rounded-lg border bg-slate-50 px-3 py-2 text-sm"><Layers3 size={16}/> OSM • Bing • Esri • Topographique</div><div className="ml-auto rounded-lg bg-slate-50 border px-4 py-2.5 text-sm"><span className="text-slate-500">Surface :</span> <strong>{surface!==null?`${surface.toLocaleString('fr-FR')} m²`:'—'}</strong></div></div>{status&&<div className="mt-3 text-sm text-slate-600">{status}</div>}</div>
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm"><div className="h-[600px]"><MapContainer center={[35.435,7.143]} zoom={11} className="h-full w-full"><LayersControl position="topright">
+      <LayersControl.BaseLayer checked name="OpenStreetMap"><TileLayer attribution="© OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/></LayersControl.BaseLayer>
+      <LayersControl.BaseLayer name="Esri Satellite"><TileLayer attribution="Tiles © Esri" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"/></LayersControl.BaseLayer>
+      <LayersControl.BaseLayer name="Esri Streets"><TileLayer attribution="Tiles © Esri" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"/></LayersControl.BaseLayer>
+      <LayersControl.BaseLayer name="Esri Topographique"><TileLayer attribution="Tiles © Esri" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"/></LayersControl.BaseLayer>
+      <LayersControl.BaseLayer name="Bing Aerial"><TileLayer attribution="© Microsoft Bing" url="https://ecn.t3.tiles.virtualearth.net/tiles/a{q}.jpeg?g=1"/></LayersControl.BaseLayer>
+      {cadastre&&<LayersControl.Overlay checked name="Cadastre SHP"><GeoJSON data={cadastre as any} style={()=>({color:'#2563eb',weight:1,fillOpacity:0.08})}/></LayersControl.Overlay>}
+      {selected.length>0&&<LayersControl.Overlay checked name="Parcelles sélectionnées"><div>{selected.map(p=><GeoJSON key={p.id} data={p.feature as any} style={()=>({color:'#dc2626',weight:3,fillOpacity:0.18})}/>)}</div></LayersControl.Overlay>}
+    </LayersControl><FitToCollection data={cadastre}/>{focus&&<FitToFeature feature={focus}/>}</MapContainer></div></div>
+    {selected.length>0&&<div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden"><div className="px-4 py-3 border-b font-semibold text-slate-800">Parcelles affichées ({selected.length})</div><div className="divide-y">{selected.map(p=><div key={p.id} className="flex items-center justify-between px-4 py-3 text-sm"><span><strong>{p.commune}</strong> — Section {p.section} — Îlot {p.ilot} — {p.surface!==null?`${p.surface.toLocaleString('fr-FR')} m²`:'surface non renseignée'}</span><button onClick={()=>setSelected(v=>v.filter(x=>x.id!==p.id))} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16}/></button></div>)}</div></div>}
+    {!cadastre&&<div className="text-xs text-slate-500 bg-slate-50 border rounded-lg p-3">اختر ملفات SHP من أي مجلد في الجهاز. حدد .SHP ومعه الملفات المرتبطة بنفس الاسم: .SHX و .DBF و .PRJ. إذا كان الـPRJ يعرّف UTM، يتم تحويل الإحداثيات تلقائيًا إلى WGS84 لعرضها في الخريطة.</div>}
+  </div>;
 }
