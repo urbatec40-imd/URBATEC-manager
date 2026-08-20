@@ -121,7 +121,7 @@ export function ClientsPage({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.length === 0 && (
           <p className="text-gray-400 text-center py-8 col-span-full">
-            Aucun client trouvÃ©
+            Aucun client trouvé
           </p>
         )}
         {filtered.map((c) => {
@@ -188,7 +188,7 @@ export function ClientsPage({
                     <MapPin size={14} className="text-gray-400" />
                     <span className="truncate">
                       {c.commune}
-                      {c.daira ? ` â€” ${c.daira}` : ''}
+                      {c.daira ? ` — ${c.daira}` : ''}
                     </span>
                   </div>
                 )}
@@ -200,11 +200,11 @@ export function ClientsPage({
                   <p className="font-bold text-gray-800">{stats.nbDossiers}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">FacturÃ©</p>
+                  <p className="text-gray-400">Facturé</p>
                   <p className="font-bold text-gray-800">{formatMontant(stats.totalFacture)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400">PayÃ©</p>
+                  <p className="text-gray-400">Payé</p>
                   <p className="font-bold text-green-600">{formatMontant(stats.totalPaye)}</p>
                 </div>
                 <div>
@@ -244,7 +244,7 @@ export function ClientsPage({
 
       <ConfirmDialog
         open={!!deleteId}
-        message="Voulez-vous rÃ©ellement supprimer cet Ã©lÃ©ment ?"
+        message="Voulez-vous réellement supprimer cet élément ?"
         onConfirm={async () => {
           if (deleteId) {
             await onDelete(deleteId);
@@ -283,9 +283,9 @@ function ClientDetail({
   return (
     <Modal open={true} onClose={onClose} title={client.nom} size="lg">
       <div className="space-y-5">
-        {/* CoordonnÃ©es */}
+        {/* Coordonnées */}
         <div>
-          <h4 className="font-bold text-gray-700 mb-2 text-sm">CoordonnÃ©es</h4>
+          <h4 className="font-bold text-gray-700 mb-2 text-sm">Coordonnées</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             {client.telephone && (
               <div>
@@ -318,19 +318,19 @@ function ClientDetail({
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-500">Daïra</p>
-              <p className="text-gray-800">{client.daira || 'â€”'}</p>
+              <p className="text-gray-800">{client.daira || '—'}</p>
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-500">Commune</p>
-              <p className="text-gray-800">{client.commune || 'â€”'}</p>
+              <p className="text-gray-800">{client.commune || '—'}</p>
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-500">Section</p>
-              <p className="text-gray-800">{client.section || 'â€”'}</p>
+              <p className="text-gray-800">{client.section || '—'}</p>
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-500">Îlot</p>
-              <p className="text-gray-800">{client.ilot || 'â€”'}</p>
+              <p className="text-gray-800">{client.ilot || '—'}</p>
             </div>
           </div>
         </div>
@@ -432,7 +432,7 @@ function ClientDetail({
 
       <ConfirmDialog
         open={!!deleteDossierId}
-        message="Voulez-vous rÃ©ellement supprimer ce dossier ?"
+        message="Voulez-vous réellement supprimer ce dossier ?"
         onConfirm={async () => {
           if (deleteDossierId) {
             await onDeleteDossier(deleteDossierId);
@@ -710,6 +710,8 @@ function ClientForm({
     </Modal>
   );
 }
+
+
 
 
 
