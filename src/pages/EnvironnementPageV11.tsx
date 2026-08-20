@@ -17,132 +17,41 @@ interface DecisionRow {
   documents?: { impact?: boolean; danger?: boolean; notice?: boolean; rapportDangereux?: boolean };
   sourcePage?: number;
 }
-interface Row {
-  rubrique: string;
-  famille: string;
-  familleLabel: string;
-  designation: string;
-  decisionRows?: DecisionRow[];
-  source: string;
-  sourceUrl: string;
-  selectable?: boolean;
-  classificationMode?: 'single' | 'multiple';
-}
+interface Row { rubrique: string; famille: string; familleLabel: string; designation: string; decisionRows?: DecisionRow[]; source: string; sourceUrl: string; selectable?: boolean; classificationMode?: 'single' | 'multiple'; }
 interface Family { code: string; label: string }
 interface Dataset { version: string; date: string; sourceUrl: string; families?: Family[]; rubriques: Row[] }
-
 const EMPTY: Dataset = { version: '07-144', date: '19 mai 2007', sourceUrl: 'https://www.joradp.dz/FTP/jo-francais/2007/F2007034.PDF', rubriques: [] };
-
-function clean(v: string) {
-  return v.replace(/Ã©/g, 'é').replace(/Ã¨/g, 'è').replace(/Ãª/g, 'ê').replace(/Ã®/g, 'î').replace(/Ã´/g, 'ô').replace(/Ã¹/g, 'ù').replace(/Ã§/g, 'ç').replace(/Ã /g, 'à').replace(/â€™/g, '’').replace(/dâ€™/g, 'd’').replace(/lâ€™/g, 'l’').replace(/\s+/g, ' ').trim();
-}
-function norm(v: string) {
-  return v.toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’'`´]/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').replace(/\s+/g, ' ').trim();
-}
-function shortDesignation(value: string) {
-  const s = clean(value);
-  const cut = [
-    s.search(/\s+(?:La|Le|Les)\s+(?:quantité|capacité|puissance|volume|surface|nombre|production|consommation)\b/i),
-    s.search(/\s+\d+\s*[.)]\s+/),
-    s.search(/\s+vis[ée]s?\s+par\s+d['’]autres\s+rubriques?\s*:/i),
-  ].filter(n => n >= 0).sort((a, b) => a - b)[0];
-  return cut == null ? s : s.slice(0, cut).replace(/[,:;\-\s]+$/, '').trim();
-}
-function regimeLabel(v: string) {
-  return ({ AM: 'Autorisation ministérielle', AW: 'Autorisation du Wali', APAPC: 'Autorisation du président de l’APC', D: 'Déclaration auprès du président de l’APC' } as Record<string,string>)[v] ?? v;
-}
-function category(v: string) {
-  return ({ AM: '1re catégorie', AW: '2e catégorie', APAPC: '3e catégorie', D: '4e catégorie' } as Record<string,string>)[v] ?? '';
-}
+function clean(v: string) { return v.replace(/Ã©/g, 'é').replace(/Ã¨/g, 'è').replace(/Ãª/g, 'ê').replace(/Ã®/g, 'î').replace(/Ã´/g, 'ô').replace(/Ã¹/g, 'ù').replace(/Ã§/g, 'ç').replace(/Ã /g, 'à').replace(/â€™/g, '’').replace(/dâ€™/g, 'd’').replace(/lâ€™/g, 'l’').replace(/\s+/g, ' ').trim(); }
+function norm(v: string) { return v.toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’'`´]/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').replace(/\s+/g, ' ').trim(); }
+function shortDesignation(value: string) { const s = clean(value); const cut = [s.search(/\s+(?:La|Le|Les)\s+(?:quantité|capacité|puissance|volume|surface|nombre|production|consommation)\b/i), s.search(/\s+\d+\s*[.)]\s+/), s.search(/\s+vis[ée]s?\s+par\s+d['’]autres\s+rubriques?\s*:/i)].filter(n => n >= 0).sort((a, b) => a - b)[0]; return cut == null ? s : s.slice(0, cut).replace(/[,:;\-\s]+$/, '').trim(); }
+function regimeLabel(v: string) { return ({ AM: 'Autorisation ministérielle', AW: 'Autorisation du Wali', APAPC: 'Autorisation du président de l’APC', D: 'Déclaration auprès du président de l’APC' } as Record<string,string>)[v] ?? v; }
+function category(v: string) { return ({ AM: '1re catégorie', AW: '2e catégorie', APAPC: '3e catégorie', D: '4e catégorie' } as Record<string,string>)[v] ?? ''; }
 function isFamilyCode(code: string) { return /^\d{4}$/.test(code) && code.endsWith('00'); }
 function situationLabel(r: DecisionRow) { return clean(r.rawCondition || r.criterion || 'Situation définie par la rubrique'); }
-function documentsFor(row: DecisionRow) {
-  return [
-    ['Étude d’impact', !!row.documents?.impact],
-    ['Étude de dangers', !!row.documents?.danger],
-    ['Notice d’impact', !!row.documents?.notice],
-    ['Rapport sur les produits dangereux', !!row.documents?.rapportDangereux],
-  ].filter(([, required]) => required) as const;
-}
-
+function documentsFor(row: DecisionRow) { return [['Étude d’impact', !!row.documents?.impact], ['Étude de dangers', !!row.documents?.danger], ['Notice d’impact', !!row.documents?.notice], ['Rapport sur les produits dangereux', !!row.documents?.rapportDangereux]].filter(([, required]) => required) as const; }
 export function EnvironnementPageV11({ clientName, dossierNumero, onBack }: { clientName: string; dossierNumero?: string; onBack: () => void }) {
-  const [dataset, setDataset] = useState<Dataset>(EMPTY);
-  const [query, setQuery] = useState('');
-  const [selected, setSelected] = useState<Row | null>(null);
-  const [selectedCase, setSelectedCase] = useState<DecisionRow | null>(null);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    fetch('/data/nomenclature-07-144.json')
-      .then(async r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return await r.json() as Dataset; })
-      .then(d => setDataset({ ...d, rubriques: (d.rubriques ?? []).map(r => ({ ...r, selectable: r.selectable ?? !isFamilyCode(r.rubrique), classificationMode: r.classificationMode ?? ((r.decisionRows?.length ?? 0) > 1 ? 'multiple' : 'single'), designation: clean(r.designation), familleLabel: clean(r.familleLabel) })) }))
-      .catch(e => setError((e as Error).message));
-  }, []);
-
-  const index = useMemo(() => buildActivityIndex(dataset.rubriques.filter(r => !isFamilyCode(r.rubrique))), [dataset.rubriques]);
-  const q = norm(query);
-  const exact = /^\d{4}$/.test(q) && !isFamilyCode(q) ? dataset.rubriques.find(r => r.rubrique === q && r.selectable !== false) ?? null : null;
-  const numericMatches = useMemo(() => {
-    if (!/^\d{1,4}$/.test(q) || exact) return [] as Row[];
-    return dataset.rubriques.filter(r => r.selectable !== false && !isFamilyCode(r.rubrique) && r.rubrique.startsWith(q)).sort((a, b) => a.rubrique.localeCompare(b.rubrique));
-  }, [dataset.rubriques, q, exact]);
-
-  const textSuggestions = useMemo(() => {
-    if (!q || exact || numericMatches.length) return [];
-    return suggestActivities(index, q, 12);
-  }, [q, exact, numericMatches.length, index]);
-
-  const familiesForNumericSearch = useMemo(() => {
-    if (!/^\d{1,4}$/.test(q)) return [] as Array<{ family: Family; rows: Row[] }>;
-    const families = dataset.families ?? [];
-    return families.map(f => ({ family: f, rows: numericMatches.filter(r => r.famille === f.code) })).filter(x => x.rows.length);
-  }, [dataset.families, numericMatches, q]);
-
+  const [dataset, setDataset] = useState<Dataset>(EMPTY); const [query, setQuery] = useState(''); const [selected, setSelected] = useState<Row | null>(null); const [selectedCase, setSelectedCase] = useState<DecisionRow | null>(null); const [error, setError] = useState('');
+  useEffect(() => { fetch('/data/nomenclature-07-144.json').then(async r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return await r.json() as Dataset; }).then(d => setDataset({ ...d, rubriques: (d.rubriques ?? []).map(r => ({ ...r, selectable: r.selectable ?? !isFamilyCode(r.rubrique), classificationMode: r.classificationMode ?? ((r.decisionRows?.length ?? 0) > 1 ? 'multiple' : 'single'), designation: clean(r.designation), familleLabel: clean(r.familleLabel) })) })).catch(e => setError((e as Error).message)); }, []);
+  const index = useMemo(() => buildActivityIndex(dataset.rubriques.filter(r => !isFamilyCode(r.rubrique))), [dataset.rubriques]); const q = norm(query); const exact = /^\d{4}$/.test(q) && !isFamilyCode(q) ? dataset.rubriques.find(r => r.rubrique === q && r.selectable !== false) ?? null : null;
+  const numericMatches = useMemo(() => { if (!/^\d{1,4}$/.test(q) || exact) return [] as Row[]; return dataset.rubriques.filter(r => r.selectable !== false && !isFamilyCode(r.rubrique) && r.rubrique.startsWith(q)).sort((a, b) => a.rubrique.localeCompare(b.rubrique)); }, [dataset.rubriques, q, exact]);
+  const textSuggestions = useMemo(() => { if (!q || exact || numericMatches.length) return []; return suggestActivities(index, q, 12); }, [q, exact, numericMatches.length, index]);
+  const familiesForNumericSearch = useMemo(() => { if (!/^\d{1,4}$/.test(q)) return [] as Array<{ family: Family; rows: Row[] }>; const families = dataset.families ?? []; return families.map(f => ({ family: f, rows: numericMatches.filter(r => r.famille === f.code) })).filter(x => x.rows.length); }, [dataset.families, numericMatches, q]);
   const cases = useMemo(() => selected?.decisionRows ?? [], [selected]);
-
   function reset() { setQuery(''); setSelected(null); setSelectedCase(null); setError(''); }
-  function accept(row: Row) {
-    setSelected(row);
-    setSelectedCase(row.decisionRows?.length === 1 ? row.decisionRows[0] : null);
-    setError('');
-  }
-  function onCaseChange(indexValue: string) {
-    const idx = Number(indexValue);
-    setSelectedCase(Number.isInteger(idx) && idx >= 0 ? cases[idx] ?? null : null);
-    setError('');
-  }
-
+  function accept(row: Row) { setSelected(row); setSelectedCase(row.decisionRows?.length === 1 ? row.decisionRows[0] : null); setError(''); }
+  function onCaseChange(indexValue: string) { const idx = Number(indexValue); setSelectedCase(Number.isInteger(idx) && idx >= 0 ? cases[idx] ?? null : null); setError(''); }
   return <div className="space-y-6">
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex items-center gap-3"><button type="button" onClick={onBack} className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"><ArrowLeft size={18}/></button><div><h1 className="text-2xl font-bold text-gray-800">Module Environnement</h1><p className="text-sm text-gray-500">{dossierNumero ?? 'Nouveau projet'}{clientName ? ` — ${clientName}` : ''}</p></div></div>
-      <span className="text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Nomenclature 07-144</span>
-    </div>
-
+    <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-3"><button type="button" onClick={onBack} className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"><ArrowLeft size={18}/></button><div><h1 className="text-2xl font-bold text-gray-800">Module Environnement</h1><p className="text-sm text-gray-500">{dossierNumero ?? 'Nouveau projet'}{clientName ? ` — ${clientName}` : ''}</p></div></div><span className="text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Nomenclature 07-144</span></div>
     <div className="grid grid-cols-3 gap-2 text-xs"><Step n="1" title="Activité / Rubrique" active={!selected}/><Step n="2" title="Classement" active={!!selected && !selectedCase}/><Step n="3" title="Rapports nécessaires" active={!!selectedCase}/></div>
-
-    {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <Field label="Type / désignation de l’activité" required><div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => { setQuery(e.target.value); setError(''); }} placeholder="Désignation, mot-clé, abréviation ou N° de rubrique" />{query && <button type="button" onClick={reset} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div></Field>
-
+    {!selected && <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><Field label="Type / désignation de l’activité" required><div className="relative"><input className={`${inputCls} pr-10`} value={query} onChange={e => { setQuery(e.target.value); setError(''); }} placeholder="Désignation, mot-clé, abréviation ou N° de rubrique" />{query && <button type="button" onClick={reset} className="absolute top-2.5 right-2.5 p-1.5 text-gray-400 hover:text-red-600"><X size={16}/></button>}</div></Field>
       {exact && <ResultCard row={exact} onAccept={() => accept(exact)} />}
-
       {!exact && familiesForNumericSearch.length > 0 && <div className="mt-4 space-y-5">{familiesForNumericSearch.map(({ family, rows }) => <div key={family.code}><div className="px-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">{family.code} — {family.label}</div><div className="border rounded-lg divide-y overflow-hidden">{rows.map(r => <ResultCard key={r.rubrique} row={r} onAccept={() => accept(r)} compact />)}</div></div>)}</div>}
-
       {!exact && !numericMatches.length && q.length >= 2 && <div className="mt-4">{textSuggestions.length ? <div className="border rounded-lg divide-y max-h-80 overflow-y-auto">{textSuggestions.map((c: ActivityCandidate) => { const r = dataset.rubriques.find(x => x.rubrique === c.rubrique); return <div key={`${c.rubrique}-${c.designation}`} className="p-3 flex items-center gap-3"><div className="flex-1"><div className="font-medium text-sm">{c.rubrique} — {shortDesignation(c.designation)}</div></div>{r && <button type="button" onClick={() => accept(r)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold"><Check size={14}/> Accepter</button>}</div>; })}</div> : <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">Aucune proposition suffisamment fiable.</div>}</div>}
     </div>}
-
-    {selected && <>
-      <div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-5"><div className="text-sm font-semibold text-emerald-800">Rubrique acceptée</div><div className="text-xl font-bold mt-1">{selected.rubrique}</div><div className="text-sm text-gray-700 mt-1">{shortDesignation(selected.designation)}</div><button type="button" onClick={reset} className="mt-3 text-xs text-sky-700 hover:underline">Changer</button></div>
-
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-        <h2 className="font-semibold mb-4">Données nécessaires au classement</h2>
-        {cases.length === 0 ? <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">Aucune situation structurée n’est disponible pour cette rubrique.</div> : cases.length === 1 ? <div className="rounded-lg bg-slate-50 border border-slate-200 p-4"><div className="text-sm font-semibold">{situationLabel(cases[0])}</div></div> : <Field label="Choisir la situation / l’intervalle" required><select className={inputCls} value={selectedCase ? String(cases.indexOf(selectedCase)) : ''} onChange={e => onCaseChange(e.target.value)}><option value="">Sélectionnez la situation prévue par la Nomenclature</option>{cases.map((c, i) => <option key={`${c.rubrique}-${i}`} value={String(i)}>{situationLabel(c)}</option>)}</select></Field>}
-        {cases.length === 1 && <button type="button" onClick={() => setSelectedCase(cases[0])} className="mt-4 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-600 text-white text-xs font-semibold">Valider la situation</button>}
-      </div>
-
-      {selectedCase && <>
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5"><div className="text-sm font-semibold text-emerald-800">Classement selon la Nomenclature 07-144</div><div className="text-2xl font-bold text-emerald-950 mt-1">{category(selectedCase.regime)} — {regimeLabel(selectedCase.regime)}</div><div className="grid md:grid-cols-4 gap-3 mt-4"><Result label="Rubrique" value={selectedCase.rubrique}/><Result label="Situation" value={situationLabel(selectedCase)}/><Result label="Rayon d’affichage" value={selectedCase.rayon || '—'}/><Result label="Régime" value={selectedCase.regime}/></div></div>
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><FileText size={18} className="text-emerald-600"/><h2 className="font-semibold">Rapports nécessaires</h2></div>{documentsFor(selectedCase).length ? <div className="grid md:grid-cols-2 gap-3">{documentsFor(selectedCase).map(([name]) => <div key={name} className="rounded-lg border p-4 bg-emerald-50 border-emerald-200"><div className="text-xs font-semibold">Requis</div><div className="font-medium mt-1">{name}</div></div>)}</div> : <div className="text-sm text-gray-600">Aucun rapport marqué X pour cette situation.</div>}</div>
-      </>}
+    {selected && <><div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-5"><div className="text-sm font-semibold text-emerald-800">Rubrique acceptée</div><div className="text-xl font-bold mt-1">{selected.rubrique}</div><div className="text-sm text-gray-700 mt-1">{shortDesignation(selected.designation)}</div><button type="button" onClick={reset} className="mt-3 text-xs text-sky-700 hover:underline">Changer</button></div>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><h2 className="font-semibold mb-4">Données nécessaires au classement</h2>{cases.length === 0 ? <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">Aucune situation structurée n’est disponible pour cette rubrique.</div> : cases.length === 1 ? <div className="rounded-lg bg-slate-50 border border-slate-200 p-4"><div className="text-sm font-semibold">{situationLabel(cases[0])}</div></div> : <Field label="Choisir la situation / l’intervalle" required><select className={inputCls} value={selectedCase ? String(cases.indexOf(selectedCase)) : ''} onChange={e => onCaseChange(e.target.value)}><option value="">Sélectionnez la situation prévue par la Nomenclature</option>{cases.map((c, i) => <option key={`${c.rubrique}-${i}`} value={String(i)}>{situationLabel(c)}</option>)}</select></Field>}{cases.length === 1 && <button type="button" onClick={() => setSelectedCase(cases[0])} className="mt-4 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sky-600 text-white text-xs font-semibold">Valider la situation</button>}</div>
+      {selectedCase && <><div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5"><div className="text-sm font-semibold text-emerald-800">Résultat réglementaire selon la Nomenclature 07-144</div><div className="text-2xl font-bold text-emerald-950 mt-1">{category(selectedCase.regime)}</div><div className="mt-2 text-base font-semibold text-emerald-900">Procédure applicable : {regimeLabel(selectedCase.regime)}</div><div className="grid md:grid-cols-3 gap-3 mt-4"><Result label="Rubrique" value={selectedCase.rubrique}/><Result label="Situation" value={situationLabel(selectedCase)}/><Result label="Rayon (information)" value={selectedCase.rayon || '—'}/></div></div>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><div className="flex items-center gap-2 mb-4"><FileText size={18} className="text-emerald-600"/><h2 className="font-semibold">Rapports nécessaires</h2></div>{documentsFor(selectedCase).length ? <div className="grid md:grid-cols-2 gap-3">{documentsFor(selectedCase).map(([name]) => <div key={name} className="rounded-lg border p-4 bg-emerald-50 border-emerald-200"><div className="text-xs font-semibold">Requis</div><div className="font-medium mt-1">{name}</div></div>)}</div> : <div className="text-sm text-gray-600">Aucun rapport marqué X pour cette situation.</div>}</div></>}
     </>}
     {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
   </div>;
