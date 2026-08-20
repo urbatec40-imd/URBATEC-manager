@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "nomenclature:build": "python scripts/run-nomenclature-build.py && python scripts/repair-nomenclature-documents-x.py",
     "nomenclature:reverse-test": "python scripts/build-nomenclature-07-144-reverse-test.py",
-    "nomenclature:reverse-test:v2": "python scripts/test-nomenclature-reverse-v2.py"
+    "nomenclature:reverse-test:v2": "python scripts/test-nomenclature-reverse-v2.py",
+    "nomenclature:raw-test": "python scripts/diagnose-nomenclature-raw.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
