@@ -1,4 +1,4 @@
-// ===== TYPES MODÈLES URATEC MANAGER =====
+﻿// ===== TYPES MODÈLES URATEC MANAGER =====
 
 export type Domaine =
   | 'Architecture'
@@ -200,13 +200,14 @@ export interface Client {
   telephone: string | null;
   email: string | null;
   adresse: string | null;
-  nif_rc: string | null;
+  numeroCarteIdentite: string | null;
+  dateDelivranceCarteIdentite: string | null;
+  nin: string | null;
+  autoriteDelivranceCarteIdentite: string | null;
   observations: string | null;
   wilaya: string | null;
   daira: string | null;
   commune: string | null;
-  section: string | null;
-  ilot: string | null;
   created_at: string;
 }
 
@@ -393,3 +394,4 @@ export interface Session {
   nom_complet: string;
   role: UserRole;
 }
+

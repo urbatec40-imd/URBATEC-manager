@@ -60,7 +60,7 @@ export function ClientsPage({
     const q = query.trim().toLowerCase();
     if (!q) return clients;
     return clients.filter((c) =>
-      [c.nom, c.telephone ?? '', c.email ?? '', c.nif_rc ?? '', c.commune ?? '']
+      [c.nom, c.telephone ?? '', c.email ?? '', c.commune ?? '']
         .join(' ')
         .toLowerCase()
         .includes(q)
@@ -461,13 +461,14 @@ function ClientForm({
     telephone: '',
     email: '',
     adresse: '',
-    nif_rc: '',
+    numeroCarteIdentite: '',
+    dateDelivranceCarteIdentite: '',
+    nin: '',
+    autoriteDelivranceCarteIdentite: '',
     observations: '',
     wilaya: 'Khenchela',
     daira: '',
     commune: '',
-    section: '',
-    ilot: '',
   });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -479,13 +480,14 @@ function ClientForm({
         telephone: initial.telephone ?? '',
         email: initial.email ?? '',
         adresse: initial.adresse ?? '',
-        nif_rc: initial.nif_rc ?? '',
+        numeroCarteIdentite: initial.numeroCarteIdentite ?? '',
+        dateDelivranceCarteIdentite: initial.dateDelivranceCarteIdentite ?? '',
+        nin: initial.nin ?? '',
+        autoriteDelivranceCarteIdentite: initial.autoriteDelivranceCarteIdentite ?? '',
         observations: initial.observations ?? '',
         wilaya: initial.wilaya ?? 'Khenchela',
         daira: initial.daira ?? '',
         commune: initial.commune ?? '',
-        section: initial.section ?? '',
-        ilot: initial.ilot ?? '',
       });
     } else {
       setForm({
@@ -493,13 +495,14 @@ function ClientForm({
         telephone: '',
         email: '',
         adresse: '',
-        nif_rc: '',
+        numeroCarteIdentite: '',
+        dateDelivranceCarteIdentite: '',
+        nin: '',
+        autoriteDelivranceCarteIdentite: '',
         observations: '',
         wilaya: 'Khenchela',
         daira: '',
         commune: '',
-        section: '',
-        ilot: '',
       });
     }
   }, [initial]);
@@ -522,13 +525,14 @@ function ClientForm({
         telephone: form.telephone || null,
         email: form.email || null,
         adresse: form.adresse || null,
-        nif_rc: form.nif_rc || null,
+        numeroCarteIdentite: form.numeroCarteIdentite || null,
+        dateDelivranceCarteIdentite: form.dateDelivranceCarteIdentite || null,
+        nin: form.nin || null,
+        autoriteDelivranceCarteIdentite: form.autoriteDelivranceCarteIdentite || null,
         observations: form.observations || null,
         wilaya: form.wilaya || 'Khenchela',
         daira: form.daira || null,
         commune: form.commune || null,
-        section: form.section || null,
-        ilot: form.ilot || null,
       });
     } catch (err) {
       setError((err as Error).message);
@@ -578,15 +582,62 @@ function ClientForm({
             onChange={(e) => setForm({ ...form, adresse: e.target.value })}
           />
         </Field>
-        <Field label="NIF / RC">
-          <input
-            className={inputCls}
-            value={form.nif_rc}
-            onChange={(e) => setForm({ ...form, nif_rc: e.target.value })}
-          />
-        </Field>
+        {/* Pièce d'identité */}
+        <div className="border-t border-gray-200 pt-4">
+          <h4 className="font-bold text-gray-700 text-sm mb-3">
+            Pièce d'identité
+          </h4>
 
-        {/* Section Localisation */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="N° Carte d'identité">
+              <input
+                className={inputCls}
+                value={form.numeroCarteIdentite}
+                onChange={(e) =>
+                  setForm({ ...form, numeroCarteIdentite: e.target.value })
+                }
+              />
+            </Field>
+
+            <Field label="Date de délivrance">
+              <input
+                type="date"
+                className={inputCls}
+                value={form.dateDelivranceCarteIdentite}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    dateDelivranceCarteIdentite: e.target.value,
+                  })
+                }
+              />
+            </Field>
+
+            <Field label="NIN">
+              <input
+                className={inputCls}
+                value={form.nin}
+                onChange={(e) =>
+                  setForm({ ...form, nin: e.target.value })
+                }
+              />
+            </Field>
+
+            <Field label="Autorité de délivrance">
+              <input
+                className={inputCls}
+                value={form.autoriteDelivranceCarteIdentite}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    autoriteDelivranceCarteIdentite: e.target.value,
+                  })
+                }
+              />
+            </Field>
+          </div>
+        </div>
+{/* Section Localisation */}
         <div className="border-t border-gray-200 pt-4">
           <h4 className="font-bold text-gray-700 text-sm mb-3">Localisation</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -600,6 +651,7 @@ function ClientForm({
                 Wilaya fixée automatiquement
               </p>
             </Field>
+
             <Field label="Daïra">
               <input
                 className={`${inputCls} bg-gray-100`}
@@ -608,6 +660,7 @@ function ClientForm({
                 placeholder="Rempli automatiquement"
               />
             </Field>
+
             <Field label="Commune">
               <select
                 className={selectCls}
@@ -622,26 +675,6 @@ function ClientForm({
                 ))}
               </select>
             </Field>
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Section">
-                <input
-                  className={inputCls}
-                  value={form.section}
-                  onChange={(e) =>
-                    setForm({ ...form, section: e.target.value })
-                  }
-                  placeholder="N° de section"
-                />
-              </Field>
-              <Field label="Îlot">
-                <input
-                  className={inputCls}
-                  value={form.ilot}
-                  onChange={(e) => setForm({ ...form, ilot: e.target.value })}
-                  placeholder="N° d'îlot"
-                />
-              </Field>
-            </div>
           </div>
         </div>
 
@@ -677,4 +710,16 @@ function ClientForm({
     </Modal>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
