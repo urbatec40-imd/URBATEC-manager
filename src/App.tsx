@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Home, FolderOpen, Users, FileText, Wallet, Clock, Scale, FlaskConical, Settings } from "lucide-react";
+import { Home, FolderOpen, Users, FileText, Wallet, Clock, Scale, FlaskConical, Settings, Map } from "lucide-react";
 import { AppProvider } from "@/lib/store";
 import { Dashboard } from "@/components/Dashboard";
 import { Dossiers } from "@/components/Dossiers";
@@ -10,8 +10,9 @@ import { Expertises } from "@/components/Expertises";
 import { Documents } from "@/components/Documents";
 import { Laboratoire } from "@/components/Laboratoire";
 import { Parametres } from "@/components/Parametres";
+import { Topographie } from "@/components/Topographie";
 
-type Page = "dashboard" | "dossiers" | "clients" | "documents" | "paiements" | "echeances" | "expertises" | "laboratoire" | "parametres";
+type Page = "dashboard" | "dossiers" | "clients" | "documents" | "paiements" | "echeances" | "expertises" | "laboratoire" | "topographie" | "parametres";
 
 const navigation = [
   { id: "dashboard" as Page, label: "TABLEAU DE BORD", icon: Home },
@@ -22,6 +23,7 @@ const navigation = [
   { id: "echeances" as Page, label: "ÉCHÉANCES", icon: Clock },
   { id: "expertises" as Page, label: "EXPERTISES JUDICIAIRES", icon: Scale },
   { id: "laboratoire" as Page, label: "LABORATOIRE", icon: FlaskConical },
+  { id: "topographie" as Page, label: "TOPOGRAPHIE", icon: Map },
   { id: "parametres" as Page, label: "PARAMÈTRES", icon: Settings },
 ];
 
@@ -35,7 +37,7 @@ function AppContent() {
           <h1 className="font-serif text-2xl font-bold text-slate-900">URATEC</h1>
           <p className="mt-1 text-xs font-medium uppercase tracking-wider text-slate-500">Manager</p>
         </div>
-        <nav className="flex-1 space-y-1 p-4">
+        <nav className="flex-1 space-y-1 overflow-y-auto p-4">
           {navigation.map((item) => {
             const Icon = item.icon;
             const active = currentPage === item.id;
@@ -71,6 +73,7 @@ function AppContent() {
         {currentPage === "expertises" && <Expertises />}
         {currentPage === "documents" && <Documents />}
         {currentPage === "laboratoire" && <Laboratoire />}
+        {currentPage === "topographie" && <Topographie />}
         {currentPage === "parametres" && <Parametres />}
       </main>
     </div>
