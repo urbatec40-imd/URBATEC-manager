@@ -12,7 +12,7 @@ export const COMMUNES_KHENCHELA: CommuneTopographieSource[] = [
   { code: "03", name: "KAIS", fileName: "KAIS.shp" },
   { code: "04", name: "BAGHAI", fileName: "BAGHAI.shp" },
   { code: "05", name: "EL HAMMA", fileName: "EL_HAMMA.shp" },
-  { code: "06", name: "AIN TOUILA", fileName: "AIN_TOUIILA.shp" },
+  { code: "06", name: "AIN TOUILA", fileName: "AIN_TOUILA.shp" },
   { code: "07", name: "TAOUZIANAT", fileName: "TAOUZIANAT.shp" },
   { code: "08", name: "BOUHMAMA", fileName: "BOUHMAMA.shp" },
   { code: "09", name: "EL OUELDJA", fileName: "EL_OUELDJA.shp" },
