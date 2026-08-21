@@ -1,5 +1,5 @@
 import './topographie-export-runtime';
-import './topographie-extrait-preview-v2';
+import './topographie-extrait-preview-v3';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
