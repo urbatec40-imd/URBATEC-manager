@@ -10,18 +10,25 @@ export function ComptePage({ session }: { session: Session }) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [resetCode, setResetCode] = useState('');
+  const [resetNewPassword, setResetNewPassword] = useState('');
+  const [resetConfirmPassword, setResetConfirmPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
   const [requestingReset, setRequestingReset] = useState(false);
+  const [applyingReset, setApplyingReset] = useState(false);
   const [message, setMessage] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
   const [resetMessage, setResetMessage] = useState('');
+  const [resetSent, setResetSent] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const current = authService.getCurrentUser();
     setUser(current ?? null);
     setRecoveryEmailState(passwordResetService.getRecoveryEmail(current?.username || session.username));
+    setResetSent(false);
+    setResetCode('');
   }, [session]);
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -64,11 +71,41 @@ export function ComptePage({ session }: { session: Session }) {
     setRequestingReset(true);
     try {
       await passwordResetService.requestPasswordReset(user?.username || session.username);
-      setResetMessage('Le code de récupération a été demandé. Vérifiez votre Email.');
+      setResetSent(true);
+      setResetMessage('Le code de récupération a été envoyé. Il est valable pendant 10 minutes.');
     } catch (err) {
+      setResetSent(false);
       setResetMessage((err as Error).message);
     } finally {
       setRequestingReset(false);
+    }
+  }
+
+  async function handleApplyReset(e: React.FormEvent) {
+    e.preventDefault();
+    setResetMessage('');
+    if (resetNewPassword !== resetConfirmPassword) {
+      setResetMessage('Les nouveaux mots de passe ne correspondent pas.');
+      return;
+    }
+    setApplyingReset(true);
+    try {
+      await passwordResetService.resetPasswordWithCode(
+        user?.username || session.username,
+        resetCode,
+        resetNewPassword
+      );
+      setResetCode('');
+      setResetNewPassword('');
+      setResetConfirmPassword('');
+      setResetSent(false);
+      setResetMessage('Mot de passe réinitialisé avec succès.');
+      const refreshed = authService.getCurrentUser();
+      if (refreshed) setUser(refreshed);
+    } catch (err) {
+      setResetMessage((err as Error).message);
+    } finally {
+      setApplyingReset(false);
     }
   }
 
@@ -108,11 +145,24 @@ export function ComptePage({ session }: { session: Session }) {
       </form>
 
       <section className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-3">
-        <div className="flex items-center gap-3"><Info size={18} className="mt-0.5 shrink-0 text-amber-600"/><div><div className="font-semibold text-amber-900">Mot de passe oublié</div><div className="mt-1 text-sm text-amber-800">Demandez un code de récupération à l’adresse Email enregistrée. Internet et le service de récupération doivent être disponibles.</div></div></div>
-        <button type="button" onClick={handleForgotPassword} disabled={requestingReset || !recoveryEmail} className="inline-flex items-center gap-2 rounded-lg border border-amber-300 bg-white px-4 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"><RotateCcw size={15}/>{requestingReset ? 'Demande en cours...' : 'Mot de passe oublié ?'}</button>
+        <div className="flex items-center gap-3"><Info size={18} className="mt-0.5 shrink-0 text-amber-600"/><div><div className="font-semibold text-amber-900">Mot de passe oublié</div><div className="mt-1 text-sm text-amber-800">Demandez un code de récupération à l’adresse Email enregistrée. Internet et le service EmailJS doivent être disponibles.</div></div></div>
+        <button type="button" onClick={handleForgotPassword} disabled={requestingReset || !recoveryEmail} className="inline-flex items-center gap-2 rounded-lg border border-amber-300 bg-white px-4 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"><RotateCcw size={15}/>{requestingReset ? 'Envoi en cours...' : 'Mot de passe oublié ?'}</button>
         {!recoveryEmail && <div className="text-xs text-amber-800">Enregistrez d’abord une adresse Email de récupération.</div>}
         {resetMessage && <div className="rounded-lg bg-white px-3 py-2 text-sm text-amber-900 border border-amber-200">{resetMessage}</div>}
       </section>
+
+      {resetSent && (
+        <form onSubmit={handleApplyReset} className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 space-y-3">
+          <div className="font-semibold text-emerald-900">Code de récupération</div>
+          <p className="text-sm text-emerald-800">Saisissez le code reçu par Email, puis choisissez le nouveau mot de passe.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={resetCode} onChange={e=>setResetCode(e.target.value.replace(/\D/g,'').slice(0,6))} placeholder="Code à 6 chiffres" className="rounded-lg border px-3 py-2" required/>
+            <input type="password" minLength={4} value={resetNewPassword} onChange={e=>setResetNewPassword(e.target.value)} placeholder="Nouveau mot de passe" className="rounded-lg border px-3 py-2" required/>
+            <input type="password" minLength={4} value={resetConfirmPassword} onChange={e=>setResetConfirmPassword(e.target.value)} placeholder="Confirmer" className="rounded-lg border px-3 py-2" required/>
+          </div>
+          <button type="submit" disabled={applyingReset} className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"><KeyRound size={15}/>{applyingReset ? 'Réinitialisation...' : 'Réinitialiser le mot de passe'}</button>
+        </form>
+      )}
     </div>
   );
 }
