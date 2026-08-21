@@ -60,6 +60,20 @@ export function getCurrentUser(): User | null {
   return users.find((u) => u.id === session.user_id) ?? users.find((u) => !!session.username && u.username.toLowerCase() === session.username.toLowerCase()) ?? null;
 }
 
+export async function changePasswordByUsername(username: string, newPassword: string): Promise<void> {
+  if (newPassword.length < 4) throw new Error('Le nouveau mot de passe doit faire au moins 4 caractères');
+  const normalized = username.trim().toLowerCase();
+  const users = localDb.read<User>('users');
+  const index = users.findIndex((u) => u.username.toLowerCase() === normalized);
+  if (index < 0) throw new Error('Utilisateur introuvable');
+
+  users[index] = { ...users[index], password_hash: await hashPassword(newPassword) };
+  localDb.write('users', users);
+
+  const session = getSession();
+  if (session?.username?.toLowerCase() === normalized) setSession(users[index]);
+}
+
 export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
   if (newPassword.length < 4) throw new Error('Le nouveau mot de passe doit faire au moins 4 caractères');
   const session = getSession();
