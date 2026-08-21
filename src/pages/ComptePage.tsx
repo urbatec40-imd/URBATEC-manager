@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { KeyRound, UserCircle2, ShieldCheck, Info, Mail } from 'lucide-react';
+import { KeyRound, UserCircle2, ShieldCheck, Info, Mail, RotateCcw } from 'lucide-react';
 import * as authService from '@/services/authService';
 import * as passwordResetService from '@/services/passwordResetService';
 import type { Session, User } from '@/types';
@@ -12,8 +12,10 @@ export function ComptePage({ session }: { session: Session }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
+  const [requestingReset, setRequestingReset] = useState(false);
   const [message, setMessage] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -57,6 +59,19 @@ export function ComptePage({ session }: { session: Session }) {
     }
   }
 
+  async function handleForgotPassword() {
+    setResetMessage('');
+    setRequestingReset(true);
+    try {
+      await passwordResetService.requestPasswordReset(user?.username || session.username);
+      setResetMessage('Le code de récupération a été demandé. Vérifiez votre Email.');
+    } catch (err) {
+      setResetMessage((err as Error).message);
+    } finally {
+      setRequestingReset(false);
+    }
+  }
+
   const username = user?.username || session.username || '—';
   const nomComplet = user?.nom_complet || session.nom_complet || '—';
   const role = user?.role || session.role || '—';
@@ -92,7 +107,12 @@ export function ComptePage({ session }: { session: Session }) {
         <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-50"><KeyRound size={15}/>{saving ? 'Enregistrement...' : 'Modifier le mot de passe'}</button>
       </form>
 
-      <div className="flex gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4"><Info size={18} className="mt-0.5 shrink-0 text-blue-600"/><div className="text-sm text-blue-800"><div className="font-semibold">Mot de passe oublié</div><div className="mt-1">Le parcours Email est maintenant préparé. Il nécessite Internet et un service de récupération configuré pour envoyer le code.</div></div></div>
+      <section className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-3">
+        <div className="flex items-center gap-3"><Info size={18} className="mt-0.5 shrink-0 text-amber-600"/><div><div className="font-semibold text-amber-900">Mot de passe oublié</div><div className="mt-1 text-sm text-amber-800">Demandez un code de récupération à l’adresse Email enregistrée. Internet et le service de récupération doivent être disponibles.</div></div></div>
+        <button type="button" onClick={handleForgotPassword} disabled={requestingReset || !recoveryEmail} className="inline-flex items-center gap-2 rounded-lg border border-amber-300 bg-white px-4 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"><RotateCcw size={15}/>{requestingReset ? 'Demande en cours...' : 'Mot de passe oublié ?'}</button>
+        {!recoveryEmail && <div className="text-xs text-amber-800">Enregistrez d’abord une adresse Email de récupération.</div>}
+        {resetMessage && <div className="rounded-lg bg-white px-3 py-2 text-sm text-amber-900 border border-amber-200">{resetMessage}</div>}
+      </section>
     </div>
   );
 }
