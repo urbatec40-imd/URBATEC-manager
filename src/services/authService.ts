@@ -7,6 +7,8 @@ import { localDb } from './localDb';
 import type { User, Session, UserRole } from '@/types';
 
 const SESSION_KEY = 'uratec_session';
+const DEFAULT_ADMIN_USERNAME = 'admin';
+const DEFAULT_ADMIN_PASSWORD_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
 
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -33,11 +35,29 @@ export async function login(username: string, password: string): Promise<Session
   return setSession(user);
 }
 
+export async function ensureDefaultAdmin(): Promise<User> {
+  const users = localDb.read<User>('users');
+  const existing = users.find((u) => u.username.toLowerCase() === DEFAULT_ADMIN_USERNAME);
+  if (existing) return existing;
+
+  const admin: User = {
+    id: localDb.genId(),
+    username: DEFAULT_ADMIN_USERNAME,
+    nom_complet: 'Administrateur URATEC',
+    password_hash: DEFAULT_ADMIN_PASSWORD_HASH,
+    role: 'Administrateur',
+    created_at: localDb.nowISO(),
+  };
+  users.push(admin);
+  localDb.write('users', users);
+  return admin;
+}
+
 export function getCurrentUser(): User | null {
   const session = getSession();
   if (!session) return null;
   const users = localDb.read<User>('users');
-  return users.find((u) => u.id === session.user_id) ?? users.find((u) => u.username.toLowerCase() === session.username.toLowerCase()) ?? null;
+  return users.find((u) => u.id === session.user_id) ?? users.find((u) => !!session.username && u.username.toLowerCase() === session.username.toLowerCase()) ?? null;
 }
 
 export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
@@ -47,7 +67,7 @@ export async function changePassword(currentPassword: string, newPassword: strin
 
   const users = localDb.read<User>('users');
   const indexById = users.findIndex((u) => u.id === session.user_id);
-  const index = indexById >= 0 ? indexById : users.findIndex((u) => u.username.toLowerCase() === session.username.toLowerCase());
+  const index = indexById >= 0 ? indexById : users.findIndex((u) => !!session.username && u.username.toLowerCase() === session.username.toLowerCase());
   if (index < 0) throw new Error('Utilisateur introuvable');
 
   if ((await hashPassword(currentPassword)) !== users[index].password_hash) throw new Error('Mot de passe actuel incorrect');
@@ -60,6 +80,17 @@ function setSession(user: User): Session {
   const session: Session = { user_id: user.id, username: user.username, nom_complet: user.nom_complet, role: user.role };
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return session;
+}
+
+export async function repairSession(): Promise<Session | null> {
+  const session = getSession();
+  if (session?.username && session?.nom_complet && session?.role) return session;
+
+  const users = localDb.read<User>('users');
+  const byId = session?.user_id ? users.find((u) => u.id === session.user_id) : null;
+  const repairedUser = byId ?? users.find((u) => u.username.toLowerCase() === DEFAULT_ADMIN_USERNAME);
+  if (!repairedUser) return null;
+  return setSession(repairedUser);
 }
 
 export function getSession(): Session | null {
