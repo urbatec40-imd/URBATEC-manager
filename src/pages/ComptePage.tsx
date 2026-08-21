@@ -1,15 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { KeyRound, UserCircle2, ShieldCheck, Info } from 'lucide-react';
 import * as authService from '@/services/authService';
-import type { Session } from '@/types';
+import type { Session, User } from '@/types';
 
 export function ComptePage({ session }: { session: Session }) {
+  const [user, setUser] = useState<User | null>(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const current = authService.getCurrentUser();
+    if (current) {
+      setUser(current);
+      return;
+    }
+    setUser({
+      id: session.user_id,
+      username: session.username || '',
+      nom_complet: session.nom_complet || '',
+      role: session.role || 'Utilisateur',
+      password_hash: '',
+      created_at: '',
+    });
+  }, [session]);
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -25,6 +42,8 @@ export function ComptePage({ session }: { session: Session }) {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      const refreshed = authService.getCurrentUser();
+      if (refreshed) setUser(refreshed);
       setMessage('Mot de passe modifié avec succès.');
     } catch (err) {
       setError((err as Error).message);
@@ -33,12 +52,16 @@ export function ComptePage({ session }: { session: Session }) {
     }
   }
 
+  const username = user?.username || session.username || '—';
+  const nomComplet = user?.nom_complet || session.nom_complet || '—';
+  const role = user?.role || session.role || '—';
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="rounded-lg border bg-slate-50 p-4"><div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-500"><UserCircle2 size={15}/> Nom d'utilisateur</div><div className="mt-1 font-bold text-slate-800">{session.username || '—'}</div></div>
-        <div className="rounded-lg border bg-slate-50 p-4"><div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-500"><UserCircle2 size={15}/> Nom complet</div><div className="mt-1 font-bold text-slate-800">{session.nom_complet || '—'}</div></div>
-        <div className="rounded-lg border bg-slate-50 p-4"><div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-500"><ShieldCheck size={15}/> Rôle</div><div className="mt-1 font-bold text-slate-800">{session.role || '—'}</div></div>
+        <div className="rounded-lg border bg-slate-50 p-4"><div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-500"><UserCircle2 size={15}/> Nom d'utilisateur</div><div className="mt-1 font-bold text-slate-800">{username}</div></div>
+        <div className="rounded-lg border bg-slate-50 p-4"><div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-500"><UserCircle2 size={15}/> Nom complet</div><div className="mt-1 font-bold text-slate-800">{nomComplet}</div></div>
+        <div className="rounded-lg border bg-slate-50 p-4"><div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-500"><ShieldCheck size={15}/> Rôle</div><div className="mt-1 font-bold text-slate-800">{role}</div></div>
       </div>
 
       <form onSubmit={handleChangePassword} className="rounded-lg border bg-white p-4 space-y-3">
