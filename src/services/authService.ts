@@ -7,6 +7,8 @@ import { localDb } from './localDb';
 import type { User, Session, UserRole } from '@/types';
 
 const SESSION_KEY = 'uratec_session';
+const DEFAULT_ADMIN_USERNAME = 'admin';
+const DEFAULT_ADMIN_PASSWORD_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
 
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -16,55 +18,93 @@ async function hashPassword(password: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function signup(
-  username: string,
-  nomComplet: string,
-  password: string,
-  role: UserRole = 'Utilisateur'
-): Promise<Session> {
+export async function signup(username: string, nomComplet: string, password: string, role: UserRole = 'Utilisateur'): Promise<Session> {
   const users = localDb.read<User>('users');
-  if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) {
-    throw new Error('Ce nom d\'utilisateur existe déjà');
-  }
-  const passwordHash = await hashPassword(password);
-  const user: User = {
-    id: localDb.genId(),
-    username: username.trim(),
-    nom_complet: nomComplet.trim(),
-    password_hash: passwordHash,
-    role,
-    created_at: localDb.nowISO(),
-  };
+  if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) throw new Error("Ce nom d'utilisateur existe déjà");
+  const user: User = { id: localDb.genId(), username: username.trim(), nom_complet: nomComplet.trim(), password_hash: await hashPassword(password), role, created_at: localDb.nowISO() };
   users.push(user);
   localDb.write('users', users);
   return setSession(user);
 }
 
-export async function login(
-  username: string,
-  password: string
-): Promise<Session> {
+export async function login(username: string, password: string): Promise<Session> {
   const users = localDb.read<User>('users');
-  const user = users.find(
-    (u) => u.username.toLowerCase() === username.toLowerCase()
-  );
+  const user = users.find((u) => u.username.toLowerCase() === username.toLowerCase());
   if (!user) throw new Error('Utilisateur introuvable');
-  const passwordHash = await hashPassword(password);
-  if (passwordHash !== user.password_hash) {
-    throw new Error('Mot de passe incorrect');
-  }
+  if ((await hashPassword(password)) !== user.password_hash) throw new Error('Mot de passe incorrect');
   return setSession(user);
 }
 
-function setSession(user: User): Session {
-  const session: Session = {
-    user_id: user.id,
-    username: user.username,
-    nom_complet: user.nom_complet,
-    role: user.role,
+export async function ensureDefaultAdmin(): Promise<User> {
+  const users = localDb.read<User>('users');
+  const existing = users.find((u) => u.username.toLowerCase() === DEFAULT_ADMIN_USERNAME);
+  if (existing) return existing;
+
+  const admin: User = {
+    id: localDb.genId(),
+    username: DEFAULT_ADMIN_USERNAME,
+    nom_complet: 'Administrateur URATEC',
+    password_hash: DEFAULT_ADMIN_PASSWORD_HASH,
+    role: 'Administrateur',
+    created_at: localDb.nowISO(),
   };
+  users.push(admin);
+  localDb.write('users', users);
+  return admin;
+}
+
+export function getCurrentUser(): User | null {
+  const session = getSession();
+  if (!session) return null;
+  const users = localDb.read<User>('users');
+  return users.find((u) => u.id === session.user_id) ?? users.find((u) => !!session.username && u.username.toLowerCase() === session.username.toLowerCase()) ?? null;
+}
+
+export async function changePasswordByUsername(username: string, newPassword: string): Promise<void> {
+  if (newPassword.length < 4) throw new Error('Le nouveau mot de passe doit faire au moins 4 caractères');
+  const normalized = username.trim().toLowerCase();
+  const users = localDb.read<User>('users');
+  const index = users.findIndex((u) => u.username.toLowerCase() === normalized);
+  if (index < 0) throw new Error('Utilisateur introuvable');
+
+  users[index] = { ...users[index], password_hash: await hashPassword(newPassword) };
+  localDb.write('users', users);
+
+  const session = getSession();
+  if (session?.username?.toLowerCase() === normalized) setSession(users[index]);
+}
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  if (newPassword.length < 4) throw new Error('Le nouveau mot de passe doit faire au moins 4 caractères');
+  const session = getSession();
+  if (!session) throw new Error('Aucune session active');
+
+  const users = localDb.read<User>('users');
+  const indexById = users.findIndex((u) => u.id === session.user_id);
+  const index = indexById >= 0 ? indexById : users.findIndex((u) => !!session.username && u.username.toLowerCase() === session.username.toLowerCase());
+  if (index < 0) throw new Error('Utilisateur introuvable');
+
+  if ((await hashPassword(currentPassword)) !== users[index].password_hash) throw new Error('Mot de passe actuel incorrect');
+  users[index] = { ...users[index], password_hash: await hashPassword(newPassword) };
+  localDb.write('users', users);
+  setSession(users[index]);
+}
+
+function setSession(user: User): Session {
+  const session: Session = { user_id: user.id, username: user.username, nom_complet: user.nom_complet, role: user.role };
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
   return session;
+}
+
+export async function repairSession(): Promise<Session | null> {
+  const session = getSession();
+  if (session?.username && session?.nom_complet && session?.role) return session;
+
+  const users = localDb.read<User>('users');
+  const byId = session?.user_id ? users.find((u) => u.id === session.user_id) : null;
+  const repairedUser = byId ?? users.find((u) => u.username.toLowerCase() === DEFAULT_ADMIN_USERNAME);
+  if (!repairedUser) return null;
+  return setSession(repairedUser);
 }
 
 export function getSession(): Session | null {
@@ -72,16 +112,8 @@ export function getSession(): Session | null {
     const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as Session;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
-export function logout(): void {
-  localStorage.removeItem(SESSION_KEY);
-}
-
-export function hasUsers(): boolean {
-  const users = localDb.read<User>('users');
-  return users.length > 0;
-}
+export function logout(): void { localStorage.removeItem(SESSION_KEY); }
+export function hasUsers(): boolean { return localDb.read<User>('users').length > 0; }
