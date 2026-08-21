@@ -34,11 +34,18 @@ function parseKml(text: string): KmzLayer['data'] {
     const name = esc(tag(pm, 'name'));
     const description = esc(tag(pm, 'description'));
     const ext: Props = {};
-    [...pm.matchAll(/<Data[^>]*name=["']([^"']+)["'][^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>[\s\S]*?<\/Data>/gi)].forEach(m => ext[m[1]] = xmlText(m[2]));
+
+    [...pm.matchAll(/<Data[^>]*name=["']([^"']+)["'][^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>[\s\S]*?<\/Data>/gi)]
+      .forEach(m => ext[m[1]] = esc(xmlText(m[2])));
+
+    [...pm.matchAll(/<SimpleData[^>]*name=["']([^"']+)["'][^>]*>([\s\S]*?)<\/SimpleData>/gi)]
+      .forEach(m => ext[m[1]] = esc(xmlText(m[2])));
+
     const pol = pm.match(/<Polygon[\s\S]*?<\/Polygon>/i);
     const line = pm.match(/<LineString[\s\S]*?<\/LineString>/i);
     const point = pm.match(/<Point[\s\S]*?<\/Point>/i);
     let geometry: Geometry | null = null;
+
     if (pol) {
       const rings = [...pol[0].matchAll(/<coordinates>([\s\S]*?)<\/coordinates>/gi)].map(m => coords(m[1]));
       if (rings.length) geometry = { type: 'Polygon', coordinates: rings };
@@ -49,6 +56,7 @@ function parseKml(text: string): KmzLayer['data'] {
       const c = coords(tag(point[0], 'coordinates'));
       if (c.length) geometry = { type: 'Point', coordinates: c[0] };
     }
+
     if (geometry) features.push({ type: 'Feature', id: `${i}`, geometry, properties: { name, description, ...ext } });
   });
   return { type: 'FeatureCollection', features };
@@ -132,19 +140,12 @@ export function TopographiePage() {
     const i = normalizeNumber(ilot);
     if (!s && !i) return [];
     return cadastralFeatures
-      .map((feature, index) => ({ feature, index, s: sectionOf(feature.properties || '' as any), i: ilotOf(feature.properties || '' as any) }))
+      .map(feature => ({ feature, s: sectionOf(feature.properties || {}), i: ilotOf(feature.properties || {}) }))
       .filter(x => {
         const sv = normalizeNumber(x.s), iv = normalizeNumber(x.i);
-        return (!s || sv.includes(s)) && (!i || iv.includes(i));
+        return (!s || sv === s) && (!i || iv === i);
       })
-      .sort((a, b) => {
-        const av = numericValue(a.i), bv = numericValue(b.i);
-        const target = numericValue(i);
-        const ar = target ? Math.abs(av - target) : av;
-        const br = target ? Math.abs(bv - target) : bv;
-        if (ar !== br) return ar - br;
-        return numericValue(a.s) - numericValue(b.s);
-      })
+      .sort((a, b) => numericValue(a.i) - numericValue(b.i))
       .slice(0, 50);
   }, [cadastralFeatures, section, ilot]);
 
