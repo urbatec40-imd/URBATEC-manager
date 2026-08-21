@@ -56,6 +56,39 @@ export async function login(
   return setSession(user);
 }
 
+export function getCurrentUser(): User | null {
+  const session = getSession();
+  if (!session) return null;
+  const users = localDb.read<User>('users');
+  return users.find((u) => u.id === session.user_id) ?? null;
+}
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<void> {
+  if (newPassword.length < 4) {
+    throw new Error('Le nouveau mot de passe doit faire au moins 4 caractères');
+  }
+  const session = getSession();
+  if (!session) throw new Error('Aucune session active');
+
+  const users = localDb.read<User>('users');
+  const index = users.findIndex((u) => u.id === session.user_id);
+  if (index < 0) throw new Error('Utilisateur introuvable');
+
+  const currentHash = await hashPassword(currentPassword);
+  if (currentHash !== users[index].password_hash) {
+    throw new Error('Mot de passe actuel incorrect');
+  }
+
+  users[index] = {
+    ...users[index],
+    password_hash: await hashPassword(newPassword),
+  };
+  localDb.write('users', users);
+}
+
 function setSession(user: User): Session {
   const session: Session = {
     user_id: user.id,
