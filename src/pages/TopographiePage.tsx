@@ -21,7 +21,8 @@ function parseKml(text: string): KmzLayer['data'] {
   const placemarks = [...text.matchAll(/<Placemark[\s\S]*?<\/Placemark>/gi)].map(m => m[0]);
   placemarks.forEach((pm, i) => {
     const name = esc(tag(pm, 'name')); const description = esc(tag(pm, 'description')); const ext: Props = {};
-    [...pm.matchAll(/<Data[^>]*name=["']([^"']+)["'][^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>[\s\S]*?<\/Data>/gi)].forEach(m => ext[m[1]] = xmlText(m[2]));
+    [...pm.matchAll(/<Data[^>]*name=["']([^"']+)["'][^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>[\s\S]*?<\/Data>/gi)].forEach(m => ext[m[1]] = esc(xmlText(m[2])));
+    [...pm.matchAll(/<SimpleData[^>]*name=["']([^"']+)["'][^>]*>([\s\S]*?)<\/SimpleData>/gi)].forEach(m => ext[m[1]] = esc(xmlText(m[2])));
     const pol = pm.match(/<Polygon[\s\S]*?<\/Polygon>/i); const line = pm.match(/<LineString[\s\S]*?<\/LineString>/i); const point = pm.match(/<Point[\s\S]*?<\/Point>/i); let geometry: Geometry | null = null;
     if (pol) { const rings = [...pol[0].matchAll(/<coordinates>([\s\S]*?)<\/coordinates>/gi)].map(m => coords(m[1])); if (rings.length) geometry = { type:'Polygon', coordinates:rings }; }
     else if (line) { const c = coords(tag(line[0], 'coordinates')); if (c.length) geometry = { type:'LineString', coordinates:c }; }
@@ -32,14 +33,14 @@ function parseKml(text: string): KmzLayer['data'] {
 }
 function Fit({ data }: { data: FeatureCollection<Geometry> | null }) { const map = useMap(); useEffect(() => { if (!data?.features.length) return; const b = L.geoJSON(data as any).getBounds(); if (b.isValid()) map.fitBounds(b,{padding:[30,30],maxZoom:17}); },[data,map]); return null; }
 function ZoomTo({ parcel }: { parcel: Parcel | null }) { const map = useMap(); useEffect(() => { if (!parcel) return; const b = L.geoJSON(parcel as any).getBounds(); if (b.isValid()) map.fitBounds(b,{padding:[50,50],maxZoom:19}); },[parcel,map]); return null; }
-const prop = (p: Props, keys: string[]) => { for (const key of keys) { const v = p[key]; if (v !== undefined && v !== null && String(v).trim() !== '') return String(v).trim(); } return ''; };
-const sectionOf = (p: Props) => prop(p,['se_no']);
-const ilotOf = (p: Props) => prop(p,['il_no']);
-const areaOf = (p: Props) => prop(p,['SHAPE_Area']);
+const prop = (p: Props, keys: string[]) => { for (const key of keys) { const exact = p[key]; if (exact !== undefined && exact !== null && String(exact).trim() !== '') return String(exact).trim(); const found = Object.keys(p).find(k => k.toUpperCase() === key.toUpperCase()); if (found && String(p[found]).trim() !== '') return String(p[found]).trim(); } return ''; };
+const sectionOf = (p: Props) => prop(p,['se_no','se_no_nat']);
+const ilotOf = (p: Props) => prop(p,['il_no','il_no_nat']);
+const areaOf = (p: Props) => prop(p,['SHAPE_Area','shape_area','il_surf_de','il_surf_ca']);
 const digits = (v: string) => v.replace(/\D/g,'');
 const num = (v: string) => Number(digits(v) || '0');
 
-function Info({ feature, onClose }: { feature: Parcel; onClose: () => void }) { const p = feature.properties || {}; return <div className="absolute z-[1000] bottom-4 left-4 max-w-sm rounded-xl bg-white shadow-xl border p-4"><div className="flex items-center justify-between gap-4"><strong>Parcelle cadastrale</strong><button type="button" onClick={onClose} className="text-slate-500"><X size={17}/></button></div><div className="mt-3 grid grid-cols-3 gap-2 text-sm"><div className="rounded-lg bg-slate-50 p-2"><b className="block text-xs text-slate-500">Section</b>{sectionOf(p)||'—'}</div><div className="rounded-lg bg-slate-50 p-2"><b className="block text-xs text-slate-500">Ilot</b>{ilotOf(p)||'—'}</div><div className="rounded-lg bg-slate-50 p-2"><b className="block text-xs text-slate-500">Area</b>{areaOf(p)||'—'}</div></div></div>; }
+function Info({ feature, onClose }: { feature: Parcel; onClose: () => void }) { const p = feature.properties || {}; return <div className="absolute z-[1000] bottom-4 left-4 max-w-sm rounded-xl bg-white shadow-xl border p-4"><div className="flex items-center justify-between gap-4"><strong>Parcelle cadastrale</strong><button type="button" onClick={onClose} className="text-slate-500"><X size={17}/></button></div><div className="mt-3 grid grid-cols-3 gap-2 text-sm"><div className="rounded-lg bg-slate-50 p-2"><b className="block text-xs text-slate-500">Section</b>{sectionOf(p)||'—'}</div><div className="rounded-lg bg-slate-50 p-2"><b className="block text-xs text-slate-500">Ilot</b>{ilotOf(p)||'—'}</div><div className="rounded-lg bg-slate-50 p-2"><b className="block text-xs text-slate-500">Area</b>{areaOf(p)||'—'} m²</div></div></div>; }
 
 export function TopographiePage() {
   const [layers,setLayers] = useState<KmzLayer[]>([]), [active,setActive] = useState<string[]>([]), [selected,setSelected] = useState<Parcel|null>(null), [commune,setCommune] = useState(''), [section,setSection] = useState(''), [ilot,setIlot] = useState(''), [status,setStatus] = useState('');
