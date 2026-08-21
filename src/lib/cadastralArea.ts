@@ -1,0 +1,1 @@
+export function areaHAC(m2:number){const total=Math.max(0,Number(m2)||0);const hectares=Math.floor(total/10000);const restA=total-hectares*10000;const ares=Math.floor(restA/100);const centiares=Math.round(restA-ares*100);return{ha:hectares,a:ares,ca:centiares};}
