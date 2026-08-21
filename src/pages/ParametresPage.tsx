@@ -5,13 +5,25 @@ import { PageHeader } from '@/components/PageHeader';
 import { Field, inputCls } from '@/components/Field';
 import { ComptePage } from './ComptePage';
 
-interface ParametresPageProps { parametres: Parametres | null; onSave: (id: string, p: Partial<Parametres>) => Promise<void>; }
+interface ParametresPageProps {
+  parametres: Parametres | null;
+  onSave: (id: string, p: Partial<Parametres>) => Promise<void>;
+}
 
 export function ParametresPage({ parametres, onSave }: ParametresPageProps) {
-  const [form, setForm] = useState({ nom_bureau:'URATEC', adresse:'', telephone:'', email:'', devise:'DZD', annee_courante:new Date().getFullYear() });
-  const [saving,setSaving]=useState(false),[saved,setSaved]=useState(false);
-  useEffect(()=>{ if(parametres) setForm({nom_bureau:parametres.nom_bureau,adresse:parametres.adresse??'',telephone:parametres.telephone??'',email:parametres.email??'',devise:parametres.devise,annee_courante:parametres.annee_courante}); },[parametres]);
-  async function submit(e:React.FormEvent){e.preventDefault();if(!parametres)return;setSaving(true);try{await onSave(parametres.id,form);setSaved(true);setTimeout(()=>setSaved(false),3000);}catch(err){console.error(err);}finally{setSaving(false);}}
+  const [form, setForm] = useState({
+    nom_bureau: 'URATEC', adresse: '', telephone: '', email: '', devise: 'DZD', annee_courante: new Date().getFullYear()
+  });
+  const [saving,setSaving] = useState(false), [saved,setSaved] = useState(false);
+  useEffect(()=>{
+    if(parametres) setForm({
+      nom_bureau:parametres.nom_bureau, adresse:parametres.adresse??'', telephone:parametres.telephone??'', email:parametres.email??'', devise:parametres.devise, annee_courante:parametres.annee_courante
+    });
+  },[parametres]);
+  async function submit(e:React.FormEvent){
+    e.preventDefault(); if(!parametres)return; setSaving(true);
+    try{await onSave(parametres.id,form);setSaved(true);setTimeout(()=>setSaved(false),3000);}catch(err){console.error(err);}finally{setSaving(false);}
+  }
   return <div>
     <PageHeader title="Paramètres" subtitle="Configuration du bureau d'études et sécurité du compte" />
     <div className="max-w-3xl space-y-6">
@@ -25,7 +37,7 @@ export function ParametresPage({ parametres, onSave }: ParametresPageProps) {
           <Field label="Nom du bureau" required><input className={inputCls} value={form.nom_bureau} onChange={e=>setForm({...form,nom_bureau:e.target.value})}/></Field>
           <Field label="Téléphone"><input className={inputCls} value={form.telephone} onChange={e=>setForm({...form,telephone:e.target.value})}/></Field>
           <Field label="Email"><input type="email" className={inputCls} value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/></Field>
-          <Field label="Devise"><input className={inputCls} value={form.devise} onChange={e=>setForm({...form,devise:e.target.value})} disabled/></Field>
+          <Field label="Devise"><input className={inputCls} value={form.devise} disabled/></Field>
           <Field label="Année courante"><input type="number" className={inputCls} value={form.annee_courante} onChange={e=>setForm({...form,annee_courante:parseInt(e.target.value,10)||2026})}/></Field>
           <Field label="Adresse" className="md:col-span-2"><input className={inputCls} value={form.adresse} onChange={e=>setForm({...form,adresse:e.target.value})}/></Field>
         </div>
