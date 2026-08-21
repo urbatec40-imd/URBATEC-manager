@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Save, Building2, Info, ShieldCheck } from 'lucide-react';
-import type { Parametres } from '@/types';
+import type { Parametres, Session } from '@/types';
 import { PageHeader } from '@/components/PageHeader';
 import { Field, inputCls } from '@/components/Field';
 import { ComptePage } from './ComptePage';
@@ -8,28 +8,20 @@ import { ComptePage } from './ComptePage';
 interface ParametresPageProps {
   parametres: Parametres | null;
   onSave: (id: string, p: Partial<Parametres>) => Promise<void>;
+  session: Session;
 }
 
-export function ParametresPage({ parametres, onSave }: ParametresPageProps) {
-  const [form, setForm] = useState({
-    nom_bureau: 'URATEC', adresse: '', telephone: '', email: '', devise: 'DZD', annee_courante: new Date().getFullYear()
-  });
+export function ParametresPage({ parametres, onSave, session }: ParametresPageProps) {
+  const [form, setForm] = useState({ nom_bureau:'URATEC', adresse:'', telephone:'', email:'', devise:'DZD', annee_courante:new Date().getFullYear() });
   const [saving,setSaving] = useState(false), [saved,setSaved] = useState(false);
-  useEffect(()=>{
-    if(parametres) setForm({
-      nom_bureau:parametres.nom_bureau, adresse:parametres.adresse??'', telephone:parametres.telephone??'', email:parametres.email??'', devise:parametres.devise, annee_courante:parametres.annee_courante
-    });
-  },[parametres]);
-  async function submit(e:React.FormEvent){
-    e.preventDefault(); if(!parametres)return; setSaving(true);
-    try{await onSave(parametres.id,form);setSaved(true);setTimeout(()=>setSaved(false),3000);}catch(err){console.error(err);}finally{setSaving(false);}
-  }
+  useEffect(()=>{ if(parametres) setForm({nom_bureau:parametres.nom_bureau,adresse:parametres.adresse??'',telephone:parametres.telephone??'',email:parametres.email??'',devise:parametres.devise,annee_courante:parametres.annee_courante}); },[parametres]);
+  async function submit(e:React.FormEvent){e.preventDefault();if(!parametres)return;setSaving(true);try{await onSave(parametres.id,form);setSaved(true);setTimeout(()=>setSaved(false),3000);}catch(err){console.error(err);}finally{setSaving(false);}}
   return <div>
     <PageHeader title="Paramètres" subtitle="Configuration du bureau d'études et sécurité du compte" />
     <div className="max-w-3xl space-y-6">
       <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center gap-2 mb-4"><ShieldCheck size={20} className="text-sky-600"/><div><h3 className="font-bold text-gray-800">Compte et sécurité</h3><p className="text-xs text-gray-500">Nom d'utilisateur, rôle et gestion du mot de passe.</p></div></div>
-        <ComptePage />
+        <ComptePage session={session} />
       </section>
       <form onSubmit={submit} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center gap-2 mb-5"><Building2 size={20} className="text-sky-600"/><h3 className="font-bold text-gray-800">Informations du bureau</h3></div>
