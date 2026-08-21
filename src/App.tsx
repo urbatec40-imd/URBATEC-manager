@@ -25,6 +25,19 @@ function App(){
  const [clients,setClients]=useState<Client[]>([]),[dossiers,setDossiers]=useState<DossierWithClient[]>([]),[allPaiements,setAllPaiements]=useState<PaiementWithDossier[]>([]),[expertises,setExpertises]=useState<ExpertiseWithDossier[]>([]),[allDocuments,setAllDocuments]=useState<DocumentWithDossier[]>([]),[essais,setEssais]=useState<Laboratoire[]>([]),[parametres,setParametres]=useState<Parametres|null>(null);
  const [openDossierId,setOpenDossierId]=useState<string|null>(null),[dossierPaiements,setDossierPaiements]=useState<Paiement[]>([]),[dossierExpertise,setDossierExpertise]=useState<Expertise|null>(null),[dossierDocuments,setDossierDocuments]=useState<DocumentRow[]>([]),[editDossier,setEditDossier]=useState<Dossier|null>(null),[editFormOpen,setEditFormOpen]=useState(false);
  const loadAll=useCallback(async()=>{setLoading(true);setError('');try{const[c,d,p,e,docs,l,params]=await Promise.all([data.getClients(),data.getDossiers(),data.getAllPaiements(),data.getExpertises(),data.getAllDocuments(),data.getLaboratoire(),data.ensureParametres()]);setClients(c);setDossiers(d);setAllPaiements(p);setExpertises(e);setAllDocuments(docs);setEssais(l);setParametres(params);}catch(err){setError((err as Error).message)}finally{setLoading(false)}},[]);
+ useEffect(()=>{
+   let active=true;
+   (async()=>{
+     try {
+       await authService.ensureDefaultAdmin();
+       const repaired=await authService.repairSession();
+       if(active && repaired) setSession(repaired);
+     } catch (err) {
+       console.error(err);
+     }
+   })();
+   return ()=>{active=false;};
+ },[]);
  useEffect(()=>{loadAll()},[loadAll]);
  const openDossier=useCallback(async(id:string)=>{setOpenDossierId(id);setPage('dossiers');try{const[p,e,docs]=await Promise.all([data.getPaiementsByDossier(id),data.getExpertiseByDossier(id),data.getDocumentsByDossier(id)]);setDossierPaiements(p);setDossierExpertise(e);setDossierDocuments(docs)}catch(err){console.error(err)}},[]);
  const refreshDossierDetail=useCallback(async()=>{if(!openDossierId)return;try{const[p,e,docs]=await Promise.all([data.getPaiementsByDossier(openDossierId),data.getExpertiseByDossier(openDossierId),data.getDocumentsByDossier(openDossierId)]);setDossierPaiements(p);setDossierExpertise(e);setDossierDocuments(docs)}catch(err){console.error(err)}},[openDossierId]);
