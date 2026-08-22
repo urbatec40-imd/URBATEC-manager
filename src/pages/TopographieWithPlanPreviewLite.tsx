@@ -22,11 +22,14 @@ const bounds=(r:Position[]):Bounds=>{const xs=r.map(p=>+p[0]),ys=r.map(p=>+p[1])
 const dist=(a:Bounds,b:Bounds)=>{let dx=0,dy=0;if(a.maxX<b.minX)dx=b.minX-a.maxX;else if(b.maxX<a.minX)dx=a.minX-b.maxX;if(a.maxY<b.minY)dy=b.minY-a.maxY;else if(b.maxY<a.minY)dy=a.minY-b.maxY;return Math.hypot(dx,dy)};
 const capture=(x:unknown)=>{const f=x as Parcel;if(!f?.geometry||!f.properties)return;const k=`${String(f.id??'')}-${sectionOf(f.properties)}-${ilotOf(f.properties)}`;if(!STORE.some(z=>`${String(z.id??'')}-${sectionOf(z.properties??{})}-${ilotOf(z.properties??{})}`===k))STORE.push(f)};
 function install(){if(hooked)return;hooked=true;const p=L.GeoJSON.prototype as any,o=p.addData;p.addData=function(data:any){if(data?.type==='FeatureCollection'&&Array.isArray(data.features))data.features.forEach(capture);else if(data?.type==='Feature')capture(data);return o.call(this,data)}}
-function readDomValue(patterns:RegExp[]):string{const body=document.body.innerText||'';for(const re of patterns){const m=body.match(re);if(m?.[1]?.trim())return m[1].trim()}return''}
+install();
+function readDomValue(patterns:RegExp[],root:ParentNode=document):string{const body=(root as Document|HTMLElement).textContent||'';for(const re of patterns){const m=body.match(re);if(m?.[1]?.trim())return m[1].trim()}return''}
 function selectedFromDom(){
-  const ss=digits(readDomValue([/Section\s*(?:numero|n°|N°|No)?\s*[:\-]?\s*([^\n|]+)/i,/Section\s*[:\-]\s*([^\n|]+)/i]));
-  const ii=digits(readDomValue([/Ilot\s*(?:numero|n°|N°|No)?\s*[:\-]?\s*([^\n|]+)/i,/Ilot\s*[:\-]\s*([^\n|]+)/i]));
-  if(ss&&ii){const exact=STORE.find(f=>digits(sectionOf(f.properties??{}))===ss&&digits(ilotOf(f.properties??{}))===ii);if(exact)return exact}
+  const popup=document.querySelector('.leaflet-popup-content');
+  const roots:ParentNode[]=[popup??document];
+  const sectionPatterns=[/Section\s*(?:numero|n°|N°|No)?\s*[:\-]?\s*([^\n|]+)/i,/Section\s*[:\-]\s*([^\n|]+)/i];
+  const ilotPatterns=[/Ilot\s*(?:numero|n°|N°|No)?\s*[:\-]?\s*([^\n|]+)/i,/Ilot\s*[:\-]\s*([^\n|]+)/i];
+  for(const root of roots){const ss=digits(readDomValue(sectionPatterns,root)),ii=digits(readDomValue(ilotPatterns,root));if(ss&&ii){const exact=STORE.find(f=>digits(sectionOf(f.properties??{}))===ss&&digits(ilotOf(f.properties??{}))===ii);if(exact)return exact}}
   const inputs=Array.from(document.querySelectorAll<HTMLInputElement>('input,select'));
   const sectionInput=inputs.find(e=>/section/i.test(`${e.name} ${e.id} ${e.placeholder} ${e.getAttribute('aria-label')||''}`));
   const ilotInput=inputs.find(e=>/ilot|îlot/i.test(`${e.name} ${e.id} ${e.placeholder} ${e.getAttribute('aria-label')||''}`));
@@ -39,7 +42,7 @@ function adminFor(p:Parcel):CadastralAdmin{const pr=p.properties??{},c=text(comm
 
 export function TopographieWithPlanPreviewLite({clients,onUpdateClient}:{clients:Client[];onUpdateClient:(id:string,data:Partial<Client>)=>Promise<void>}){
  const[open,setOpen]=useState(false),[selected,setSelected]=useState<Parcel|null>(null),[neighbors,setNeighbors]=useState<CadastralNeighbor[]>([]),[admin,setAdmin]=useState<CadastralAdmin>({commune:'Khenchela',daira:'—',wilaya:'Khenchela'}),[demandeOpen,setDemandeOpen]=useState(false);
- useEffect(()=>{install();const onClick=(e:MouseEvent)=>{const btn=(e.target as HTMLElement|null)?.closest('button');if(!btn)return;const label=btn.textContent?.toLowerCase()||'';
+ useEffect(()=>{const onClick=(e:MouseEvent)=>{const btn=(e.target as HTMLElement|null)?.closest('button');if(!btn)return;const label=btn.textContent?.toLowerCase()||'';
    if(label.includes('demande 4300')){e.preventDefault();e.stopPropagation();const p=selectedFromDom();if(p){setSelected(p);setAdmin(adminFor(p));}setDemandeOpen(true);return;}
    if(!label.includes('extrait du plan'))return;
    const p=selectedFromDom();if(!p)return;const r=ringOf(p.geometry);if(r.length<3)return;const b=bounds(r);const near=STORE.filter(f=>f!==p).map(f=>({f,r:ringOf(f.geometry)})).filter(x=>x.r.length>2).map(x=>({...x,d:dist(b,bounds(x.r))})).sort((a,b)=>a.d-b.d).slice(0,4).map((x,i)=>({id:String(x.f.id??i),ilot:ilotOf(x.f.properties??{})||`N${i+1}`,section:sectionOf(x.f.properties??{})||undefined,coordinates:x.r}));setSelected(p);setNeighbors(near);setAdmin(adminFor(p));setOpen(true)};document.addEventListener('click',onClick,true);return()=>document.removeEventListener('click',onClick,true)},[]);
