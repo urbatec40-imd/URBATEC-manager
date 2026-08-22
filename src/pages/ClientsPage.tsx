@@ -60,7 +60,7 @@ export function ClientsPage({
     const q = query.trim().toLowerCase();
     if (!q) return clients;
     return clients.filter((c) =>
-      [c.nom, c.prenom ?? '', c.telephone ?? '', c.email ?? '', c.commune ?? '']
+      [c.nom, c.prenom ?? '', c.dateLieuNaissance ?? '', c.telephone ?? '', c.email ?? '', c.commune ?? '']
         .join(' ')
         .toLowerCase()
         .includes(q)
@@ -459,6 +459,7 @@ function ClientForm({
   const [form, setForm] = useState({
     nom: '',
     prenom: '',
+    dateLieuNaissance: '',
     telephone: '',
     email: '',
     adresse: '',
@@ -479,6 +480,7 @@ function ClientForm({
       setForm({
         nom: initial.nom,
         prenom: initial.prenom ?? '',
+        dateLieuNaissance: initial.dateLieuNaissance ?? '',
         telephone: initial.telephone ?? '',
         email: initial.email ?? '',
         adresse: initial.adresse ?? '',
@@ -495,6 +497,7 @@ function ClientForm({
       setForm({
         nom: '',
     prenom: '',
+    dateLieuNaissance: '',
         telephone: '',
         email: '',
         adresse: '',
@@ -526,6 +529,7 @@ function ClientForm({
       await onSave({
         nom: form.nom.trim(),
         prenom: form.prenom.trim() || null,
+        dateLieuNaissance: form.dateLieuNaissance.trim() || null,
         telephone: form.telephone || null,
         email: form.email || null,
         adresse: form.adresse || null,
@@ -565,6 +569,15 @@ function ClientForm({
             className={inputCls}
             value={form.prenom}
             onChange={(e) => setForm({ ...form, prenom: e.target.value })}
+          />
+        </Field>        <Field label="Date et lieu de naissance">
+          <input
+            className={inputCls}
+            value={form.dateLieuNaissance}
+            onChange={(e) =>
+              setForm({ ...form, dateLieuNaissance: e.target.value })
+            }
+            placeholder="JJ/MM/AAAA — Lieu de naissance"
           />
         </Field>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -721,6 +734,7 @@ function ClientForm({
     </Modal>
   );
 }
+
 
 
 
