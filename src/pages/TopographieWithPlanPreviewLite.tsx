@@ -10,30 +10,31 @@ type Props=Record<string,unknown>; type Parcel=Feature<Geometry,Props>; type Bou
 const STORE:Parcel[]=[];let hooked=false;
 const text=(v:unknown)=>String(v??'').trim(),digits=(v:unknown)=>text(v).replace(/[^0-9]/g,'');
 const prop=(p:Props,keys:string[])=>{for(const k of keys){const v=p[k];if(v!==undefined&&v!==null&&text(v)!=='')return text(v)}return''};
-const sectionOf=(p:Props)=>prop(p,['se_no','se_no_nat','section','SECTION']),ilotOf=(p:Props)=>prop(p,['il_no','il_no_nat','ilot','ILOT']),areaOf=(p:Props)=>prop(p,['SHAPE_Area','il_surf_de','il_surf_ca','area','AREA']);
-const communeOf=(p:Props)=>prop(p,['commune','COMMUNE','municipality','MUNICIPALITE']),dairaOf=(p:Props)=>prop(p,['daira','DAIRA']),wilayaOf=(p:Props)=>prop(p,['wilaya','WILAYA','province','PROVINCE']);
+const sectionOf=(p:Props)=>prop(p,['se_no','se_no_nat','section','SECTION','section_no','SECTION_NO','numero_section','NUMERO_SECTION']);
+const ilotOf=(p:Props)=>prop(p,['il_no','il_no_nat','ilot','ILOT','ilot_no','ILOT_NO','numero_ilot','NUMERO_ILOT']);
+const areaOf=(p:Props)=>prop(p,['SHAPE_Area','SHAPE__Area','il_surf_de','il_surf_ca','surface','SURFACE','area','AREA','superficie','SUPERFICIE']);
+const communeOf=(p:Props)=>prop(p,['commune','COMMUNE','municipality','MUNICIPALITE','municipalite','Municipalite']);
+const dairaOf=(p:Props)=>prop(p,['daira','DAIRA','daira_name','DAIRA_NAME']);
+const wilayaOf=(p:Props)=>prop(p,['wilaya','WILAYA','province','PROVINCE']);
 const DAIRA_BY_COMMUNE:Record<string,string>={'Ain Touila':'Ain Touila',"M'Toussa":'Ain Touila','Babar':'Babar','Bouhmama':'Bouhmama','Chelia':'Bouhmama',"M'Sara":'Bouhmama','Yabous':'Bouhmama','Chechar':'Chechar','Djellal':'Chechar','El Ouldja':'Chechar','Khirane':'Chechar','Khenchela':'Khenchela','El Hamma':'El Hamma','Baghai':'El Hamma','Ensigha':'El Hamma','Tamza':'El Hamma','Kais':'Kais','Remila':'Kais','Taouzianat':'Kais','Ouled Rechache':'Ouled Rechache','El Mahmal':'Ouled Rechache'};
 const ringOf=(g:Geometry):Position[]=>g.type==='Polygon'?(g.coordinates[0]??[]):g.type==='LineString'?(g.coordinates??[]):[];
 const bounds=(r:Position[]):Bounds=>{const xs=r.map(p=>+p[0]),ys=r.map(p=>+p[1]);return{minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)}};
-const dist=(a:Bounds,b:Bounds)=>{
-  let dx=0;
-  let dy=0;
-  if(a.maxX<b.minX){
-    dx=b.minX-a.maxX;
-  }else if(b.maxX<a.minX){
-    dx=a.minX-b.maxX;
-  }
-  if(a.maxY<b.minY){
-    dy=b.minY-a.maxY;
-  }else if(b.maxY<a.minY){
-    dy=a.minY-b.maxY;
-  }
-  return Math.hypot(dx,dy);
-};
+const dist=(a:Bounds,b:Bounds)=>{let dx=0,dy=0;if(a.maxX<b.minX)dx=b.minX-a.maxX;else if(b.maxX<a.minX)dx=a.minX-b.maxX;if(a.maxY<b.minY)dy=b.minY-a.maxY;else if(b.maxY<a.minY)dy=a.minY-b.maxY;return Math.hypot(dx,dy)};
 const capture=(x:unknown)=>{const f=x as Parcel;if(!f?.geometry||!f.properties)return;const k=`${String(f.id??'')}-${sectionOf(f.properties)}-${ilotOf(f.properties)}`;if(!STORE.some(z=>`${String(z.id??'')}-${sectionOf(z.properties??{})}-${ilotOf(z.properties??{})}`===k))STORE.push(f)};
 function install(){if(hooked)return;hooked=true;const p=L.GeoJSON.prototype as any,o=p.addData;p.addData=function(data:any){if(data?.type==='FeatureCollection'&&Array.isArray(data.features))data.features.forEach(capture);else if(data?.type==='Feature')capture(data);return o.call(this,data)}}
-function selectedFromDom(){const body=document.body.innerText,s=body.match(/Section numero\s*:\s*([^\n]+)/i),i=body.match(/Ilot numero\s*:\s*([^\n]+)/i);if(!s||!i)return null;const ss=digits(s[1]),ii=digits(i[1]);return STORE.find(f=>digits(sectionOf(f.properties??{}))===ss&&digits(ilotOf(f.properties??{}))===ii)??null}
-function currentCommune(){const el=document.querySelector<HTMLInputElement>('input[placeholder*="Commune"]');return text(el?.value)}
+function readDomValue(patterns:RegExp[]):string{const body=document.body.innerText||'';for(const re of patterns){const m=body.match(re);if(m?.[1]?.trim())return m[1].trim()}return''}
+function selectedFromDom(){
+  const ss=digits(readDomValue([/Section\s*(?:numero|n°|N°|No)?\s*[:\-]?\s*([^\n|]+)/i,/Section\s*[:\-]\s*([^\n|]+)/i]));
+  const ii=digits(readDomValue([/Ilot\s*(?:numero|n°|N°|No)?\s*[:\-]?\s*([^\n|]+)/i,/Ilot\s*[:\-]\s*([^\n|]+)/i]));
+  if(ss&&ii){const exact=STORE.find(f=>digits(sectionOf(f.properties??{}))===ss&&digits(ilotOf(f.properties??{}))===ii);if(exact)return exact}
+  const inputs=Array.from(document.querySelectorAll<HTMLInputElement>('input,select'));
+  const sectionInput=inputs.find(e=>/section/i.test(`${e.name} ${e.id} ${e.placeholder} ${e.getAttribute('aria-label')||''}`));
+  const ilotInput=inputs.find(e=>/ilot|îlot/i.test(`${e.name} ${e.id} ${e.placeholder} ${e.getAttribute('aria-label')||''}`));
+  const s2=digits(sectionInput?.value),i2=digits(ilotInput?.value);
+  if(s2&&i2){const exact=STORE.find(f=>digits(sectionOf(f.properties??{}))===s2&&digits(ilotOf(f.properties??{}))===i2);if(exact)return exact}
+  return STORE.length===1?STORE[0]:null;
+}
+function currentCommune(){const el=document.querySelector<HTMLInputElement>('input[placeholder*="Commune"],select[name*="commune" i],input[name*="commune" i]');return text(el?.value)}
 function adminFor(p:Parcel):CadastralAdmin{const pr=p.properties??{},c=text(communeOf(pr)||currentCommune()||'Khenchela');return{commune:c,daira:text(dairaOf(pr)||DAIRA_BY_COMMUNE[c]||'—'),wilaya:text(wilayaOf(pr)||'Khenchela')}}
 
 export function TopographieWithPlanPreviewLite({clients,onUpdateClient}:{clients:Client[];onUpdateClient:(id:string,data:Partial<Client>)=>Promise<void>}){
