@@ -3,7 +3,8 @@ import { ArrowLeft, Save, UserRound, Plus, X } from 'lucide-react';
 import type { Client } from '@/types';
 
 type Parcel = { properties?: Record<string, unknown>; geometry?: unknown; id?: string | number } | null;
-type Props = { clients: Client[]; onUpdateClient: (id: string, data: Partial<Client>) => Promise<void>; onClose: () => void; parcel?: Parcel };
+type CadastralAdmin = { commune: string; daira?: string; wilaya?: string };
+type Props = { clients: Client[]; onUpdateClient: (id: string, data: Partial<Client>) => Promise<void>; onClose: () => void; parcel?: Parcel; parcelAdmin?: CadastralAdmin };
 
 const clientFields = [
   ['nom', 'Nom / Raison sociale'], ['prenom', 'Prénom'], ['dateLieuNaissance', 'Date et lieu de naissance'],
@@ -14,28 +15,19 @@ const mandateFields = [
   ['nom', 'Nom'], ['prenom', 'Prénom'], ['nomPere', 'Nom du père'], ['dateLieuNaissance', 'Date et lieu de naissance'],
   ['procuration', 'Date et numéro de la procuration'], ['redacteur', 'Rédacteur de la procuration'], ['telephone', 'Téléphone'],
 ] as const;
-const prop = (p: Record<string, unknown>, keys: string[]) => { for (const k of keys) { const v = p[k]; if (v !== undefined && v !== null && String(v).trim() !== '') return String(v); } return ''; };
-const sectionOf = (p: Record<string, unknown>) => prop(p, ['se_no', 'se_no_nat', 'section', 'SECTION']);
-const ilotOf = (p: Record<string, unknown>) => prop(p, ['il_no', 'il_no_nat', 'ilot', 'ILOT']);
-const communeOf = (p: Record<string, unknown>) => prop(p, ['commune', 'COMMUNE', 'municipality', 'MUNICIPALITE']);
+const prop = (p: Record<string, unknown>, keys: string[]) => { for (const k of keys) { const v = p[k]; if (v !== undefined && v !== null && String(v).trim() !== '') return String(v).trim(); } return ''; };
+const sectionOf = (p: Record<string, unknown>) => prop(p, ['se_no', 'se_no_nat', 'section', 'SECTION', 'section_no', 'SECTION_NO', 'numero_section', 'NUMERO_SECTION']);
+const ilotOf = (p: Record<string, unknown>) => prop(p, ['il_no', 'il_no_nat', 'ilot', 'ILOT', 'ilot_no', 'ILOT_NO', 'numero_ilot', 'NUMERO_ILOT']);
+const communeOf = (p: Record<string, unknown>) => prop(p, ['commune', 'COMMUNE', 'municipality', 'MUNICIPALITE', 'municipalite', 'Municipalite']);
 const lieuDitOf = (p: Record<string, unknown>) => prop(p, ['cite', 'CITE', 'lieu_dit', 'LIEU_DIT', 'lieudit', 'LIEUDIT']);
-const areaOf = (p: Record<string, unknown>) => prop(p, ['SHAPE_Area', 'SHAPE__Area', 'il_surf_de', 'il_surf_ca', 'surface', 'SURFACE', 'area', 'AREA']);
+const areaOf = (p: Record<string, unknown>) => prop(p, ['SHAPE_Area', 'SHAPE__Area', 'il_surf_de', 'il_surf_ca', 'surface', 'SURFACE', 'area', 'AREA', 'superficie', 'SUPERFICIE']);
 const docTypes = ['Acte administratif', 'Acte sous seing privé', 'Acte de cession', 'Certificat de possession', 'Attestation notariale', 'Procès-verbal de constat', 'Autre'];
 type Doc = { id: string; label: string };
 
-function numericArea(value: string): number {
-  const s = String(value ?? '').trim().replace(/\s/g, '').replace(',', '.');
-  if (!s) return 0;
-  const n = Number(s);
-  return Number.isFinite(n) ? n : 0;
-}
+function numericArea(value: string): number { const s = String(value ?? '').trim().replace(/\s/g, '').replace(',', '.'); if (!s) return 0; const n = Number(s); return Number.isFinite(n) ? n : 0; }
+function formatArea(value: number): string { if (!Number.isFinite(value) || value <= 0) return ''; return Number(value.toFixed(4)).toLocaleString('fr-FR', { maximumFractionDigits: 4, useGrouping: false }); }
 
-function formatArea(value: number): string {
-  if (!Number.isFinite(value) || value <= 0) return '';
-  return Number(value.toFixed(4)).toLocaleString('fr-FR', { maximumFractionDigits: 4, useGrouping: false });
-}
-
-export function Demande4300Page({ clients, onUpdateClient, onClose, parcel }: Props) {
+export function Demande4300Page({ clients, onUpdateClient, onClose, parcel, parcelAdmin }: Props) {
   const [clientId, setClientId] = useState(clients[0]?.id ?? '');
   const [form, setForm] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false); const [message, setMessage] = useState('');
@@ -46,38 +38,23 @@ export function Demande4300Page({ clients, onUpdateClient, onClose, parcel }: Pr
   const client = useMemo(() => clients.find(c => c.id === clientId), [clients, clientId]);
   useEffect(() => { if (!client) { setForm({}); return; } const c = client as Client & Record<string, unknown>; const next: Record<string, string> = {}; clientFields.forEach(([key]) => { next[key] = String(c[key] ?? ''); }); setForm(next); setMessage(''); }, [client]);
   const parcelProperties = (parcel?.properties ?? {}) as Record<string, unknown>;
+  const designatedCommune = useMemo(() => communeOf(parcelProperties) || parcelAdmin?.commune || '', [parcelProperties, parcelAdmin]);
+  const designatedSection = sectionOf(parcelProperties);
+  const designatedIlot = ilotOf(parcelProperties);
   const parcelAreaM2 = useMemo(() => numericArea(areaOf(parcelProperties)), [parcel]);
-  useEffect(() => {
-    setLieuDit(lieuDitOf(parcelProperties));
-    if (parcelAreaM2 > 0) {
-      setSurface(formatArea(parcelAreaM2));
-      setSurfaceUnit('m²');
-    } else {
-      setSurface('');
-    }
-  }, [parcel, parcelAreaM2]);
-  useEffect(() => {
-    if (regul === 'totalite' && parcelAreaM2 > 0) setSurface(formatArea(surfaceUnit === 'ha' ? parcelAreaM2 / 10000 : parcelAreaM2));
-  }, [regul, parcelAreaM2, surfaceUnit]);
+  useEffect(() => { setLieuDit(lieuDitOf(parcelProperties)); if (parcelAreaM2 > 0) { setSurface(formatArea(parcelAreaM2)); setSurfaceUnit('m²'); } else setSurface(''); }, [parcel, parcelAreaM2]);
+  useEffect(() => { if (regul === 'totalite' && parcelAreaM2 > 0) setSurface(formatArea(surfaceUnit === 'ha' ? parcelAreaM2 / 10000 : parcelAreaM2)); }, [regul, parcelAreaM2, surfaceUnit]);
   const setValue = (key: string, value: string) => setForm(current => ({ ...current, [key]: value }));
   const setMandataireValue = (key: string, value: string) => setMandataire(current => ({ ...current, [key]: value }));
   const addDocument = () => { if (!newDoc || (newDoc === 'Autre' && !newAutre.trim())) return; const label = newDoc === 'Autre' ? `Autre : ${newAutre.trim()}` : newDoc; setDocuments(current => [...current, { id: crypto.randomUUID(), label }]); setNewDoc(''); setNewAutre(''); };
   const save = async () => { if (!client) return; if (!form.nom?.trim()) { setMessage('Le nom du client est obligatoire.'); return; } setSaving(true); setMessage(''); try { await onUpdateClient(client.id, form as Partial<Client>); setMessage('Informations du client enregistrées.'); } catch (e) { setMessage(`Erreur : ${(e as Error).message}`); } finally { setSaving(false); } };
-  const changeSurfaceUnit = (unit: 'm²' | 'ha') => {
-    if (parcelAreaM2 > 0) {
-      setSurface(formatArea(unit === 'ha' ? parcelAreaM2 / 10000 : parcelAreaM2));
-    } else if (surface) {
-      const current = numericArea(surface);
-      setSurface(formatArea(unit === 'ha' ? current / 10000 : current * 10000));
-    }
-    setSurfaceUnit(unit);
-  };
+  const changeSurfaceUnit = (unit: 'm²' | 'ha') => { if (unit === surfaceUnit) return; if (parcelAreaM2 > 0) setSurface(formatArea(unit === 'ha' ? parcelAreaM2 / 10000 : parcelAreaM2)); else if (surface) { const current = numericArea(surface); setSurface(formatArea(surfaceUnit === 'm²' && unit === 'ha' ? current / 10000 : current * 10000)); } setSurfaceUnit(unit); };
   return (
     <div className="min-h-full bg-slate-50 -m-4 lg:-m-6 p-4 lg:p-6"><div className="mx-auto max-w-6xl">
       <div className="mb-5 flex items-center justify-between gap-3"><div className="flex items-center gap-3"><button type="button" onClick={onClose} className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700"><ArrowLeft size={18}/></button><div><h1 className="text-2xl font-bold text-slate-900">Demande 4300</h1><p className="text-sm text-slate-500">Fiche de renseignements — article 166 de la loi de finances pour 2025</p></div></div><button type="button" onClick={save} disabled={!client || saving} className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white"><Save size={16}/> {saving ? 'Enregistrement...' : 'Enregistrer'}</button></div>
       <div className="rounded-xl border bg-white p-5 shadow-sm"><div className="mb-5 flex items-center gap-2 border-b pb-4"><UserRound size={20} className="text-sky-600"/><h2 className="font-semibold">DEMANDEUR — Client</h2></div>{clients.length===0?<div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Aucun client enregistré dans le module Clients.</div>:<><div className="mb-5 max-w-xl"><label className="mb-1 block text-sm font-medium">Sélectionner le client</label><select value={clientId} onChange={e=>setClientId(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm">{clients.map(c=><option key={c.id} value={c.id}>{c.nom}</option>)}</select></div><div className="grid grid-cols-1 gap-4 md:grid-cols-2">{clientFields.map(([key,label])=><div key={key} className={key==='observations'?'md:col-span-2':''}><label className="mb-1 block text-sm font-medium">{label}</label>{key==='observations'?<textarea value={form[key]??''} onChange={e=>setValue(key,e.target.value)} rows={3} className="w-full rounded-lg border px-3 py-2 text-sm"/>:<input value={form[key]??''} onChange={e=>setValue(key,e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm"/>}</div>)}</div></>}</div>
       <div className="mt-4 rounded-xl border bg-white p-5 shadow-sm"><div className="flex items-center justify-between border-b pb-3"><h2 className="font-semibold">MANDATAIRE (le cas échéant)</h2><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={hasMandataire} onChange={e=>setHasMandataire(e.target.checked)}/> Présence d'un mandataire</label></div>{hasMandataire&&<div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">{mandateFields.map(([key,label])=><div key={key} className={key==='dateLieuNaissance'||key==='procuration'||key==='redacteur'?'md:col-span-2':''}><label className="mb-1 block text-sm font-medium">{label}</label><input value={mandataire[key]??''} onChange={e=>setMandataireValue(key,e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm"/></div>)}</div>}</div>
-      <div className="mt-4 rounded-xl border bg-white p-5 shadow-sm"><h2 className="mb-4 border-b pb-3 font-semibold">DÉSIGNATION DU BIEN</h2><div className="grid grid-cols-1 gap-4 md:grid-cols-2"><div><label className="block text-sm font-medium">Commune</label><input readOnly value={communeOf(parcelProperties)} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">Section</label><input readOnly value={sectionOf(parcelProperties)} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">Ilot</label><input readOnly value={ilotOf(parcelProperties)} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">N° de la partie</label><input value={partie} onChange={e=>setPartie(e.target.value)} disabled={regul!=='partie'} placeholder={regul==='partie'?'À renseigner':'Non applicable'} className="w-full rounded-lg border px-3 py-2 text-sm disabled:bg-slate-50"/></div><div><label className="block text-sm font-medium">Cité ou lieu-dit</label><input value={lieuDit} onChange={e=>setLieuDit(e.target.value)} placeholder="À renseigner" className="w-full rounded-lg border px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">Nature du bien</label><select value={nature} onChange={e=>setNature(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm"><option value="">Sélectionner</option><option>BNR</option><option>B.I.E.N / ETAT</option><option>Autre</option></select>{nature==='Autre'&&<input value={natureAutre} onChange={e=>setNatureAutre(e.target.value)} placeholder="Préciser la nature du bien" className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"/>}</div><div><label className="block text-sm font-medium">Surface</label><div className="flex gap-2"><input readOnly={regul==='totalite' && parcelAreaM2>0} value={surface} onChange={e=>setSurface(e.target.value)} placeholder={parcelAreaM2>0?'Surface extraite automatiquement':'Surface à renseigner'} inputMode="decimal" className="w-full rounded-lg border px-3 py-2 text-sm"/><select value={surfaceUnit} onChange={e=>changeSurfaceUnit(e.target.value as 'm²' | 'ha')} className="w-24 rounded-lg border px-2 py-2 text-sm"><option value="m²">m²</option><option value="ha">ha</option></select></div>{parcelAreaM2>0&&<p className="mt-1 text-xs text-emerald-600">Surface cadastrale : {formatArea(parcelAreaM2)} m² — {formatArea(parcelAreaM2/10000)} ha</p>}</div></div><div className="mt-4"><label className="block text-sm font-medium mb-2">Nature de régularisation</label><div className="flex flex-wrap gap-5"><label className="flex items-center gap-2"><input type="radio" name="regul" checked={regul==='partie'} onChange={()=>setRegul('partie')}/> Partie du bien</label><label className="flex items-center gap-2"><input type="radio" name="regul" checked={regul==='totalite'} onChange={()=>setRegul('totalite')}/> Totalité du bien</label></div></div></div>
+      <div className="mt-4 rounded-xl border bg-white p-5 shadow-sm"><h2 className="mb-4 border-b pb-3 font-semibold">DÉSIGNATION DU BIEN</h2><div className="grid grid-cols-1 gap-4 md:grid-cols-2"><div><label className="block text-sm font-medium">Commune</label><input readOnly value={designatedCommune} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">Section</label><input readOnly value={designatedSection} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">Ilot</label><input readOnly value={designatedIlot} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">N° de la partie</label><input value={partie} onChange={e=>setPartie(e.target.value)} disabled={regul!=='partie'} placeholder={regul==='partie'?'À renseigner':'Non applicable'} className="w-full rounded-lg border px-3 py-2 text-sm disabled:bg-slate-50"/></div><div><label className="block text-sm font-medium">Cité ou lieu-dit</label><input value={lieuDit} onChange={e=>setLieuDit(e.target.value)} placeholder="À renseigner" className="w-full rounded-lg border px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">Nature du bien</label><select value={nature} onChange={e=>setNature(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm"><option value="">Sélectionner</option><option>BNR</option><option>B.I.E.N / ETAT</option><option>Autre</option></select>{nature==='Autre'&&<input value={natureAutre} onChange={e=>setNatureAutre(e.target.value)} placeholder="Préciser la nature du bien" className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"/>}</div><div><label className="block text-sm font-medium">Surface</label><div className="flex gap-1"><input readOnly={regul==='totalite' && parcelAreaM2>0} value={surface} onChange={e=>setSurface(e.target.value)} placeholder={parcelAreaM2>0?'Surface extraite automatiquement':'Surface à renseigner'} inputMode="decimal" className="min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"/><button type="button" onClick={()=>changeSurfaceUnit('m²')} className={`rounded-lg border px-3 py-2 text-sm font-semibold ${surfaceUnit==='m²'?'bg-sky-600 text-white border-sky-600':'bg-white text-slate-700'}`}>m²</button><button type="button" onClick={()=>changeSurfaceUnit('ha')} className={`rounded-lg border px-3 py-2 text-sm font-semibold ${surfaceUnit==='ha'?'bg-emerald-600 text-white border-emerald-600':'bg-white text-slate-700'}`}>ha</button></div>{parcelAreaM2>0&&<p className="mt-1 text-xs text-emerald-600">Surface cadastrale : {formatArea(parcelAreaM2)} m² — {formatArea(parcelAreaM2/10000)} ha</p>}</div></div><div className="mt-4"><label className="block text-sm font-medium mb-2">Nature de régularisation</label><div className="flex flex-wrap gap-5"><label className="flex items-center gap-2"><input type="radio" name="regul" checked={regul==='partie'} onChange={()=>setRegul('partie')}/> Partie du bien</label><label className="flex items-center gap-2"><input type="radio" name="regul" checked={regul==='totalite'} onChange={()=>setRegul('totalite')}/> Totalité du bien</label></div>{regul==='totalite'&&parcelAreaM2>0&&<p className="mt-2 text-xs font-medium text-emerald-600">Totalité du bien : la surface cadastrale est automatiquement reprise.</p>}</div></div>
       <div className="mt-4 rounded-xl border bg-white p-5 shadow-sm"><div className="flex items-center justify-between border-b pb-3"><h2 className="font-semibold">Documents fournis</h2><span className="text-xs text-slate-500">{documents.length} document(s)</span></div><div className="mt-4 flex flex-wrap gap-2"><select value={newDoc} onChange={e=>setNewDoc(e.target.value)} className="rounded-lg border px-3 py-2 text-sm"><option value="">Ajouter un document...</option>{docTypes.map(d=><option key={d}>{d}</option>)}</select>{newDoc==='Autre'&&<input value={newAutre} onChange={e=>setNewAutre(e.target.value)} placeholder="Préciser" className="rounded-lg border px-3 py-2 text-sm"/>}<button type="button" onClick={addDocument} disabled={!newDoc||(newDoc==='Autre'&&!newAutre.trim())} className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"><Plus size={15}/> Ajouter</button></div><div className="mt-4 space-y-2">{documents.map((d,i)=><div key={d.id} className="flex items-center justify-between rounded-lg border bg-slate-50 px-3 py-2 text-sm"><span>{i+1}. {d.label}</span><button type="button" onClick={()=>setDocuments(v=>v.filter(x=>x.id!==d.id))} className="text-red-600"><X size={16}/></button></div>)}{documents.length===0&&<div className="text-sm text-slate-500">Aucun document sélectionné.</div>}</div></div>
     </div></div>
   );
