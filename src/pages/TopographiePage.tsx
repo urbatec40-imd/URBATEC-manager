@@ -5,24 +5,18 @@ import type { Feature, FeatureCollection, Geometry, Position } from 'geojson';
 import L from 'leaflet';
 import { unzipSync, strFromU8 } from 'fflate';
 import 'leaflet/dist/leaflet.css';
-
 type Props = Record<string, unknown>;
 type KmzLayer = { id:string; name:string; data:FeatureCollection<Geometry>; description:string; properties:Props };
 type Parcel = Feature<Geometry,Props>;
 type BaseMap = { id:string; name:string; url:string; attribution:string };
 type CorrectionMode = 'off'|'manual'|'auto';
-
 const COMMUNES=['Ain Touila','Babar','Baghai','Bouhmama','Chelia','Djellal','El Hamma','El Mahmal','Ensigha','Khenchela','Kais','Khirane',"M'Toussa",'Ouled Rechache','Remila','Tamza','Taouzianat','Yabous','El Ouldja',"R'Mila"];
-const BASEMAPS:BaseMap[]=[
-{id:'osm',name:'OpenStreetMap',url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',attribution:'© OpenStreetMap contributors'},
-{id:'google-sat',name:'Google Satellite',url:'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',attribution:'© Google'},
-{id:'google-hybrid',name:'Google Hybrid',url:'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',attribution:'© Google'},
-{id:'esri-sat',name:'Esri World Imagery',url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attribution:'© Esri'}];
+const BASEMAPS:BaseMap[]=[{id:'osm',name:'OpenStreetMap',url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',attribution:'© OpenStreetMap contributors'},{id:'google-sat',name:'Google Satellite',url:'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',attribution:'© Google'},{id:'google-hybrid',name:'Google Hybrid',url:'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',attribution:'© Google'},{id:'esri-sat',name:'Esri World Imagery',url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attribution:'© Esri'}];
 const STORAGE_KEY='urbatec.topographie.kmz.layers.v1';
 const xmlText=(s:string)=>s.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
 const tag=(s:string,n:string)=>{const m=s.match(new RegExp(`<${n}[^>]*>([\\s\\S]*?)<\\/${n}>`,'i'));return m?xmlText(m[1]):''};
 const esc=(s:string)=>s.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'");
-const parseCoords=(s:string):Array<[number,number]>=>(s:string)=>{const r:Array<[number,number]>=[];for(const v of s.trim().split(/\s+/)){const [x,y]=v.split(',').map(Number);if(Number.isFinite(x)&&Number.isFinite(y))r.push([x,y])}return r};
+const parseCoords=(s:string):Array<[number,number]>=>{const r:Array<[number,number]>=[];for(const v of s.trim().split(/\s+/)){const [x,y]=v.split(',').map(Number);if(Number.isFinite(x)&&Number.isFinite(y))r.push([x,y])}return r};
 const prop=(p:Props,keys:string[])=>{for(const k of keys){const v=p[k];if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim()}return''};
 const sectionOf=(p:Props)=>prop(p,['se_no','se_no_nat','section','SECTION']);const ilotOf=(p:Props)=>prop(p,['il_no','il_no_nat','ilot','ILOT']);const areaOf=(p:Props)=>prop(p,['SHAPE_Area','il_surf_de','il_surf_ca','area','AREA']);const communeOf=(p:Props)=>prop(p,['commune','COMMUNE','municipality','MUNICIPALITE','municipalite','Municipalite']);const digits=(v:string)=>v.replace(/[^0-9]/g,'');
 function parseKml(text:string):KmzLayer['data']{const features:Parcel[]=[];[...text.matchAll(/<Placemark[\s\S]*?<\/Placemark>/gi)].forEach((m,i)=>{const pm=m[0],name=esc(tag(pm,'name')),description=esc(tag(pm,'description'));const ext:Props={};[...pm.matchAll(/<Data[^>]*name=["']([^"']+)["'][^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>[\s\S]*?<\/Data>/gi)].forEach(x=>ext[x[1]]=esc(xmlText(x[2])));[...pm.matchAll(/<SimpleData[^>]*name=["']([^"']+)["'][^>]*>([\s\S]*?)<\/SimpleData>/gi)].forEach(x=>ext[x[1]]=esc(xmlText(x[2])));const pol=pm.match(/<Polygon[\s\S]*?<\/Polygon>/i),line=pm.match(/<LineString[\s\S]*?<\/LineString>/i),point=pm.match(/<Point[\s\S]*?<\/Point>/i);let geometry:Geometry|null=null;if(pol){const rings=[...pol[0].matchAll(/<coordinates>([\s\S]*?)<\/coordinates>/gi)].map(x=>parseCoords(x[1]));if(rings.length)geometry={type:'Polygon',coordinates:rings}}else if(line){const c=parseCoords(tag(line[0],'coordinates'));if(c.length)geometry={type:'LineString',coordinates:c}}else if(point){const c=parseCoords(tag(point[0],'coordinates'));if(c.length)geometry={type:'Point',coordinates:c[0]}}if(geometry)features.push({type:'Feature',id:`${i}`,geometry,properties:{name,description,...ext}})});return{type:'FeatureCollection',features}}
