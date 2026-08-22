@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import type { Client } from '@/types';
 import type { Feature, Geometry, Position } from 'geojson';
 import L from 'leaflet';
 import { TopographiePage } from './TopographiePage';
 import { CadastralPlanSheet, type CadastralAdmin, type CadastralNeighbor } from '../components/CadastralPlanSheet';
+import { Demande4300Page } from '../components/Demande4300Page';
 
 type Props=Record<string,unknown>; type Parcel=Feature<Geometry,Props>; type Bounds={minX:number;maxX:number;minY:number;maxY:number};
 const STORE:Parcel[]=[];let hooked=false;
@@ -19,6 +21,13 @@ function install(){if(hooked)return;hooked=true;const p=L.GeoJSON.prototype as a
 function selectedFromDom(){const body=document.body.innerText,s=body.match(/Section numero\s*:\s*([^\n]+)/i),i=body.match(/Ilot numero\s*:\s*([^\n]+)/i);if(!s||!i)return null;const ss=digits(s[1]),ii=digits(i[1]);return STORE.find(f=>digits(sectionOf(f.properties??{}))===ss&&digits(ilotOf(f.properties??{}))===ii)??null}
 function currentCommune(){const el=document.querySelector<HTMLInputElement>('input[placeholder*="Commune"]');return text(el?.value)}
 function adminFor(p:Parcel):CadastralAdmin{const pr=p.properties??{},c=text(communeOf(pr)||currentCommune()||'Khenchela');return{commune:c,daira:text(dairaOf(pr)||DAIRA_BY_COMMUNE[c]||'—'),wilaya:text(wilayaOf(pr)||'Khenchela')}}
-export function TopographieWithPlanPreviewLite(){const[open,setOpen]=useState(false),[selected,setSelected]=useState<Parcel|null>(null),[neighbors,setNeighbors]=useState<CadastralNeighbor[]>([]),[admin,setAdmin]=useState<CadastralAdmin>({commune:'Khenchela',daira:'—',wilaya:'Khenchela'});
-useEffect(()=>{install();const onClick=(e:MouseEvent)=>{const btn=(e.target as HTMLElement|null)?.closest('button');if(!btn||!btn.textContent?.toLowerCase().includes('extrait du plan'))return;const p=selectedFromDom();if(!p)return;const r=ringOf(p.geometry);if(r.length<3)return;const b=bounds(r);const near=STORE.filter(f=>f!==p).map(f=>({f,r:ringOf(f.geometry)})).filter(x=>x.r.length>2).map(x=>({...x,d:dist(b,bounds(x.r))})).sort((a,b)=>a.d-b.d).slice(0,4).map((x,i)=>({id:String(x.f.id??i),ilot:ilotOf(x.f.properties??{})||`N${i+1}`,section:sectionOf(x.f.properties??{})||undefined,coordinates:x.r}));setSelected(p);setNeighbors(near);setAdmin(adminFor(p));setOpen(true)};document.addEventListener('click',onClick);return()=>document.removeEventListener('click',onClick)},[]);
-const pr=selected?.properties??{};return<><TopographiePage/><CadastralPlanSheet open={open} onClose={()=>setOpen(false)} commune={admin.commune} admin={admin} section={sectionOf(pr)} ilot={ilotOf(pr)} surface={areaOf(pr)} selectedRing={selected?ringOf(selected.geometry):[]} neighbors={neighbors}/></>}
+
+export function TopographieWithPlanPreviewLite({clients,onUpdateClient}:{clients:Client[];onUpdateClient:(id:string,data:Partial<Client>)=>Promise<void>}){
+ const[open,setOpen]=useState(false),[selected,setSelected]=useState<Parcel|null>(null),[neighbors,setNeighbors]=useState<CadastralNeighbor[]>([]),[admin,setAdmin]=useState<CadastralAdmin>({commune:'Khenchela',daira:'—',wilaya:'Khenchela'}),[demandeOpen,setDemandeOpen]=useState(false);
+ useEffect(()=>{install();const onClick=(e:MouseEvent)=>{const btn=(e.target as HTMLElement|null)?.closest('button');if(!btn)return;const label=btn.textContent?.toLowerCase()||'';
+   if(label.includes('demande 4300')){e.preventDefault();setDemandeOpen(true);return;}
+   if(!label.includes('extrait du plan'))return;
+   const p=selectedFromDom();if(!p)return;const r=ringOf(p.geometry);if(r.length<3)return;const b=bounds(r);const near=STORE.filter(f=>f!==p).map(f=>({f,r:ringOf(f.geometry)})).filter(x=>x.r.length>2).map(x=>({...x,d:dist(b,bounds(x.r))})).sort((a,b)=>a.d-b.d).slice(0,4).map((x,i)=>({id:String(x.f.id??i),ilot:ilotOf(x.f.properties??{})||`N${i+1}`,section:sectionOf(x.f.properties??{})||undefined,coordinates:x.r}));setSelected(p);setNeighbors(near);setAdmin(adminFor(p));setOpen(true)};document.addEventListener('click',onClick);return()=>document.removeEventListener('click',onClick)},[]);
+ const pr=selected?.properties??{};
+ return <>{!demandeOpen&&<><TopographiePage/><CadastralPlanSheet open={open} onClose={()=>setOpen(false)} commune={admin.commune} admin={admin} section={sectionOf(pr)} ilot={ilotOf(pr)} surface={areaOf(pr)} selectedRing={selected?ringOf(selected.geometry):[]} neighbors={neighbors}/></>}{demandeOpen&&<Demande4300Page clients={clients} onUpdateClient={onUpdateClient} onClose={()=>setDemandeOpen(false)}/>}</>;
+}
