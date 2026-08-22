@@ -15,7 +15,21 @@ const communeOf=(p:Props)=>prop(p,['commune','COMMUNE','municipality','MUNICIPAL
 const DAIRA_BY_COMMUNE:Record<string,string>={'Ain Touila':'Ain Touila',"M'Toussa":'Ain Touila','Babar':'Babar','Bouhmama':'Bouhmama','Chelia':'Bouhmama',"M'Sara":'Bouhmama','Yabous':'Bouhmama','Chechar':'Chechar','Djellal':'Chechar','El Ouldja':'Chechar','Khirane':'Chechar','Khenchela':'Khenchela','El Hamma':'El Hamma','Baghai':'El Hamma','Ensigha':'El Hamma','Tamza':'El Hamma','Kais':'Kais','Remila':'Kais','Taouzianat':'Kais','Ouled Rechache':'Ouled Rechache','El Mahmal':'Ouled Rechache'};
 const ringOf=(g:Geometry):Position[]=>g.type==='Polygon'?(g.coordinates[0]??[]):g.type==='LineString'?(g.coordinates??[]):[];
 const bounds=(r:Position[]):Bounds=>{const xs=r.map(p=>+p[0]),ys=r.map(p=>+p[1]);return{minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)}};
-const dist=(a:Bounds,b:Bounds)=>{const dx=a.maxX<b.minX?b.minX-a.maxX:b.maxX<a.minX?a.minX-b.maxX:0,dy=a.maxY<b.minY?b.minY-a.maxY:a.minY-b.maxY:0;return Math.hypot(dx,dy)};
+const dist=(a:Bounds,b:Bounds)=>{
+  let dx=0;
+  let dy=0;
+  if(a.maxX<b.minX){
+    dx=b.minX-a.maxX;
+  }else if(b.maxX<a.minX){
+    dx=a.minX-b.maxX;
+  }
+  if(a.maxY<b.minY){
+    dy=b.minY-a.maxY;
+  }else if(b.maxY<a.minY){
+    dy=a.minY-b.maxY;
+  }
+  return Math.hypot(dx,dy);
+};
 const capture=(x:unknown)=>{const f=x as Parcel;if(!f?.geometry||!f.properties)return;const k=`${String(f.id??'')}-${sectionOf(f.properties)}-${ilotOf(f.properties)}`;if(!STORE.some(z=>`${String(z.id??'')}-${sectionOf(z.properties??{})}-${ilotOf(z.properties??{})}`===k))STORE.push(f)};
 function install(){if(hooked)return;hooked=true;const p=L.GeoJSON.prototype as any,o=p.addData;p.addData=function(data:any){if(data?.type==='FeatureCollection'&&Array.isArray(data.features))data.features.forEach(capture);else if(data?.type==='Feature')capture(data);return o.call(this,data)}}
 function selectedFromDom(){const body=document.body.innerText,s=body.match(/Section numero\s*:\s*([^\n]+)/i),i=body.match(/Ilot numero\s*:\s*([^\n]+)/i);if(!s||!i)return null;const ss=digits(s[1]),ii=digits(i[1]);return STORE.find(f=>digits(sectionOf(f.properties??{}))===ss&&digits(ilotOf(f.properties??{}))===ii)??null}
