@@ -197,6 +197,7 @@ export type EcheanceStatut =
 export interface Client {
   id: string;
   nom: string;
+  prenom: string | null;
   telephone: string | null;
   email: string | null;
   adresse: string | null;
@@ -394,4 +395,6 @@ export interface Session {
   nom_complet: string;
   role: UserRole;
 }
+
+
 

@@ -60,7 +60,7 @@ export function ClientsPage({
     const q = query.trim().toLowerCase();
     if (!q) return clients;
     return clients.filter((c) =>
-      [c.nom, c.telephone ?? '', c.email ?? '', c.commune ?? '']
+      [c.nom, c.prenom ?? '', c.telephone ?? '', c.email ?? '', c.commune ?? '']
         .join(' ')
         .toLowerCase()
         .includes(q)
@@ -141,7 +141,7 @@ export function ClientsPage({
                       className="font-bold text-gray-800 cursor-pointer hover:text-sky-600 transition-colors"
                       onClick={() => setSelectedClient(c)}
                     >
-                      {c.nom}
+                      {c.nom}{c.prenom ? " — " + c.prenom : ""}
                     </h3>
                   </div>
                 </div>
@@ -458,6 +458,7 @@ function ClientForm({
 }) {
   const [form, setForm] = useState({
     nom: '',
+    prenom: '',
     telephone: '',
     email: '',
     adresse: '',
@@ -477,6 +478,7 @@ function ClientForm({
     if (initial) {
       setForm({
         nom: initial.nom,
+        prenom: initial.prenom ?? '',
         telephone: initial.telephone ?? '',
         email: initial.email ?? '',
         adresse: initial.adresse ?? '',
@@ -492,6 +494,7 @@ function ClientForm({
     } else {
       setForm({
         nom: '',
+    prenom: '',
         telephone: '',
         email: '',
         adresse: '',
@@ -522,6 +525,7 @@ function ClientForm({
     try {
       await onSave({
         nom: form.nom.trim(),
+        prenom: form.prenom.trim() || null,
         telephone: form.telephone || null,
         email: form.email || null,
         adresse: form.adresse || null,
@@ -554,6 +558,13 @@ function ClientForm({
             className={inputCls}
             value={form.nom}
             onChange={(e) => setForm({ ...form, nom: e.target.value })}
+          />
+        </Field>
+        <Field label="Prénom">
+          <input
+            className={inputCls}
+            value={form.prenom}
+            onChange={(e) => setForm({ ...form, prenom: e.target.value })}
           />
         </Field>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -710,6 +721,10 @@ function ClientForm({
     </Modal>
   );
 }
+
+
+
+
 
 
 
