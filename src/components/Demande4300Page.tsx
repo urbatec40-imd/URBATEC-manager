@@ -6,205 +6,45 @@ type Parcel = { properties?: Record<string, unknown>; geometry?: unknown; id?: s
 type Props = { clients: Client[]; onUpdateClient: (id: string, data: Partial<Client>) => Promise<void>; onClose: () => void; parcel?: Parcel };
 
 const clientFields = [
-  ['nom', 'Nom / Raison sociale'],
-  ['prenom', 'Prénom'],
-  ['dateLieuNaissance', 'Date et lieu de naissance'],
-  ['nin', 'NIN'],
-  ['nif', 'NIF'],
-  ['telephone', 'Téléphone'],
-  ['email', 'E-mail'],
-  ['adresse', 'Adresse'],
-  ['wilaya', 'Wilaya'],
-  ['daira', 'Daïra'],
-  ['commune', 'Commune'],
-  ['observations', 'Observations'],
+  ['nom', 'Nom / Raison sociale'], ['prenom', 'Prénom'], ['dateLieuNaissance', 'Date et lieu de naissance'],
+  ['nin', 'NIN'], ['nif', 'NIF'], ['telephone', 'Téléphone'], ['email', 'E-mail'], ['adresse', 'Adresse'],
+  ['wilaya', 'Wilaya'], ['daira', 'Daïra'], ['commune', 'Commune'], ['observations', 'Observations'],
 ] as const;
-
-const prop = (p: Record<string, unknown>, keys: string[]) => {
-  for (const k of keys) {
-    const v = p[k];
-    if (v !== undefined && v !== null && String(v).trim() !== '') return String(v);
-  }
-  return '';
-};
+const mandateFields = [
+  ['nom', 'Nom'], ['prenom', 'Prénom'], ['nomPere', 'Nom du père'], ['dateLieuNaissance', 'Date et lieu de naissance'],
+  ['procuration', 'Date et numéro de la procuration'], ['redacteur', 'Rédacteur de la procuration'], ['telephone', 'Téléphone'],
+] as const;
+const prop = (p: Record<string, unknown>, keys: string[]) => { for (const k of keys) { const v = p[k]; if (v !== undefined && v !== null && String(v).trim() !== '') return String(v); } return ''; };
 const sectionOf = (p: Record<string, unknown>) => prop(p, ['se_no', 'se_no_nat', 'section', 'SECTION']);
 const ilotOf = (p: Record<string, unknown>) => prop(p, ['il_no', 'il_no_nat', 'ilot', 'ILOT']);
 const communeOf = (p: Record<string, unknown>) => prop(p, ['commune', 'COMMUNE', 'municipality', 'MUNICIPALITE']);
-
-const docTypes = ['Acte administratif', 'Acte sous seing privé', 'Attestation notariale', 'Procès-verbal de constat', 'Autre'];
+const lieuDitOf = (p: Record<string, unknown>) => prop(p, ['cite', 'CITE', 'lieu_dit', 'LIEU_DIT', 'lieudit', 'LIEUDIT']);
+const docTypes = ['Acte administratif', 'Acte sous seing privé', 'Acte de cession', 'Certificat de possession', 'Attestation notariale', 'Procès-verbal de constat', 'Autre'];
 type Doc = { id: string; label: string };
 
 export function Demande4300Page({ clients, onUpdateClient, onClose, parcel }: Props) {
   const [clientId, setClientId] = useState(clients[0]?.id ?? '');
   const [form, setForm] = useState<Record<string, string>>({});
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
-  const [regul, setRegul] = useState<'partie' | 'totalite' | ''>('');
-  const [nature, setNature] = useState('');
-  const [natureAutre, setNatureAutre] = useState('');
-  const [partie, setPartie] = useState('');
-  const [surface, setSurface] = useState('');
-  const [documents, setDocuments] = useState<Doc[]>([]);
-  const [newDoc, setNewDoc] = useState('');
-  const [newAutre, setNewAutre] = useState('');
-
+  const [saving, setSaving] = useState(false); const [message, setMessage] = useState('');
+  const [hasMandataire, setHasMandataire] = useState(false); const [mandataire, setMandataire] = useState<Record<string, string>>({});
+  const [regul, setRegul] = useState<'partie' | 'totalite' | ''>(''); const [nature, setNature] = useState(''); const [natureAutre, setNatureAutre] = useState('');
+  const [partie, setPartie] = useState(''); const [surface, setSurface] = useState(''); const [lieuDit, setLieuDit] = useState('');
+  const [documents, setDocuments] = useState<Doc[]>([]); const [newDoc, setNewDoc] = useState(''); const [newAutre, setNewAutre] = useState('');
   const client = useMemo(() => clients.find(c => c.id === clientId), [clients, clientId]);
-
-  useEffect(() => {
-    if (!client) {
-      setForm({});
-      return;
-    }
-    const c = client as Client & Record<string, unknown>;
-    const next: Record<string, string> = {};
-    clientFields.forEach(([key]) => {
-      next[key] = String(c[key] ?? '');
-    });
-    setForm(next);
-    setMessage('');
-  }, [client]);
-
+  useEffect(() => { if (!client) { setForm({}); return; } const c = client as Client & Record<string, unknown>; const next: Record<string, string> = {}; clientFields.forEach(([key]) => { next[key] = String(c[key] ?? ''); }); setForm(next); setMessage(''); }, [client]);
   const parcelProperties = (parcel?.properties ?? {}) as Record<string, unknown>;
+  useEffect(() => { setLieuDit(lieuDitOf(parcelProperties)); }, [parcel]);
   const setValue = (key: string, value: string) => setForm(current => ({ ...current, [key]: value }));
-
-  const addDocument = () => {
-    if (!newDoc) return;
-    if (newDoc === 'Autre' && !newAutre.trim()) return;
-    const label = newDoc === 'Autre' ? `Autre : ${newAutre.trim()}` : newDoc;
-    setDocuments(current => [...current, { id: crypto.randomUUID(), label }]);
-    setNewDoc('');
-    setNewAutre('');
-  };
-
-  const save = async () => {
-    if (!client) return;
-    if (!form.nom?.trim()) {
-      setMessage('Le nom du client est obligatoire.');
-      return;
-    }
-    setSaving(true);
-    setMessage('');
-    try {
-      await onUpdateClient(client.id, form as Partial<Client>);
-      setMessage('Informations du client enregistrées.');
-    } catch (e) {
-      setMessage(`Erreur : ${(e as Error).message}`);
-    } finally {
-      setSaving(false);
-    }
-  };
-
+  const setMandataireValue = (key: string, value: string) => setMandataire(current => ({ ...current, [key]: value }));
+  const addDocument = () => { if (!newDoc || (newDoc === 'Autre' && !newAutre.trim())) return; const label = newDoc === 'Autre' ? `Autre : ${newAutre.trim()}` : newDoc; setDocuments(current => [...current, { id: crypto.randomUUID(), label }]); setNewDoc(''); setNewAutre(''); };
+  const save = async () => { if (!client) return; if (!form.nom?.trim()) { setMessage('Le nom du client est obligatoire.'); return; } setSaving(true); setMessage(''); try { await onUpdateClient(client.id, form as Partial<Client>); setMessage('Informations du client enregistrées.'); } catch (e) { setMessage(`Erreur : ${(e as Error).message}`); } finally { setSaving(false); } };
   return (
-    <>
-      <div className="min-h-full bg-slate-50 -m-4 lg:-m-6 p-4 lg:p-6">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <button type="button" onClick={onClose} className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700">
-                <ArrowLeft size={18} />
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">Demande 4300</h1>
-                <p className="text-sm text-slate-500">Fiche de renseignements — article 166 de la loi de finances pour 2025</p>
-              </div>
-            </div>
-            <button type="button" onClick={save} disabled={!client || saving} className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white">
-              <Save size={16} /> {saving ? 'Enregistrement...' : 'Enregistrer'}
-            </button>
-          </div>
-
-          <div className="rounded-xl border bg-white p-5 shadow-sm">
-            <div className="mb-5 flex items-center gap-2 border-b pb-4">
-              <UserRound size={20} className="text-sky-600" />
-              <h2 className="font-semibold">DEMANDEUR — Client</h2>
-            </div>
-
-            {clients.length === 0 ? (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                Aucun client enregistré dans le module Clients.
-              </div>
-            ) : (
-              <>
-                <div className="mb-5 max-w-xl">
-                  <label className="mb-1 block text-sm font-medium">Sélectionner le client</label>
-                  <select value={clientId} onChange={e => setClientId(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm">
-                    {clients.map(c => <option key={c.id} value={c.id}>{c.nom}</option>)}
-                  </select>
-                </div>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {clientFields.map(([key, label]) => (
-                    <div key={key} className={key === 'observations' ? 'md:col-span-2' : ''}>
-                      <label className="mb-1 block text-sm font-medium">{label}</label>
-                      {key === 'observations' ? (
-                        <textarea value={form[key] ?? ''} onChange={e => setValue(key, e.target.value)} rows={3} className="w-full rounded-lg border px-3 py-2 text-sm" />
-                      ) : (
-                        <input value={form[key] ?? ''} onChange={e => setValue(key, e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="mt-4 rounded-xl border bg-white p-5 shadow-sm">
-            <h2 className="mb-4 border-b pb-3 font-semibold">DÉSIGNATION DU BIEN</h2>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div><label className="block text-sm font-medium">Commune</label><input readOnly value={communeOf(parcelProperties)} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm" /></div>
-              <div><label className="block text-sm font-medium">Section</label><input readOnly value={sectionOf(parcelProperties)} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm" /></div>
-              <div><label className="block text-sm font-medium">Ilot</label><input readOnly value={ilotOf(parcelProperties)} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm" /></div>
-              <div>
-                <label className="block text-sm font-medium">N° de la partie</label>
-                <input value={partie} onChange={e => setPartie(e.target.value)} disabled={regul !== 'partie'} placeholder={regul === 'partie' ? 'À renseigner' : 'Non applicable'} className="w-full rounded-lg border px-3 py-2 text-sm disabled:bg-slate-50" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Nature du bien</label>
-                <select value={nature} onChange={e => setNature(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm">
-                  <option value="">Sélectionner</option><option>BNR</option><option>B.I.E.N / ETAT</option><option>Autre</option>
-                </select>
-                {nature === 'Autre' && <input value={natureAutre} onChange={e => setNatureAutre(e.target.value)} placeholder="Préciser la nature du bien" className="mt-2 w-full rounded-lg border px-3 py-2 text-sm" />}
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Surface</label>
-                <div className="flex gap-2"><input value={surface} onChange={e => setSurface(e.target.value)} placeholder="Surface à renseigner" inputMode="decimal" className="w-full rounded-lg border px-3 py-2 text-sm" /><span className="self-center text-sm text-slate-500">m²</span></div>
-              </div>
-            </div>
-            <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium">Nature de régularisation</label>
-              <div className="flex flex-wrap gap-5">
-                <label className="flex items-center gap-2"><input type="radio" name="regul" checked={regul === 'partie'} onChange={() => setRegul('partie')} /> Partie du bien</label>
-                <label className="flex items-center gap-2"><input type="radio" name="regul" checked={regul === 'totalite'} onChange={() => setRegul('totalite')} /> Totalité du bien</label>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-xl border bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between border-b pb-3">
-              <h2 className="font-semibold">Documents fournis</h2>
-              <span className="text-xs text-slate-500">{documents.length} document(s)</span>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <select value={newDoc} onChange={e => setNewDoc(e.target.value)} className="rounded-lg border px-3 py-2 text-sm">
-                <option value="">Ajouter un document...</option>
-                {docTypes.map(d => <option key={d}>{d}</option>)}
-              </select>
-              {newDoc === 'Autre' && <input value={newAutre} onChange={e => setNewAutre(e.target.value)} placeholder="Préciser" className="rounded-lg border px-3 py-2 text-sm" />}
-              <button type="button" onClick={addDocument} disabled={!newDoc || (newDoc === 'Autre' && !newAutre.trim())} className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
-                <Plus size={15} /> Ajouter
-              </button>
-            </div>
-            <div className="mt-4 space-y-2">
-              {documents.map((d, i) => (
-                <div key={d.id} className="flex items-center justify-between rounded-lg border bg-slate-50 px-3 py-2 text-sm">
-                  <span>{i + 1}. {d.label}</span>
-                  <button type="button" onClick={() => setDocuments(v => v.filter(x => x.id !== d.id))} className="text-red-600"><X size={16} /></button>
-                </div>
-              ))}
-              {documents.length === 0 && <div className="text-sm text-slate-500">Aucun document sélectionné.</div>}
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+    <div className="min-h-full bg-slate-50 -m-4 lg:-m-6 p-4 lg:p-6"><div className="mx-auto max-w-6xl">
+      <div className="mb-5 flex items-center justify-between gap-3"><div className="flex items-center gap-3"><button type="button" onClick={onClose} className="rounded-lg border border-slate-300 bg-white p-2 text-slate-700"><ArrowLeft size={18}/></button><div><h1 className="text-2xl font-bold text-slate-900">Demande 4300</h1><p className="text-sm text-slate-500">Fiche de renseignements — article 166 de la loi de finances pour 2025</p></div></div><button type="button" onClick={save} disabled={!client || saving} className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white"><Save size={16}/> {saving ? 'Enregistrement...' : 'Enregistrer'}</button></div>
+      <div className="rounded-xl border bg-white p-5 shadow-sm"><div className="mb-5 flex items-center gap-2 border-b pb-4"><UserRound size={20} className="text-sky-600"/><h2 className="font-semibold">DEMANDEUR — Client</h2></div>{clients.length===0?<div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Aucun client enregistré dans le module Clients.</div>:<><div className="mb-5 max-w-xl"><label className="mb-1 block text-sm font-medium">Sélectionner le client</label><select value={clientId} onChange={e=>setClientId(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm">{clients.map(c=><option key={c.id} value={c.id}>{c.nom}</option>)}</select></div><div className="grid grid-cols-1 gap-4 md:grid-cols-2">{clientFields.map(([key,label])=><div key={key} className={key==='observations'?'md:col-span-2':''}><label className="mb-1 block text-sm font-medium">{label}</label>{key==='observations'?<textarea value={form[key]??''} onChange={e=>setValue(key,e.target.value)} rows={3} className="w-full rounded-lg border px-3 py-2 text-sm"/>:<input value={form[key]??''} onChange={e=>setValue(key,e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm"/>}</div>)}</div></>}</div>
+      <div className="mt-4 rounded-xl border bg-white p-5 shadow-sm"><div className="flex items-center justify-between border-b pb-3"><h2 className="font-semibold">MANDATAIRE (le cas échéant)</h2><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={hasMandataire} onChange={e=>setHasMandataire(e.target.checked)}/> Présence d'un mandataire</label></div>{hasMandataire&&<div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">{mandateFields.map(([key,label])=><div key={key} className={key==='dateLieuNaissance'||key==='procuration'||key==='redacteur'?'md:col-span-2':''}><label className="mb-1 block text-sm font-medium">{label}</label><input value={mandataire[key]??''} onChange={e=>setMandataireValue(key,e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm"/></div>)}</div>}</div>
+      <div className="mt-4 rounded-xl border bg-white p-5 shadow-sm"><h2 className="mb-4 border-b pb-3 font-semibold">DÉSIGNATION DU BIEN</h2><div className="grid grid-cols-1 gap-4 md:grid-cols-2"><div><label className="block text-sm font-medium">Commune</label><input readOnly value={communeOf(parcelProperties)} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">Section</label><input readOnly value={sectionOf(parcelProperties)} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">Ilot</label><input readOnly value={ilotOf(parcelProperties)} className="w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">N° de la partie</label><input value={partie} onChange={e=>setPartie(e.target.value)} disabled={regul!=='partie'} placeholder={regul==='partie'?'À renseigner':'Non applicable'} className="w-full rounded-lg border px-3 py-2 text-sm disabled:bg-slate-50"/></div><div><label className="block text-sm font-medium">Cité ou lieu-dit</label><input value={lieuDit} onChange={e=>setLieuDit(e.target.value)} placeholder="À renseigner" className="w-full rounded-lg border px-3 py-2 text-sm"/></div><div><label className="block text-sm font-medium">Nature du bien</label><select value={nature} onChange={e=>setNature(e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm"><option value="">Sélectionner</option><option>BNR</option><option>B.I.E.N / ETAT</option><option>Autre</option></select>{nature==='Autre'&&<input value={natureAutre} onChange={e=>setNatureAutre(e.target.value)} placeholder="Préciser la nature du bien" className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"/>}</div><div><label className="block text-sm font-medium">Surface</label><div className="flex gap-2"><input value={surface} onChange={e=>setSurface(e.target.value)} placeholder="Surface à renseigner" inputMode="decimal" className="w-full rounded-lg border px-3 py-2 text-sm"/><span className="self-center text-sm text-slate-500">m²</span></div></div></div><div className="mt-4"><label className="block text-sm font-medium mb-2">Nature de régularisation</label><div className="flex flex-wrap gap-5"><label className="flex items-center gap-2"><input type="radio" name="regul" checked={regul==='partie'} onChange={()=>setRegul('partie')}/> Partie du bien</label><label className="flex items-center gap-2"><input type="radio" name="regul" checked={regul==='totalite'} onChange={()=>setRegul('totalite')}/> Totalité du bien</label></div></div></div>
+      <div className="mt-4 rounded-xl border bg-white p-5 shadow-sm"><div className="flex items-center justify-between border-b pb-3"><h2 className="font-semibold">Documents fournis</h2><span className="text-xs text-slate-500">{documents.length} document(s)</span></div><div className="mt-4 flex flex-wrap gap-2"><select value={newDoc} onChange={e=>setNewDoc(e.target.value)} className="rounded-lg border px-3 py-2 text-sm"><option value="">Ajouter un document...</option>{docTypes.map(d=><option key={d}>{d}</option>)}</select>{newDoc==='Autre'&&<input value={newAutre} onChange={e=>setNewAutre(e.target.value)} placeholder="Préciser" className="rounded-lg border px-3 py-2 text-sm"/>}<button type="button" onClick={addDocument} disabled={!newDoc||(newDoc==='Autre'&&!newAutre.trim())} className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"><Plus size={15}/> Ajouter</button></div><div className="mt-4 space-y-2">{documents.map((d,i)=><div key={d.id} className="flex items-center justify-between rounded-lg border bg-slate-50 px-3 py-2 text-sm"><span>{i+1}. {d.label}</span><button type="button" onClick={()=>setDocuments(v=>v.filter(x=>x.id!==d.id))} className="text-red-600"><X size={16}/></button></div>)}{documents.length===0&&<div className="text-sm text-slate-500">Aucun document sélectionné.</div>}</div></div>
+    </div></div>
   );
 }
