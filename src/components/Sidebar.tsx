@@ -8,6 +8,7 @@ import {
   Building2,
   LogOut,
   MapPinned,
+  ShieldCheck,
 } from 'lucide-react';
 import type { Session } from '@/types';
 
@@ -22,6 +23,7 @@ export type PageKey =
   | 'laboratoire'
   | 'environnement'
   | 'topographie'
+  | 'compte'
   | 'parametres';
 
 interface SidebarProps {
@@ -40,6 +42,7 @@ const NAV: { key: PageKey; label: string; icon: typeof LayoutDashboard }[] = [
   { key: 'clients', label: 'Clients', icon: Users },
   { key: 'paiements', label: 'Paiements', icon: CreditCard },
   { key: 'topographie', label: 'Topographie', icon: MapPinned },
+  { key: 'compte', label: 'Compte & Sécurité', icon: ShieldCheck },
   { key: 'parametres', label: 'Paramètres', icon: Settings },
 ];
 
