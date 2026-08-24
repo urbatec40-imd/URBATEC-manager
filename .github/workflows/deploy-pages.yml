@@ -21,7 +21,8 @@ jobs:
       - name: Checkout safe version 2e6e1a9
         uses: actions/checkout@v4
         with:
-          ref: 2e6e1a9
+          ref: 2e6e1a9293d5fb535aadbad2642f060763f60c61
+          fetch-depth: 1
 
       - name: Setup Node.js 24
         uses: actions/setup-node@v4
